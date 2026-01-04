@@ -3,22 +3,31 @@ import {
   AbilityBuilder,
   CreateAbility,
   createMongoAbility,
-  ForcedSubject,
   MongoAbility,
 } from '@casl/ability'
+
+import z from 'zod';
 import type { User } from './models/user';
 import { permissions } from './permissions';
+import { userSubject, type UserSubject } from './subjects/user';
+import { projectSubject, type ProjectSubject } from './subjects/project';
+import { organizationSubject } from './subjects/organizations';
+import { inviteSubject } from './subjects/invite';
+import { billingSubject } from './subjects/billing';
 
-const actions = ['manage', 'invite', 'delete'] as const
-const subjects = ['User', 'Project','all'] as const
+const appAbilitySchema = z.union([
+  projectSubject,
+  userSubject,
+  organizationSubject,
+  inviteSubject,
+  billingSubject,
+  z.tuple([
+    z.literal('manage'),
+    z.literal('all')
+  ])
+])
 
-type AppAbilities = [
-  (typeof actions)[number],
-  (
-    | (typeof subjects)[number]
-    | ForcedSubject<Exclude<(typeof subjects)[number], 'all'>>
-  ),
-]
+type AppAbilities = z.infer<typeof appAbilitySchema>
 
 export type AppAbility = MongoAbility<AppAbilities>
 export const createAppAbility = createMongoAbility as CreateAbility<AppAbility>
