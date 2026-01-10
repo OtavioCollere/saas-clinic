@@ -1,4 +1,4 @@
-export type UserRoleType = 'OWNER' | 'PROFESSIONAL' | 'PATIENT'; 
+export type UserRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT'; 
 
 export class UserRole{
   constructor(

@@ -217,6 +217,7 @@ Representa os procedimentos vinculados ao agendamento.
 ### User
 - [ ] Criar usuário
 - [ ] Editar usuário
+- [ ] Buscar usuário
 
 ---
 
