@@ -1,96 +1,99 @@
 import { isLeft, isRight, unwrapEither } from '@/core/either/either';
 import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicHasPendingAppointmentsError } from '@/core/errors/clinic-has-pending-appointments-error';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
+import { FranchiseHasPendingAppointmentsError } from '@/core/errors/franchise-has-pending-appointments-error';
+import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
 import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
-import { ClinicStatus } from '@/domain/enterprise/value-objects/clinic-status';
+import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { makeClinic } from 'tests/factories/makeClinic';
 import { makeClinicMembership } from 'tests/factories/makeClinicMembership';
+import { makeFranchise } from 'tests/factories/makeFranchise';
 import { makeUser } from 'tests/factories/makeUser';
 import { InMemoryAppointmentsRepository } from 'tests/in-memory-repositories/in-memory-appointments-repository';
 import { InMemoryClinicMembershipRepository } from 'tests/in-memory-repositories/in-memory-clinic-membership-repository';
-import { InMemoryClinicRepository } from 'tests/in-memory-repositories/in-memory-clinic-repository';
+import { InMemoryFranchiseRepository } from 'tests/in-memory-repositories/in-memory-franchise-repository';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { InactivateClinicUseCase } from '../inactivate-clinic';
+import { ActivateFranchiseUseCase } from '../activate-franchise';
 
-describe('InactivateClinicUseCase Unit Tests', () => {
-  let sut: InactivateClinicUseCase;
-  let inMemoryClinicRepository: InMemoryClinicRepository;
+describe('ActivateFranchiseUseCase Unit Tests', () => {
+  let sut: ActivateFranchiseUseCase;
+  let inMemoryFranchiseRepository: InMemoryFranchiseRepository;
   let inMemoryAppointmentsRepository: InMemoryAppointmentsRepository;
   let inMemoryClinicMembershipRepository: InMemoryClinicMembershipRepository;
 
   beforeEach(() => {
-    inMemoryClinicRepository = new InMemoryClinicRepository();
+    inMemoryFranchiseRepository = new InMemoryFranchiseRepository();
     inMemoryAppointmentsRepository = new InMemoryAppointmentsRepository();
     inMemoryClinicMembershipRepository = new InMemoryClinicMembershipRepository();
-    sut = new InactivateClinicUseCase(
-      inMemoryClinicRepository,
+    sut = new ActivateFranchiseUseCase(
+      inMemoryFranchiseRepository,
       inMemoryAppointmentsRepository,
       inMemoryClinicMembershipRepository
     );
   });
 
-  it('should be able to inactivate a clinic', async () => {
+  it('should be able to activate a franchise', async () => {
     const user = makeUser();
     const clinic = makeClinic({
       ownerId: user.id,
-      status: ClinicStatus.active(),
+    });
+    const franchise = makeFranchise({
+      clinicId: clinic.id,
+      status: FranchiseStatus.inactive(),
     });
     const membership = makeClinicMembership({
       userId: user.id,
       clinicId: clinic.id,
       role: ClinicRole.owner(),
     });
-    inMemoryClinicRepository.items.push(clinic);
+    inMemoryFranchiseRepository.items.push(franchise);
     inMemoryClinicMembershipRepository.items.push(membership);
 
-    // Associate an empty franchise list to clinic (no appointments)
-    const franchiseId = new UniqueEntityId().toString();
-    inMemoryAppointmentsRepository.associateFranchisesToClinic(clinic.id.toString(), [franchiseId]);
-
     const result = await sut.execute({
-      clinicId: clinic.id.toString(),
+      franchiseId: franchise.id.toString(),
       userId: user.id.toString(),
     });
 
     expect(isRight(result)).toBeTruthy();
     if (isRight(result)) {
-      expect(unwrapEither(result).clinic.status.isInactive()).toBeTruthy();
+      expect(unwrapEither(result).franchise.status.isActive()).toBeTruthy();
     }
   });
 
-  it('should not be able to inactivate a non existent clinic', async () => {
+  it('should not be able to activate a non existent franchise', async () => {
     const user = makeUser();
 
     const result = await sut.execute({
-      clinicId: 'non-existent-clinic-id',
+      franchiseId: 'non-existent-franchise-id',
       userId: user.id.toString(),
     });
 
     expect(isLeft(result)).toBeTruthy();
-    expect(unwrapEither(result)).toBeInstanceOf(ClinicNotFoundError);
+    expect(unwrapEither(result)).toBeInstanceOf(FranchiseNotFoundError);
   });
 
-  it('should not be able to inactivate a clinic when user is not the owner', async () => {
+  it('should not be able to activate a franchise when user is not the owner', async () => {
     const owner = makeUser();
     const otherUser = makeUser();
     const clinic = makeClinic({
       ownerId: owner.id,
-      status: ClinicStatus.active(),
+    });
+    const franchise = makeFranchise({
+      clinicId: clinic.id,
+      status: FranchiseStatus.inactive(),
     });
     const membership = makeClinicMembership({
       userId: owner.id,
       clinicId: clinic.id,
       role: ClinicRole.owner(),
     });
-    inMemoryClinicRepository.items.push(clinic);
+    inMemoryFranchiseRepository.items.push(franchise);
     inMemoryClinicMembershipRepository.items.push(membership);
 
     const result = await sut.execute({
-      clinicId: clinic.id.toString(),
+      franchiseId: franchise.id.toString(),
       userId: otherUser.id.toString(),
     });
 
@@ -98,30 +101,28 @@ describe('InactivateClinicUseCase Unit Tests', () => {
     expect(unwrapEither(result)).toBeInstanceOf(UserIsNotOwnerError);
   });
 
-  it('should not be able to inactivate a clinic with pending appointments', async () => {
+  it('should not be able to activate a franchise with pending appointments', async () => {
     const user = makeUser();
     const clinic = makeClinic({
       ownerId: user.id,
-      status: ClinicStatus.active(),
+    });
+    const franchise = makeFranchise({
+      clinicId: clinic.id,
+      status: FranchiseStatus.inactive(),
     });
     const membership = makeClinicMembership({
       userId: user.id,
       clinicId: clinic.id,
       role: ClinicRole.owner(),
     });
-    inMemoryClinicRepository.items.push(clinic);
+    inMemoryFranchiseRepository.items.push(franchise);
     inMemoryClinicMembershipRepository.items.push(membership);
-
-    const franchiseId = new UniqueEntityId();
-    inMemoryAppointmentsRepository.associateFranchisesToClinic(clinic.id.toString(), [
-      franchiseId.toString(),
-    ]);
 
     const startAt = new Date();
     const endAt = new Date(startAt.getTime() + 60 * 60 * 1000); // 1 hour later
     const pendingAppointment = Appointment.create({
       professionalId: new UniqueEntityId(),
-      franchiseId: franchiseId,
+      franchiseId: franchise.id,
       patientId: new UniqueEntityId(),
       name: 'Test Appointment',
       appointmentItems: [],
@@ -133,11 +134,12 @@ describe('InactivateClinicUseCase Unit Tests', () => {
     inMemoryAppointmentsRepository.items.push(pendingAppointment);
 
     const result = await sut.execute({
-      clinicId: clinic.id.toString(),
+      franchiseId: franchise.id.toString(),
       userId: user.id.toString(),
     });
 
     expect(isLeft(result)).toBeTruthy();
-    expect(unwrapEither(result)).toBeInstanceOf(ClinicHasPendingAppointmentsError);
+    expect(unwrapEither(result)).toBeInstanceOf(FranchiseHasPendingAppointmentsError);
   });
 });
+

@@ -1,14 +1,11 @@
 import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
 import { ClinicAlreadyExistsError } from '@/core/errors/clinic-already-exists-error';
 import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { OwnerNotFoundError } from '@/core/errors/owner-not-found-error';
 import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
-import type { UserNotFoundError } from '@/core/errors/user-not-found-error';
 import type { Clinic } from '@/domain/enterprise/entities/clinic';
 import { Slug } from '@/domain/enterprise/value-objects/slug';
+import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
-import type { UsersRepository } from '../../repositories/users-repository';
 
 interface EditClinicUseCaseRequest {
   editorId: string;
@@ -19,14 +16,17 @@ interface EditClinicUseCaseRequest {
 }
 
 type EditClinicUseCaseResponse = Either<
-  UserIsNotOwnerError | UserNotFoundError | ClinicNotFoundError | ClinicAlreadyExistsError,
+  UserIsNotOwnerError | ClinicNotFoundError | ClinicAlreadyExistsError,
   {
     clinic: Clinic;
   }
 >;
 
 export class EditClinicUseCase {
-  constructor(private clinicRepository: ClinicRepository) {}
+  constructor(
+    private clinicRepository: ClinicRepository,
+    private clinicMembershipRepository: ClinicMembershipRepository
+  ) {}
 
   async execute({
     clinicId,
@@ -41,7 +41,12 @@ export class EditClinicUseCase {
       return makeLeft(new ClinicNotFoundError());
     }
 
-    if (clinic.ownerId.toString() !== editorId) {
+    const clinicMembership = await this.clinicMembershipRepository.findByUserAndClinic(
+      editorId,
+      clinicId
+    );
+
+    if (!clinicMembership || !clinicMembership.role.isOwner()) {
       return makeLeft(new UserIsNotOwnerError());
     }
 
@@ -60,6 +65,8 @@ export class EditClinicUseCase {
 
     if (description) clinic.description = description;
     if (avatarUrl) clinic.avatarUrl = avatarUrl;
+
+    clinic.updatedAt = new Date();
 
     await this.clinicRepository.update(clinic);
 

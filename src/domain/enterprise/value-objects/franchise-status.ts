@@ -1,3 +1,5 @@
+import { DomainError } from '@/core/errors/domain-error';
+
 export type FranchiseStatusType = 'ACTIVE' | 'INACTIVE'
 
 export class FranchiseStatus {
@@ -23,5 +25,21 @@ export class FranchiseStatus {
 
   getValue(): FranchiseStatusType {
     return this.value
+  }
+
+  activate(): FranchiseStatus {
+    if (this.isActive()) {
+      throw new DomainError('Franchise is already active');
+    }
+
+    return FranchiseStatus.active();
+  }
+
+  inactivate(): FranchiseStatus {
+    if (this.isInactive()) {
+      throw new DomainError('Franchise is already inactive');
+    }
+
+    return FranchiseStatus.inactive();
   }
 }

@@ -2,9 +2,11 @@ import { type Either, makeLeft, makeRight } from '@/core/either/either';
 import { UniqueEntityId } from '@/core/entities/unique-entity-id';
 import { ClinicAlreadyExistsError } from '@/core/errors/clinic-already-exists-error';
 import { OwnerNotFoundError } from '@/core/errors/owner-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
 import { Clinic } from '@/domain/enterprise/entities/clinic';
+import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
+import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { Slug } from '@/domain/enterprise/value-objects/slug';
+import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
 import type { UsersRepository } from '../../repositories/users-repository';
 
@@ -16,7 +18,7 @@ interface CreateClinicUseCaseRequest {
 }
 
 type CreateClinicUseCaseResponse = Either<
-  OwnerNotFoundError | UserIsNotOwnerError | ClinicAlreadyExistsError,
+  OwnerNotFoundError | ClinicAlreadyExistsError,
   {
     clinic: Clinic;
   }
@@ -25,7 +27,8 @@ type CreateClinicUseCaseResponse = Either<
 export class CreateClinicUseCase {
   constructor(
     private clinicRepository: ClinicRepository,
-    private usersRepository: UsersRepository
+    private usersRepository: UsersRepository,
+    private clinicMembershipRepository: ClinicMembershipRepository
   ) {}
 
   async execute({ name, ownerId, description, avatarUrl }: CreateClinicUseCaseRequest) {
@@ -33,10 +36,6 @@ export class CreateClinicUseCase {
 
     if (!user) {
       return makeLeft(new OwnerNotFoundError());
-    }
-
-    if (!user.role.isOwner()) {
-      return makeLeft(new UserIsNotOwnerError());
     }
 
     const slug = Slug.create(name);
@@ -52,6 +51,16 @@ export class CreateClinicUseCase {
       description,
       avatarUrl,
     });
+
+    await this.clinicRepository.create(clinic);
+
+    const membership = ClinicMembership.create({
+      userId: new UniqueEntityId(ownerId),
+      clinicId: clinic.id,
+      role: ClinicRole.owner(),
+    });
+
+    await this.clinicMembershipRepository.create(membership);
 
     return makeRight({
       clinic,

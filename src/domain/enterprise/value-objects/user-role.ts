@@ -1,16 +1,16 @@
-export type UserRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT' | 'STAFF'; 
+export type UserRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT'; 
 
 export class UserRole{
   constructor(
     private readonly value : UserRoleType
   ) {}
 
-  static owner(){
-    return new UserRole('OWNER')
+  static admin(){
+    return new UserRole('ADMIN')
   }
 
-  static staff(){
-    return new UserRole('STAFF')
+  static owner(){
+    return new UserRole('OWNER')
   }
 
   static professional() {
@@ -19,6 +19,10 @@ export class UserRole{
 
   static patient() {
     return new UserRole('PATIENT')
+  }
+
+  isAdmin(){
+    return this.value === 'ADMIN';
   }
 
   isOwner(){
@@ -33,7 +37,7 @@ export class UserRole{
     return this.value === 'PATIENT';
   }
 
-  isStaff(){
-    return this.value === 'STAFF';
+  getValue(): UserRoleType {
+    return this.value;
   }
 }

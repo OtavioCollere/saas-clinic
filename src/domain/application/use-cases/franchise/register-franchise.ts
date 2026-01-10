@@ -1,32 +1,44 @@
 import { type Either, makeLeft, makeRight } from '@/core/either/either';
+import { UniqueEntityId } from '@/core/entities/unique-entity-id';
 import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
 import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
-import type { Clinic } from '@/domain/enterprise/entities/clinic';
+import { Franchise } from '@/domain/enterprise/entities/franchise';
+import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';
 import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
+import type { FranchiseRepository } from '../../repositories/franchise-repository';
 
-interface ActivateClinicUseCaseRequest {
+interface RegisterFranchiseUseCaseRequest {
   clinicId: string;
   userId: string;
+  name: string;
+  address: string;
+  zipCode: string;
+  description?: string;
 }
 
-type ActivateClinicUseCaseResponse = Either<
+type RegisterFranchiseUseCaseResponse = Either<
   ClinicNotFoundError | UserIsNotOwnerError,
   {
-    clinic: Clinic;
+    franchise: Franchise;
   }
 >;
 
-export class ActivateClinicUseCase {
+export class RegisterFranchiseUseCase {
   constructor(
     private clinicRepository: ClinicRepository,
+    private franchiseRepository: FranchiseRepository,
     private clinicMembershipRepository: ClinicMembershipRepository
   ) {}
 
   async execute({
     clinicId,
     userId,
-  }: ActivateClinicUseCaseRequest): Promise<ActivateClinicUseCaseResponse> {
+    name,
+    address,
+    zipCode,
+    description,
+  }: RegisterFranchiseUseCaseRequest): Promise<RegisterFranchiseUseCaseResponse> {
     const clinic = await this.clinicRepository.findById(clinicId);
 
     if (!clinic) {
@@ -42,11 +54,17 @@ export class ActivateClinicUseCase {
       return makeLeft(new UserIsNotOwnerError());
     }
 
-    clinic.status = clinic.status.activate();
-    clinic.updatedAt = new Date();
+    const franchise = Franchise.create({
+      clinicId: new UniqueEntityId(clinicId),
+      name,
+      address,
+      zipCode,
+      status: FranchiseStatus.active(),
+      description,
+    });
 
-    await this.clinicRepository.update(clinic);
+    await this.franchiseRepository.create(franchise);
 
-    return makeRight({ clinic });
+    return makeRight({ franchise });
   }
 }

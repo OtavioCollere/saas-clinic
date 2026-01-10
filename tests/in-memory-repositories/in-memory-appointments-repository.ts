@@ -22,4 +22,14 @@ export class InMemoryAppointmentsRepository implements AppointmentsRepository {
       return isPending && belongsToClinic;
     });
   }
+
+  async findPendingByFranchiseId(franchiseId: string): Promise<Appointment[]> {
+    return this.items.filter((appointment) => {
+      const status = appointment.status;
+      const isPending = status.isWaiting() || status.isConfirmed();
+      const belongsToFranchise = appointment.franchiseId.toString() === franchiseId;
+
+      return isPending && belongsToFranchise;
+    });
+  }
 }

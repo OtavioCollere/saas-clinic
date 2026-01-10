@@ -54,10 +54,6 @@ export class Franchise extends Entity<FranchiseProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
-    return this.props.updatedAt;
-  }
-
   set clinicId(clinicId: UniqueEntityId) {
     this.props.clinicId = clinicId;
   }

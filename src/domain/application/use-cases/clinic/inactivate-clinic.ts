@@ -4,6 +4,7 @@ import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
 import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
 import type { Clinic } from '@/domain/enterprise/entities/clinic';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
+import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
 
 interface InactivateClinicUseCaseRequest {
@@ -21,7 +22,8 @@ type InactivateClinicUseCaseResponse = Either<
 export class InactivateClinicUseCase {
   constructor(
     private clinicRepository: ClinicRepository,
-    private appointmentsRepository: AppointmentsRepository
+    private appointmentsRepository: AppointmentsRepository,
+    private clinicMembershipRepository: ClinicMembershipRepository
   ) {}
 
   async execute({
@@ -34,7 +36,12 @@ export class InactivateClinicUseCase {
       return makeLeft(new ClinicNotFoundError());
     }
 
-    if (clinic.ownerId.toString() !== userId) {
+    const clinicMembership = await this.clinicMembershipRepository.findByUserAndClinic(
+      userId,
+      clinicId
+    );
+
+    if (!clinicMembership || !clinicMembership.role.isOwner()) {
       return makeLeft(new UserIsNotOwnerError());
     }
 

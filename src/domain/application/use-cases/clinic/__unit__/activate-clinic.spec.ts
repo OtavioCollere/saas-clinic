@@ -2,9 +2,11 @@ import { isLeft, isRight, unwrapEither } from '@/core/either/either';
 import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
 import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
 import { ClinicStatus } from '@/domain/enterprise/value-objects/clinic-status';
-import { UserRole } from '@/domain/enterprise/value-objects/user-role';
+import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { makeClinic } from 'tests/factories/makeClinic';
+import { makeClinicMembership } from 'tests/factories/makeClinicMembership';
 import { makeUser } from 'tests/factories/makeUser';
+import { InMemoryClinicMembershipRepository } from 'tests/in-memory-repositories/in-memory-clinic-membership-repository';
 import { InMemoryClinicRepository } from 'tests/in-memory-repositories/in-memory-clinic-repository';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ActivateClinicUseCase } from '../activate-clinic';
@@ -12,25 +14,31 @@ import { ActivateClinicUseCase } from '../activate-clinic';
 describe('ActivateClinicUseCase Unit Tests', () => {
   let sut: ActivateClinicUseCase;
   let inMemoryClinicRepository: InMemoryClinicRepository;
+  let inMemoryClinicMembershipRepository: InMemoryClinicMembershipRepository;
 
   beforeEach(() => {
     inMemoryClinicRepository = new InMemoryClinicRepository();
-    sut = new ActivateClinicUseCase(inMemoryClinicRepository);
+    inMemoryClinicMembershipRepository = new InMemoryClinicMembershipRepository();
+    sut = new ActivateClinicUseCase(inMemoryClinicRepository, inMemoryClinicMembershipRepository);
   });
 
   it('should be able to activate a clinic', async () => {
-    const owner = makeUser({
-      role: UserRole.owner(),
-    });
+    const user = makeUser();
     const clinic = makeClinic({
-      ownerId: owner.id,
+      ownerId: user.id,
       status: ClinicStatus.inactive(),
     });
+    const membership = makeClinicMembership({
+      userId: user.id,
+      clinicId: clinic.id,
+      role: ClinicRole.owner(),
+    });
     inMemoryClinicRepository.items.push(clinic);
+    inMemoryClinicMembershipRepository.items.push(membership);
 
     const result = await sut.execute({
       clinicId: clinic.id.toString(),
-      userId: owner.id.toString(),
+      userId: user.id.toString(),
     });
 
     expect(isRight(result)).toBeTruthy();
@@ -40,13 +48,11 @@ describe('ActivateClinicUseCase Unit Tests', () => {
   });
 
   it('should not be able to activate a non existent clinic', async () => {
-    const owner = makeUser({
-      role: UserRole.owner(),
-    });
+    const user = makeUser();
 
     const result = await sut.execute({
       clinicId: 'non-existent-clinic-id',
-      userId: owner.id.toString(),
+      userId: user.id.toString(),
     });
 
     expect(isLeft(result)).toBeTruthy();
@@ -54,17 +60,19 @@ describe('ActivateClinicUseCase Unit Tests', () => {
   });
 
   it('should not be able to activate a clinic when user is not the owner', async () => {
-    const owner = makeUser({
-      role: UserRole.owner(),
-    });
-    const otherUser = makeUser({
-      role: UserRole.owner(),
-    });
+    const owner = makeUser();
+    const otherUser = makeUser();
     const clinic = makeClinic({
       ownerId: owner.id,
       status: ClinicStatus.inactive(),
     });
+    const membership = makeClinicMembership({
+      userId: owner.id,
+      clinicId: clinic.id,
+      role: ClinicRole.owner(),
+    });
     inMemoryClinicRepository.items.push(clinic);
+    inMemoryClinicMembershipRepository.items.push(membership);
 
     const result = await sut.execute({
       clinicId: clinic.id.toString(),
