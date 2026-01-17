@@ -65,7 +65,7 @@ export class Appointment extends Entity<AppointmentProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt(): Date | undefined {
     return this.props.updatedAt;
   }
 

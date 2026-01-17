@@ -1,43 +1,25 @@
-export type UserRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT'; 
+export type UserRoleType = "ADMIN" | "MEMBER";
 
-export class UserRole{
-  constructor(
-    private readonly value : UserRoleType
-  ) {}
+export class UserRole {
+	constructor(private readonly value: UserRoleType) {}
 
-  static admin(){
-    return new UserRole('ADMIN')
-  }
+	static admin() {
+		return new UserRole("ADMIN");
+	}
 
-  static owner(){
-    return new UserRole('OWNER')
-  }
+	static member() {
+		return new UserRole("MEMBER");
+	}
 
-  static professional() {
-    return new UserRole('PROFESSIONAL')
-  }
+	isAdmin() {
+		return this.value === "ADMIN";
+	}
 
-  static patient() {
-    return new UserRole('PATIENT')
-  }
+	isMember() {
+		return this.value === "MEMBER";
+	}
 
-  isAdmin(){
-    return this.value === 'ADMIN';
-  }
-
-  isOwner(){
-    return this.value === 'OWNER';
-  }
-
-  isProfessional(){
-    return this.value === 'PROFESSIONAL';
-  }
-
-  isPatient(){
-    return this.value === 'PATIENT';
-  }
-
-  getValue(): UserRoleType {
-    return this.value;
-  }
+	getValue(): UserRoleType {
+		return this.value;
+	}
 }

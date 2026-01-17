@@ -1,28 +1,28 @@
-import { Email } from '../value-objects/email';
-import { Cpf } from '../value-objects/cpf';
-import type { UserRole } from '../value-objects/user-role';
 import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { Optional } from '@/core/types/optional';
+import type { Cpf } from '../value-objects/cpf';
+import type { Email } from '../value-objects/email';
+import type { UserRole } from '../value-objects/user-role';
 
-export interface UserProps{
-  name : string
-  cpf : Cpf 
-  email : Email 
-  password : string
-  role : UserRole
-  updatedAt? : Date
-  createdAt : Date
+export interface UserProps {
+  name: string;
+  cpf: Cpf;
+  email: Email;
+  password: string;
+  role: UserRole;
+  updatedAt?: Date;
+  createdAt: Date;
 }
 
-export class User extends Entity<UserProps>{
-  static create(props: Optional<UserProps, "createdAt" | "updatedAt">, id?: UniqueEntityId) {
+export class User extends Entity<UserProps> {
+  static create(props: Optional<UserProps, 'createdAt' | 'updatedAt'>, id?: UniqueEntityId) {
     const user = new User(
       {
         ...props,
-        createdAt: props.createdAt ?? new Date()
+        createdAt: props.createdAt ?? new Date(),
       },
-      id,
+      id
     );
     return user;
   }

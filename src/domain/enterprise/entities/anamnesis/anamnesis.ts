@@ -1,10 +1,10 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { Optional } from '@/core/types/optional';
 import { Entity } from '@/core/entities/entity';
-import { AestheticHistory } from './aesthetic-history';
-import { HealthConditions } from './health-conditions';
-import { MedicalHistory } from './medical-history';
-import { PhysicalAssessment } from './physical-assessment';
+import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { Optional } from '@/core/types/optional';
+import type { AestheticHistory } from './aesthetic-history';
+import type { HealthConditions } from './health-conditions';
+import type { MedicalHistory } from './medical-history';
+import type { PhysicalAssessment } from './physical-assessment';
 
 export interface AnamnesisProps {
   patientId: UniqueEntityId;
@@ -17,13 +17,13 @@ export interface AnamnesisProps {
 }
 
 export class Anamnesis extends Entity<AnamnesisProps> {
-  static create(props: Optional<AnamnesisProps, "createdAt" | "updatedAt">, id?: UniqueEntityId) {
+  static create(props: Optional<AnamnesisProps, 'createdAt' | 'updatedAt'>, id?: UniqueEntityId) {
     const anamnesis = new Anamnesis(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
       },
-      id,
+      id
     );
 
     return anamnesis;
@@ -53,7 +53,7 @@ export class Anamnesis extends Entity<AnamnesisProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt(): Date | undefined {
     return this.props.updatedAt;
   }
 

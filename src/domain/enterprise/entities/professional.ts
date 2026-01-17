@@ -1,8 +1,8 @@
-import { Profession } from '../value-objects/profession';
-import { Council } from '../value-objects/council';
 import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { Optional } from '@/core/types/optional';
+import type { Council } from '../value-objects/council';
+import type { Profession } from '../value-objects/profession';
 
 export interface ProfessionalProps {
   franchiseId: UniqueEntityId;
@@ -16,13 +16,16 @@ export interface ProfessionalProps {
 }
 
 export class Professional extends Entity<ProfessionalProps> {
-  static create(props: Optional<ProfessionalProps, "createdAt" | "updatedAt">, id?: UniqueEntityId) {
+  static create(
+    props: Optional<ProfessionalProps, 'createdAt' | 'updatedAt'>,
+    id?: UniqueEntityId
+  ) {
     const professional = new Professional(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
       },
-      id,
+      id
     );
     return professional;
   }
@@ -55,7 +58,7 @@ export class Professional extends Entity<ProfessionalProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt(): Date | undefined {
     return this.props.updatedAt;
   }
 

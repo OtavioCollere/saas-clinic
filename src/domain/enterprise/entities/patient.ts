@@ -1,9 +1,12 @@
 import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import type { Optional } from '@/core/types/optional';
+import type { Anamnesis } from './anamnesis/anamnesis';
 
 export interface PatientProps {
-  userId?: UniqueEntityId;
+  clinicId: UniqueEntityId;
+  userId: UniqueEntityId;
+  anamnesis: Anamnesis;
   name: string;
   birthDay: Date;
   address: string;
@@ -13,19 +16,27 @@ export interface PatientProps {
 }
 
 export class Patient extends Entity<PatientProps> {
-  static create(props: Optional<PatientProps, "createdAt" | "updatedAt">, id?: UniqueEntityId) {
+  static create(props: Optional<PatientProps, 'createdAt' | 'updatedAt'>, id?: UniqueEntityId) {
     const patient = new Patient(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
       },
-      id,
+      id
     );
     return patient;
   }
 
+  get clinicId() {
+    return this.props.clinicId;
+  }
+
   get userId() {
     return this.props.userId;
+  }
+
+  get anamnesis() {
+    return this.props.anamnesis;
   }
 
   get name() {
@@ -48,12 +59,20 @@ export class Patient extends Entity<PatientProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt(): Date | undefined {
     return this.props.updatedAt;
   }
 
-  set userId(userId: UniqueEntityId | undefined) {
+  set clinicId(clinicId: UniqueEntityId) {
+    this.props.clinicId = clinicId;
+  }
+
+  set userId(userId: UniqueEntityId) {
     this.props.userId = userId;
+  }
+
+  set anamnesis(anamnesis: Anamnesis) {
+    this.props.anamnesis = anamnesis;
   }
 
   set name(name: string) {

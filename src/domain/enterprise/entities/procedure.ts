@@ -49,7 +49,7 @@ export class Procedure extends Entity<ProcedureProps> {
     return this.props.createdAt;
   }
 
-  get updatedAt() {
+  get updatedAt(): Date | undefined {
     return this.props.updatedAt;
   }
 

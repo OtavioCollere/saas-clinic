@@ -1,22 +1,53 @@
 {
+  "name": "sass-clinic",
+  "version": "0.0.1",
+  "description": "SaaS para Clínicas de Estética",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
   "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "tsx watch src/main.ts",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "format": "biome format --write .",
+    "test:watch": "vitest --watch",
+    "test:cov": "vitest --coverage",
     "lint": "biome lint .",
+    "format": "biome format --write .",
     "check": "biome check --write ."
   },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "vite-tsconfig-paths": "^6.0.4",
-    "vitest": "^4.0.16"
-  },
   "dependencies": {
+    "@fastify/static": "^9.0.0",
+    "@nestjs/common": "^11.1.11",
+    "@nestjs/core": "^11.1.11",
+    "@nestjs/platform-fastify": "^11.1.11",
+    "@nestjs/swagger": "^11.2.4",
     "@prisma/client": "^7.2.0",
     "@types/node": "^25.0.3",
     "prisma": "^7.2.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.16"
   }
 }
