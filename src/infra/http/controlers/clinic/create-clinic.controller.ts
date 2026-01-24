@@ -5,7 +5,7 @@ import type { CreateClinicUseCase } from "@/domain/application/use-cases/clinic/
 import { BadRequestException, Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ClinicPresenter } from "../presenters/clinic-presenter";
+import { ClinicPresenter } from "../../presenters/clinic-presenter";
 
 const createClinicBodySchema = z.object({
 	name: z.string(),

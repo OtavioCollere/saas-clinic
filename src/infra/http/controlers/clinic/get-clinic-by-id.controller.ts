@@ -4,7 +4,7 @@ import type { GetClinicByIdUseCase } from "@/domain/application/use-cases/clinic
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ClinicPresenter } from "../presenters/clinic-presenter";
+import { ClinicPresenter } from "../../presenters/clinic-presenter";
 
 const getClinicByIdParamsSchema = z.object({
 	clinicId: z.string(),

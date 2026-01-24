@@ -5,7 +5,7 @@ import type { ActivateClinicUseCase } from "@/domain/application/use-cases/clini
 import { Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ClinicPresenter } from "../presenters/clinic-presenter";
+import { ClinicPresenter } from "../../presenters/clinic-presenter";
 
 const activateClinicBodySchema = z.object({
 	userId: z.string(),

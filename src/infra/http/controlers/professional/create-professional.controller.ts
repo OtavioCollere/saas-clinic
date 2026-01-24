@@ -7,7 +7,7 @@ import type { CreateProfessionalUseCase } from "@/domain/application/use-cases/p
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ProfessionalPresenter } from "../presenters/professional-presenter";
+import { ProfessionalPresenter } from "../../presenters/professional-presenter";
 
 const createProfessionalBodySchema = z.object({
 	userId: z.string(),

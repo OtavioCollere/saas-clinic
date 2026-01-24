@@ -6,7 +6,7 @@ import type { EditClinicUseCase } from "@/domain/application/use-cases/clinic/ed
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ClinicPresenter } from "../presenters/clinic-presenter";
+import { ClinicPresenter } from "../../presenters/clinic-presenter";
 
 const editClinicBodySchema = z.object({
 	editorId: z.string(),

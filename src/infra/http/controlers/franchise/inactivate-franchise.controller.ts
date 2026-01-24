@@ -6,7 +6,7 @@ import type { InactivateFranchiseUseCase } from "@/domain/application/use-cases/
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { FranchisePresenter } from "../presenters/franchise-presenter";
+import { FranchisePresenter } from "../../presenters/franchise-presenter";
 
 const inactivateFranchiseBodySchema = z.object({
 	userId: z.string(),

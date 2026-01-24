@@ -5,7 +5,7 @@ import type { EditProfessionalUseCase } from "@/domain/application/use-cases/pro
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ProfessionalPresenter } from "../presenters/professional-presenter";
+import { ProfessionalPresenter } from "../../presenters/professional-presenter";
 
 const editProfessionalBodySchema = z.object({
 	editorId: z.string(),

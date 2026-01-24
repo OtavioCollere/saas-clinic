@@ -4,7 +4,7 @@ import type { RegisterUserUseCase } from "@/domain/application/use-cases/users/r
 import { BadRequestException, Body, Controller, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { UserPresenter } from "../presenters/user-presenter";
+import { UserPresenter } from "../../presenters/user-presenter";
 
 const registerUserBodySchema = z.object({
 	name: z.string(),

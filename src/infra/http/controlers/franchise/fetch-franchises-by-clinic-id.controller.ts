@@ -4,7 +4,7 @@ import type { FetchFranchisesByClinicIdUseCase } from "@/domain/application/use-
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { FranchisePresenter } from "../presenters/franchise-presenter";
+import { FranchisePresenter } from "../../presenters/franchise-presenter";
 
 const fetchFranchisesByClinicIdParamsSchema = z.object({
 	clinicId: z.string(),

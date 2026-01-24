@@ -4,7 +4,7 @@ import type { GetProfessionalsByFranchiseIdUseCase } from "@/domain/application/
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ProfessionalPresenter } from "../presenters/professional-presenter";
+import { ProfessionalPresenter } from "../../presenters/professional-presenter";
 
 const getProfessionalsByFranchiseIdParamsSchema = z.object({
 	franchiseId: z.string(),

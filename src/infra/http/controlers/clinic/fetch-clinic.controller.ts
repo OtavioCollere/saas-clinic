@@ -1,9 +1,9 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
+import { unwrapEither } from "@/core/either/either";
 import type { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-clinic";
 import { Controller, Get, Query, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ClinicPresenter } from "../presenters/clinic-presenter";
+import { ClinicPresenter } from "../../presenters/clinic-presenter";
 
 const fetchClinicQuerySchema = z.object({
 	page: z.coerce.number().int().positive(),
@@ -28,11 +28,6 @@ export class FetchClinicController {
 			pageSize,
 			query: searchQuery,
 		});
-
-		if (isLeft(result)) {
-			const error = unwrapEither(result);
-			throw new Error(error.message);
-		}
 
 		const { clinics } = unwrapEither(result);
 

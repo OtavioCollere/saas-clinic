@@ -5,7 +5,7 @@ import type { RegisterFranchiseUseCase } from "@/domain/application/use-cases/fr
 import { Body, Controller, ForbiddenException, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { FranchisePresenter } from "../presenters/franchise-presenter";
+import { FranchisePresenter } from "../../presenters/franchise-presenter";
 
 const registerFranchiseBodySchema = z.object({
 	userId: z.string(),

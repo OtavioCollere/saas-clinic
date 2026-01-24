@@ -4,7 +4,7 @@ import type { GetProfessionalUseCase } from "@/domain/application/use-cases/prof
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { ProfessionalPresenter } from "../presenters/professional-presenter";
+import { ProfessionalPresenter } from "../../presenters/professional-presenter";
 
 const getProfessionalParamsSchema = z.object({
 	professionalId: z.string(),

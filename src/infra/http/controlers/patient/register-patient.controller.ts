@@ -5,7 +5,7 @@ import type { RegisterPatientUseCase } from "@/domain/application/use-cases/pati
 import { Body, Controller, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
-import { PatientPresenter } from "../presenters/patient-presenter";
+import { PatientPresenter } from "../../presenters/patient-presenter";
 
 const registerPatientBodySchema = z.object({
 	personId: z.string(),
