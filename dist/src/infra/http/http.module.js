@@ -10,6 +10,7 @@ exports.HttpModule = void 0;
 const common_1 = require("@nestjs/common");
 const database_module_1 = require("../database/database.module");
 const prisma_service_1 = require("../database/prisma.service");
+const health_controller_1 = require("./controlers/health/health.controller");
 let HttpModule = class HttpModule {
 };
 exports.HttpModule = HttpModule;
@@ -17,7 +18,7 @@ exports.HttpModule = HttpModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         providers: [prisma_service_1.PrismaService],
-        controllers: [],
+        controllers: [health_controller_1.HealthController],
     })
 ], HttpModule);
 //# sourceMappingURL=http.module.js.map

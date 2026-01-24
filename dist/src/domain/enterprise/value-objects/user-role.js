@@ -6,16 +6,16 @@ class UserRole {
         this.value = value;
     }
     static admin() {
-        return new UserRole('ADMIN');
+        return new UserRole("ADMIN");
     }
     static member() {
-        return new UserRole('MEMBER');
+        return new UserRole("MEMBER");
     }
     isAdmin() {
-        return this.value === 'ADMIN';
+        return this.value === "ADMIN";
     }
     isMember() {
-        return this.value === 'MEMBER';
+        return this.value === "MEMBER";
     }
     getValue() {
         return this.value;

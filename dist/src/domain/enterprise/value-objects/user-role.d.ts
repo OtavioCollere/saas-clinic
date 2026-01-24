@@ -1,4 +1,4 @@
-export type UserRoleType = 'ADMIN' | 'MEMBER';
+export type UserRoleType = "ADMIN" | "MEMBER";
 export declare class UserRole {
     private readonly value;
     constructor(value: UserRoleType);

@@ -9,9 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZodPipe = void 0;
+exports.ZodValidationPipe = void 0;
 const common_1 = require("@nestjs/common");
-let ZodPipe = class ZodPipe {
+let ZodValidationPipe = class ZodValidationPipe {
     constructor(schema) {
         this.schema = schema;
     }
@@ -20,9 +20,9 @@ let ZodPipe = class ZodPipe {
         return value;
     }
 };
-exports.ZodPipe = ZodPipe;
-exports.ZodPipe = ZodPipe = __decorate([
+exports.ZodValidationPipe = ZodValidationPipe;
+exports.ZodValidationPipe = ZodValidationPipe = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [Object])
-], ZodPipe);
+], ZodValidationPipe);
 //# sourceMappingURL=zod-validation-pipe.js.map

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const app_service_1 = require("./app.service");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -35,6 +36,6 @@ __decorate([
 exports.AppController = AppController = __decorate([
     (0, swagger_1.ApiTags)("app"),
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [Function])
+    __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);
 //# sourceMappingURL=app.controller.js.map
