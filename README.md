@@ -13,12 +13,15 @@ Simplificar a operação da clínica (agenda, pacientes, procedimentos e pagamen
 NEXT STEPS
 # finalizar modulo de appointments
 # finalizar autenticacao
-#   - Criar implementacao do hasher e encrypter
-#   - Configurar Env do projeto
-#   - Criar decorators para ver se esta logado
+#   (OK) - Criar implementacao do hasher e encrypter 
+#   (OK) - Configurar Env do projeto 
+#   (OK) - Criar decorators para ver se esta logado
 #   - envio de email para verificar conta
       - implementacao logout
 #   - logout
+
+### mudar personId para userIds
+### revisar todas controllers
 
 
 # deploy cloud run

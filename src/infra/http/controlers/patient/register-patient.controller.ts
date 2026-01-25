@@ -6,9 +6,11 @@ import { Body, Controller, NotFoundException, Param, Post, UsePipes } from "@nes
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { PatientPresenter } from "../../presenters/patient-presenter";
+import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
+import { User } from "@/domain/enterprise/entities/user";
 
 const registerPatientBodySchema = z.object({
-	personId: z.string(),
+	clinicId: z.string(),
 	name: z.string(),
 	birthDay: z.coerce.date(),
 	address: z.string(),
@@ -16,27 +18,21 @@ const registerPatientBodySchema = z.object({
 	anamnesis: z.any(),
 });
 
-const registerPatientParamsSchema = z.object({
-	clinicId: z.string(),
-});
 
 type RegisterPatientBodySchema = z.infer<typeof registerPatientBodySchema>;
-type RegisterPatientParamsSchema = z.infer<typeof registerPatientParamsSchema>;
 
 const registerPatientBodyValidationPipe = new ZodValidationPipe(registerPatientBodySchema);
-const registerPatientParamsValidationPipe = new ZodValidationPipe(registerPatientParamsSchema);
-
 @Controller("/clinics")
 export class RegisterPatientController {
 	constructor(private readonly registerPatientUseCase: RegisterPatientUseCase) {}
 
 	@Post("/:clinicId/patients")
 	async handle(
-		@Param(registerPatientParamsValidationPipe) params: RegisterPatientParamsSchema,
+		@CurrentUser() user: User,
 		@Body(registerPatientBodyValidationPipe) body: RegisterPatientBodySchema,
 	) {
-		const { clinicId } = params;
-		const { personId, name, birthDay, address, zipCode, anamnesis } = body;
+		const personId = user.id.toString();
+		const { clinicId, name, birthDay, address, zipCode, anamnesis } = body;
 
 		const result = await this.registerPatientUseCase.execute({
 			clinicId,
