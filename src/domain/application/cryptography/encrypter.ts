@@ -1,4 +1,4 @@
-export interface Encrypter {
-    sign(value: string): Promise<string>
-    refresh(value: string): Promise<string>
+export abstract class Encrypter {
+    abstract sign(payload: Record<string, unknown>): Promise<string>
+    abstract refresh(payload: Record<string, unknown>): Promise<string>
 }

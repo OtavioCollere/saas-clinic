@@ -1,3 +1,3 @@
-export interface HashComparer {
-    compare(plainText: string, hashedText: string) : Boolean
+export abstract class HashComparer {
+    abstract compare(plainText: string, hashedText: string) : Promise<Boolean>
 }

@@ -13,11 +13,13 @@ Simplificar a operação da clínica (agenda, pacientes, procedimentos e pagamen
 NEXT STEPS
 # finalizar modulo de appointments
 # finalizar autenticacao
-#   - Criar decorators para ver se esta logado
 #   - Criar implementacao do hasher e encrypter
 #   - Configurar Env do projeto
+#   - Criar decorators para ver se esta logado
+#   - envio de email para verificar conta
+      - implementacao logout
 #   - logout
-# envio de email para verificar conta
+
 
 # deploy cloud run
 # fila com bullmq / rabitmq / pub sub
