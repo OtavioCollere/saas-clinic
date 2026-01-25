@@ -1,6 +1,7 @@
 import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { Email } from "../value-objects/email";
 import { Entity } from "@/core/entities/entity";
+import type { Optional } from "@/core/types/optional";
 
 // regras de negocio
 // o token dura 60 minutos
@@ -15,15 +16,25 @@ export interface EmailVerificationProps {
     email: Email;
     token: string;
     expiresAt: Date;
-    createdAt: Date;
-    verifiedAt : Date
+    createdAt?: Date;
+    verifiedAt? : Date
 }
 
 export class EmailVerification extends Entity<EmailVerificationProps> {
-    static create(props: EmailVerificationProps, id?: UniqueEntityId) {
-        const emailVerification = new EmailVerification(props, id);
+    static create(
+        props: Optional<EmailVerificationProps, 'createdAt' | 'verifiedAt'>,
+        id?: UniqueEntityId
+      ) {
+        const emailVerification = new EmailVerification(
+          {
+            ...props,
+            createdAt: props.createdAt ?? new Date(),
+            verifiedAt: props.verifiedAt ?? undefined
+          },
+          id
+        );
         return emailVerification;
-    }
+      }
 
     get userId() {
         return this.props.userId;
@@ -37,11 +48,23 @@ export class EmailVerification extends Entity<EmailVerificationProps> {
         return this.props.token;
     }
 
-    get expiresAt() {
-        return this.props.expiresAt;
+    get verifiedAt(): Date | null {
+        return this.props.verifiedAt ?? null;
     }
 
+    get expiresAt(): Date {
+        return this.props.expiresAt;
+    }
+    
     get createdAt() {
         return this.props.createdAt;
+    }
+
+    set verifiedAt(verifiedAt: Date) {
+        this.props.verifiedAt = verifiedAt;
+    }
+
+    verifyEmail() {
+        this.props.verifiedAt = new Date();
     }
 }

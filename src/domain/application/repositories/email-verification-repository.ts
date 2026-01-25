@@ -11,5 +11,10 @@ export abstract class EmailVerificationRepository {
     abstract transaction<T>(
       fn: (tx: TransactionContext) => Promise<T>,
     ): Promise<T>;
+
+    abstract deleteAllByUserId(userId: string, tx?: TransactionContext): Promise<void>;
+
+    abstract findByToken(token: string): Promise<EmailVerification | null>;
+
+    abstract save(emailVerification: EmailVerification, tx?: TransactionContext): Promise<EmailVerification>;
   }
-  

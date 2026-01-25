@@ -9,7 +9,7 @@ export interface UserProps {
   name: string;
   cpf: Cpf;
   email: Email;
-  isEmailVerified: boolean;
+  isEmailVerified?: boolean;
   password: string;
   role: UserRole;
   updatedAt?: Date;
@@ -22,6 +22,7 @@ export class User extends Entity<UserProps> {
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
+        isEmailVerified: props.isEmailVerified ?? false,
       },
       id
     );
@@ -46,6 +47,10 @@ export class User extends Entity<UserProps> {
 
   get role() {
     return this.props.role;
+  }
+
+  get isEmailVerified() {
+    return this.props.isEmailVerified ?? false;
   }
 
   get updatedAt(): Date | undefined {
@@ -78,5 +83,13 @@ export class User extends Entity<UserProps> {
 
   set updatedAt(updatedAt: Date) {
     this.props.updatedAt = updatedAt;
+  }
+
+  set isEmailVerified(isEmailVerified: boolean) {
+    this.props.isEmailVerified = isEmailVerified;
+  }
+
+  verifyEmail() {
+    this.props.isEmailVerified = true
   }
 }

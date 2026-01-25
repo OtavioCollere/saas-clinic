@@ -51,6 +51,8 @@ export class SendEmailVerificationUseCase {
       token,
     });
 
-    return makeRight(emailVerification);
+    return makeRight({
+      message : 'If you have an account with this email, you will receive an email to verify your account.',
+    });
   }
 }
