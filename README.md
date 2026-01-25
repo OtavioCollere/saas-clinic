@@ -16,11 +16,15 @@ NEXT STEPS
 #   (OK) - Criar implementacao do hasher e encrypter 
 #   (OK) - Configurar Env do projeto 
 #   (OK) - Criar decorators para ver se esta logado
-#   - envio de email para verificar conta
+#   (OK) - envio de email para verificar conta
+         - implementacao envio de email
       - implementacao logout
 #   - logout
 
-### mudar personId para userIds
+
+### criar controllers faltantes
+### verificar testes unitarios que faltam
+### mudar personId para userId
 ### revisar todas controllers
 
 
