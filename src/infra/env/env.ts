@@ -8,6 +8,10 @@ export const envSchema = z.object({
   JWT_REFRESH_EXPIRATION: z.string(),
   JWT_PUBLIC_KEY: z.string(),
   JWT_PRIVATE_KEY: z.string(),
+
+  SENDGRID_API_KEY: z.string(),
+  EMAIL_FROM: z.string(),
+  EMAIL_VERIFY_URL: z.string(),
 })
 
 export type Env = z.infer<typeof envSchema>;
