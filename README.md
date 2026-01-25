@@ -17,10 +17,16 @@ NEXT STEPS
 #   (OK) - Configurar Env do projeto 
 #   (OK) - Criar decorators para ver se esta logado
 #   (OK) - envio de email para verificar conta
-         - implementacao envio de email
-      - implementacao logout
-#   - logout
+        (OK) - implementacao envio de email
+      
+# TO-DO NOW
+# 
 
+    
+#   - logout
+# Implementar rate limit
+# Implementar cache aside -> definir rota 
+#
 
 ### criar controllers faltantes
 ### verificar testes unitarios que faltam
@@ -30,13 +36,19 @@ NEXT STEPS
 
 # deploy cloud run
 # fila com bullmq / rabitmq / pub sub
-# verificar oque implementar com redis
-# rate limit
-
+# observabilidade 
+# healt check
 
 ### sprint 2
 # sessions repository
 # mfa 
+
+⭐ Email verification + Email change flow
+
+Você já tem verificação de email. Completa com:
+- reenvio de verificação
+- invalidar tokens antigos
+- trocar email → precisa verificar o novo
 
 
 ---------

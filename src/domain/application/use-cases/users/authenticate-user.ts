@@ -3,6 +3,7 @@ import { WrongCredentialsError } from "@/core/errors/wrong-credentials-error";
 import { UsersRepository } from "../../repositories/users-repository";
 import { HashComparer } from "../../cryptography/hash-comparer";
 import { Encrypter } from "../../cryptography/encrypter";
+import type { ClinicMembershipRepository } from "../../repositories/clinic-membership-repository";
 
 interface AuthenticateUserUseCaseRequest{
     email: string;
@@ -20,7 +21,7 @@ export class AuthenticateUserUseCase{
     constructor(
         private usersRepository: UsersRepository,
         private hashComparer: HashComparer,
-        private encrypter: Encrypter
+        private encrypter: Encrypter,
     ){}
 
     async execute({email, password}: AuthenticateUserUseCaseRequest): Promise<AuthenticateUserUseCaseResponse> {
@@ -36,8 +37,13 @@ export class AuthenticateUserUseCase{
             return makeLeft(new WrongCredentialsError())
         }
 
-        const accessToken = await this.encrypter.sign(user.id.toString());
-        const refreshToken = await this.encrypter.refresh(user.id.toString());
+        const accessToken = await this.encrypter.sign({
+            userId : user.id.toString(),
+        });
+        
+        const refreshToken = await this.encrypter.refresh({
+            userId : user.id.toString(),
+        });
 
         return makeRight({
             access_token : accessToken,
