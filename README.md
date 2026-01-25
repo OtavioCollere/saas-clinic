@@ -10,6 +10,27 @@
 Simplificar a operação da clínica (agenda, pacientes, procedimentos e pagamentos) e ajudar no aumento de faturamento e capacidade de atendimento.
 
 ---
+NEXT STEPS
+# finalizar modulo de appointments
+# finalizar autenticacao
+#   - Criar decorators para ver se esta logado
+#   - Criar implementacao do hasher e encrypter
+#   - Configurar Env do projeto
+#   - logout
+# envio de email para verificar conta
+
+# deploy cloud run
+# fila com bullmq / rabitmq / pub sub
+# verificar oque implementar com redis
+# rate limit
+
+
+### sprint 2
+# sessions repository
+# mfa 
+
+
+---------
 
 ## Perfis de Usuário
 

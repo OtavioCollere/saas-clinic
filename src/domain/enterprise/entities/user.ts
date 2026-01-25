@@ -9,6 +9,7 @@ export interface UserProps {
   name: string;
   cpf: Cpf;
   email: Email;
+  isEmailVerified: boolean;
   password: string;
   role: UserRole;
   updatedAt?: Date;

@@ -9,6 +9,7 @@ export interface AppointmentProps {
   franchiseId: UniqueEntityId;
   patientId: UniqueEntityId;
   name: string;
+  durationInMinutes : number
   appointmentItems: AppointmentItem[];
   startAt: Date;
   endAt: Date;

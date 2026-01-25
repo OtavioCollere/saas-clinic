@@ -1,47 +1,56 @@
-import { Entity } from '@/core/entities/entity';
-import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import type { Optional } from '@/core/types/optional';
-import type { Email } from '../value-objects/email';
+import { makeLeft, makeRight } from '@/core/either/either';
+import { UsersRepository } from '../../repositories/users-repository';
+import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { EmailService } from '@/core/services/email.service';
+import { Injectable } from '@nestjs/common';
+import { EmailVerificationRepository } from '../../repositories/email-verification-repository';
+import { EmailVerification } from '@/domain/enterprise/entities/email-verification';
+import crypto from 'crypto';
 
-export interface EmailVerificationProps {
-  userId: UniqueEntityId;
-  email: Email;
-  token: string;
-  expiresAt: Date;
-  createdAt: Date;
+export interface SendEmailVerificationUseCaseRequest {
+  userId: string;
 }
 
-export class EmailVerification extends Entity<EmailVerificationProps> {
-  static create(
-    props: Optional<EmailVerificationProps, 'createdAt'>,
-    id?: UniqueEntityId,
-  ) {
-    return new EmailVerification(
-      {
-        ...props,
-        createdAt: props.createdAt ?? new Date(),
-      },
-      id,
-    );
-  }
+@Injectable()
+export class SendEmailVerificationUseCase {
+  constructor(
+    private usersRepository: UsersRepository,
+    private emailService: EmailService,
+    private emailVerificationRepository: EmailVerificationRepository,
+  ) {}
 
-  get userId() {
-    return this.props.userId;
-  }
+  async execute({ userId }: SendEmailVerificationUseCaseRequest) {
+    const user = await this.usersRepository.findById(userId);
 
-  get email() {
-    return this.props.email;
-  }
+    if (!user) {
+      return makeLeft(new UserNotFoundError());
+    }
 
-  get token() {
-    return this.props.token;
-  }
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60);
 
-  get expiresAt() {
-    return this.props.expiresAt;
-  }
+    const emailVerification = EmailVerification.create({
+      userId: user.id,
+      email: user.email,
+      token,
+      expiresAt,
+    });
 
-  get createdAt() {
-    return this.props.createdAt;
+    await this.emailVerificationRepository.transaction(async (tx) => {
+      // opcional, mas recomendado
+      await this.emailVerificationRepository.deleteAllByUserId(
+        user.id.toString(),
+        tx,
+      );
+
+      await this.emailVerificationRepository.create(emailVerification, tx);
+    });
+
+    await this.emailService.sendEmailVerification({
+      to: user.email.getValue(),
+      token,
+    });
+
+    return makeRight(emailVerification);
   }
 }

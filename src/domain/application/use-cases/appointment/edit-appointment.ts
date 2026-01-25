@@ -46,6 +46,12 @@ export class EditAppointmentUseCase {
 
   async execute({ professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
    
+    const appointment = await this.appointmentsRepository.findById(appointmentId);
+
+    if (!appointment) {
+      return makeLeft(new AppointmentNotFoundError());
+    }
+
     const professional = await this.professionalRepository.findById(professionalId);
 
     if (!professional) {
@@ -72,9 +78,19 @@ export class EditAppointmentUseCase {
       return makeLeft(new AppointmentConflictError());
     }
     
-    
+    if (professionalId) appointment.professionalId = new UniqueEntityId(professionalId) ;
+    if (franchiseId) appointment.franchiseId = new UniqueEntityId(franchiseId) ;
+    if (patientId) appointment.patientId = new UniqueEntityId(patientId) ;
+    if (name) appointment.name = name;
+    if (appointmentItems) appointment.appointmentItems = appointmentItems;
+    appointment.startAt = startAt;
+    if (durationInMinutes) {
+      const newEndAt = new Date(startAt.getTime() + durationInMinutes * 60000);
+      appointment.endAt = newEndAt;
+    }
+    appointment.status = AppointmentStatus.waiting();
 
-    await this.appointmentsRepository.create(appointment);
+    await this.appointmentsRepository.save(appointment);
 
     return makeRight({
       appointment,
