@@ -12,7 +12,7 @@ export interface MfaSettingsProps{
 }
 
 export class MfaSettings extends Entity<MfaSettingsProps>{
-  static create(props: Optional<MfaSettingsProps, 'createdAt' | 'updatedAt' | 'totpEnabled' | 'totpSecret' | 'backupCodes'>, id?: UniqueEntityId) {
+  static create(props: Optional<MfaSettingsProps, 'createdAt' | 'updatedAt' | 'totpEnabled'>, id?: UniqueEntityId) {
     const mfaSettings = new MfaSettings(
       {
         ...props,

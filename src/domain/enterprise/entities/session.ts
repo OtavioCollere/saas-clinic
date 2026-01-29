@@ -34,10 +34,26 @@ export class Session extends Entity<SessionProps>{
     return this.props.fingerprint;
   }
 
+  get userId() {
+    return this.props.userId;
+  }
+
+  get status() {
+    return this.props.status;
+  }
+
+  get mfaVerified() {
+    return this.props.mfaVerified;
+  }
 
   revokeSession() {
     this.props.status = SessionStatus.REVOKED;
     this.props.revokedAt = new Date();
+  }
+
+  activateSession() {
+    this.props.status = SessionStatus.ACTIVE;
+    this.props.mfaVerified = true;
   }
 
   activeSession() {
