@@ -17,12 +17,16 @@ export interface SessionProps{
 }
 
 export class Session extends Entity<SessionProps>{
-  static create(props: Optional<SessionProps, 'createdAt' | 'revokedAt' | 'status'>, id?: UniqueEntityId) {
+  private static readonly SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+
+  static create(props: Optional<SessionProps, 'createdAt' | 'revokedAt' | 'status' | 'expiresAt'>, id?: UniqueEntityId) {
+    const now = new Date();
     const session = new Session(
       {
         ...props,
         status: props.status ?? SessionStatus.PENDING,
-        createdAt: props.createdAt ?? new Date()
+        createdAt: props.createdAt ?? now,
+        expiresAt: props.expiresAt ?? new Date(now.getTime() + Session.SESSION_DURATION_MS)
       },
       id
     );
@@ -65,6 +69,6 @@ export class Session extends Entity<SessionProps>{
   }
 
   expiredSession() {
-    return this.props.status === SessionStatus.EXPIRED;
+    return this.props.expiresAt < new Date();
   }
 }

@@ -1,5 +1,5 @@
 import { unwrapEither } from "@/core/either/either";
-import type { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-clinic";
+import { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-clinic";
 import { Controller, Get, Query, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

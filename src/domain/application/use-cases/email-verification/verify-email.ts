@@ -1,4 +1,5 @@
-import { makeLeft, makeRight, type Either } from "@/core/either/either";
+import { Inject, Injectable } from "@nestjs/common";
+import { Either, makeLeft, makeRight } from "@/core/either/either";
 import { EmailVerificationRepository } from "../../repositories/email-verification-repository";
 import { UsersRepository } from "../../repositories/users-repository";
 import { UserNotFoundError } from "@/core/errors/user-not-found-error";
@@ -17,9 +18,12 @@ type VerifyEmailUseCaseResponse = Either<
     }
 >
 
+@Injectable()
 export class VerifyEmailUseCase {
     constructor(
+        @Inject(UsersRepository)
         private usersRepository: UsersRepository,
+        @Inject(EmailVerificationRepository)
         private emailVerificationRepository: EmailVerificationRepository
     ){}
 

@@ -8,13 +8,7 @@ export class Cpf {
   }
 
   static create(rawCpf: string): Cpf {
-    const normalized = Cpf.normalize(rawCpf);
-
-    if (!Cpf.isValid(normalized)) {
-      throw new DomainError('Invalid CPF');
-    }
-
-    return new Cpf(normalized);
+    return new Cpf(rawCpf);
   }
 
   getValue(): string {
@@ -29,7 +23,9 @@ export class Cpf {
     return cpf.replace(/\D/g, '');
   }
 
-  private static isValid(cpf: string): boolean {
+  static isValid(cpf: string): boolean {
+    cpf = Cpf.normalize(cpf);
+    
     if (cpf.length !== 11) return false;
 
     // rejeita CPFs com todos os dígitos iguais

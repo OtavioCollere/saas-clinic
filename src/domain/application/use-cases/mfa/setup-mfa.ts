@@ -1,3 +1,4 @@
+import { Injectable } from "@nestjs/common";
 import { Either, makeLeft, makeRight } from "@/core/either/either";
 import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { MfaAlreadyExistsError } from "@/core/errors/mfa-already-exists-error";
@@ -16,6 +17,7 @@ type SetupMfaUseCaseResponse = Either<
     }
 >
 
+@Injectable()
 export class SetupMfaUseCase {
     constructor(
         private mfaSettingsRepository: MfaSettingsRepository,

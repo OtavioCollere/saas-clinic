@@ -2,7 +2,7 @@ import { isLeft, unwrapEither } from "@/core/either/either";
 import { ClinicAlreadyExistsError } from "@/core/errors/clinic-already-exists-error";
 import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
-import type { EditClinicUseCase } from "@/domain/application/use-cases/clinic/edit-clinic";
+import { EditClinicUseCase } from "@/domain/application/use-cases/clinic/edit-clinic";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

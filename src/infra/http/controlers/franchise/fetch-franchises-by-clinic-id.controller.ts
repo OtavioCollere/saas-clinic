@@ -1,6 +1,6 @@
 import { isLeft, unwrapEither } from "@/core/either/either";
 import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
-import type { FetchFranchisesByClinicIdUseCase } from "@/domain/application/use-cases/franchise/fetch-franchises-by-clinic-id";
+import { FetchFranchisesByClinicIdUseCase } from "@/domain/application/use-cases/franchise/fetch-franchises-by-clinic-id";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

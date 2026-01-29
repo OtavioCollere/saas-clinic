@@ -1,6 +1,6 @@
 import { isLeft, unwrapEither } from "@/core/either/either";
 import { FranchiseNotFoundError } from "@/core/errors/franchise-not-found-error";
-import type { GetProfessionalsByFranchiseIdUseCase } from "@/domain/application/use-cases/professional/get-professionals-by-franchise-id";
+import { GetProfessionalsByFranchiseIdUseCase } from "@/domain/application/use-cases/professional/get-professionals-by-franchise-id";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

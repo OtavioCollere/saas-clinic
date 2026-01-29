@@ -1,13 +1,13 @@
 import type { Encrypter } from "@/domain/application/cryptography/encrypter";
-import { Injectable } from "@nestjs/common";
-import type { JwtService } from "@nestjs/jwt";
-import type { EnvService } from "../env/env.service";
+import { Inject, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { EnvService } from "../env/env.service";
 
 @Injectable()
 export class JwtEncrypter implements Encrypter {
   constructor(
-    private jwtService : JwtService,
-    private env : EnvService
+    @Inject(JwtService)
+    private jwtService : JwtService
   ){}
 
   async sign(payload: Record<string, unknown>): Promise<string> {

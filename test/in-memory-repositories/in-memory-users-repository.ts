@@ -44,4 +44,12 @@ export class InMemoryUsersRepository implements UsersRepository {
             this.items.splice(index, 1);
         }
     }
+
+    async findByCpf(cpf: string): Promise<User | null> {
+        const user = this.items.find((item) => item.cpf.getValue() === cpf);
+        
+        if (!user) return null;
+
+        return user;
+    }
 }

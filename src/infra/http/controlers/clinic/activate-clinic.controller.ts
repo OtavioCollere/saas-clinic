@@ -1,7 +1,7 @@
 import { isLeft, unwrapEither } from "@/core/either/either";
 import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
-import type { ActivateClinicUseCase } from "@/domain/application/use-cases/clinic/activate-clinic";
+import { ActivateClinicUseCase } from "@/domain/application/use-cases/clinic/activate-clinic";
 import { Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

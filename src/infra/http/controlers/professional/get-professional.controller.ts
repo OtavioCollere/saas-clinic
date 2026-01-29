@@ -1,6 +1,6 @@
 import { isLeft, unwrapEither } from "@/core/either/either";
 import { ProfessionalNotFoundError } from "@/core/errors/professional-not-found-error";
-import type { GetProfessionalUseCase } from "@/domain/application/use-cases/professional/get-professional";
+import { GetProfessionalUseCase } from "@/domain/application/use-cases/professional/get-professional";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

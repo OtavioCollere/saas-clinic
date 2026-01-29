@@ -2,7 +2,7 @@ import { isLeft, unwrapEither } from "@/core/either/either";
 import { FranchiseHasPendingAppointmentsError } from "@/core/errors/franchise-has-pending-appointments-error";
 import { FranchiseNotFoundError } from "@/core/errors/franchise-not-found-error";
 import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
-import type { ActivateFranchiseUseCase } from "@/domain/application/use-cases/franchise/activate-franchise";
+import { ActivateFranchiseUseCase } from "@/domain/application/use-cases/franchise/activate-franchise";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

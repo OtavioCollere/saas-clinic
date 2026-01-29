@@ -2,16 +2,9 @@ import z from "zod";
 
 export const envSchema = z.object({
   DATABASE_URL: z.string(),
-  JWT_SECRET: z.string(),
-  JWT_EXPIRATION: z.string(),
-  JWT_REFRESH_SECRET: z.string(),
-  JWT_REFRESH_EXPIRATION: z.string(),
   JWT_PUBLIC_KEY: z.string(),
   JWT_PRIVATE_KEY: z.string(),
-
-  SENDGRID_API_KEY: z.string(),
-  EMAIL_FROM: z.string(),
-  EMAIL_VERIFY_URL: z.string(),
+  PORT: z.coerce.number().default(3000),
 })
 
 export type Env = z.infer<typeof envSchema>;

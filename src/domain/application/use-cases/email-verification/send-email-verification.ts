@@ -1,8 +1,8 @@
 import { makeLeft, makeRight } from '@/core/either/either';
 import { UsersRepository } from '../../repositories/users-repository';
 import { UserNotFoundError } from '@/core/errors/user-not-found-error';
-import { EmailService } from '@/core/services/email.service';
-import { Injectable } from '@nestjs/common';
+import { EmailQueue } from '@/core/services/email/email-queue';
+import { Inject, Injectable } from '@nestjs/common';
 import { EmailVerificationRepository } from '../../repositories/email-verification-repository';
 import { EmailVerification } from '@/domain/enterprise/entities/email-verification';
 import crypto from 'crypto';
@@ -14,8 +14,11 @@ export interface SendEmailVerificationUseCaseRequest {
 @Injectable()
 export class SendEmailVerificationUseCase {
   constructor(
+    @Inject(UsersRepository)
     private usersRepository: UsersRepository,
-    private emailService: EmailService,
+    @Inject(EmailQueue)
+    private emailQueue: EmailQueue,
+    @Inject(EmailVerificationRepository)
     private emailVerificationRepository: EmailVerificationRepository,
   ) {}
 
@@ -37,7 +40,6 @@ export class SendEmailVerificationUseCase {
     });
 
     await this.emailVerificationRepository.transaction(async (tx) => {
-      // opcional, mas recomendado
       await this.emailVerificationRepository.deleteAllByUserId(
         user.id.toString(),
         tx,
@@ -46,9 +48,17 @@ export class SendEmailVerificationUseCase {
       await this.emailVerificationRepository.create(emailVerification, tx);
     });
 
-    await this.emailService.sendEmailVerification({
+    const verificationUrl = `'http://localhost:3000'/verify-email?token=${token}`;
+    
+    await this.emailQueue.enqueue({
       to: user.email.getValue(),
-      token,
+      subject: 'Verify your email',
+      html: `
+        <h1>Email Verification</h1>
+        <p>Click the link below to verify your email:</p>
+        <a href="${verificationUrl}">Verify  </p>
+      `,
+      text: `Verify your email by clicking this link: ${verificationUrl}`,
     });
 
     return makeRight({

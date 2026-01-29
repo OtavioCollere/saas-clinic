@@ -1,13 +1,31 @@
-import { Module } from "@nestjs/common";
-import { SendgridEmailService } from "./sendgrid-email.service";
-import { EnvModule } from "../env/env.module";
-import { EmailService } from "@/core/services/email.service";
+import { Module } from '@nestjs/common'
+import { BullModule } from '@nestjs/bull'
+import { EmailSender } from '@/core/services/email/email-sender'
+import { EmailQueue } from '@/core/services/email/email-queue'
+import { NodemailerEmailSender } from './nodemailer-email-sender'
+import { BullEmailQueue } from './bull-email-queue'
+import { SendEmailConsumer } from './consumers/send-email.consumer'
+import { createNodemailerTransporter } from './nodemailer.provider'
 
 @Module({
-  imports: [EnvModule],
-  providers: [
-    {provide : EmailService, useClass : SendgridEmailService},
+  imports: [
+    BullModule.registerQueue({ name: 'SEND_EMAIL_QUEUE' }),
   ],
-  exports: [SendgridEmailService],
+  providers: [
+    {
+      provide: 'NODEMAILER_TRANSPORTER',
+      useFactory: createNodemailerTransporter,
+    },
+    {
+      provide: EmailSender,
+      useClass: NodemailerEmailSender,
+    },
+    {
+      provide: EmailQueue,
+      useClass: BullEmailQueue,
+    },
+    SendEmailConsumer,
+  ],
+  exports: [EmailQueue, EmailSender],
 })
 export class EmailModule {}

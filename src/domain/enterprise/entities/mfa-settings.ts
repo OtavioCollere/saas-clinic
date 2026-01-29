@@ -29,15 +29,15 @@ export class MfaSettings extends Entity<MfaSettingsProps>{
   }
 
   get totpEnabled() {
-    return this.props.totpEnabled;
+    return this.props.totpEnabled ?? false;
   }
 
   get totpSecret() {
-    return this.props.totpSecret;
+    return this.props.totpSecret ?? '';
   }
 
   get backupCodes() {
-    return this.props.backupCodes;
+    return this.props.backupCodes ?? [];
   }
 
   get createdAt() {

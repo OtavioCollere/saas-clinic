@@ -3,7 +3,7 @@ import { FranchiseNotFoundError } from "@/core/errors/franchise-not-found-error"
 import { ProfessionalAlreadyExistsError } from "@/core/errors/professional-already-exists-error";
 import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
 import { UserNotFoundError } from "@/core/errors/user-not-found-error";
-import type { CreateProfessionalUseCase } from "@/domain/application/use-cases/professional/create-professional";
+import { CreateProfessionalUseCase } from "@/domain/application/use-cases/professional/create-professional";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

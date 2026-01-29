@@ -5,12 +5,16 @@ import {
 } from "@nestjs/platform-fastify";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestFastifyApplication>(
 		AppModule,
 		new FastifyAdapter(),
 	);
+
+	const configService = app.get(ConfigService);
+	const port = configService.get("PORT") || 3000;
 
 	const config = new DocumentBuilder()
 		.setTitle("SaaS Clinic API")
@@ -22,6 +26,6 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup("api", app, document);
 
-	await app.listen(process.env.PORT ?? 3000, "0.0.0.0");
+	await app.listen(port, "0.0.0.0");
 }
 bootstrap();

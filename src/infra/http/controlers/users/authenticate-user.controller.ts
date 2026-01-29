@@ -1,31 +1,41 @@
 import { isLeft, unwrapEither } from "@/core/either/either";
 import { WrongCredentialsError } from "@/core/errors/wrong-credentials-error";
-import type { AuthenticateUserUseCase } from "@/domain/application/use-cases/users/authenticate-user";
-import { BadRequestException, Body, Controller, Post, UsePipes } from "@nestjs/common";
+import { AuthenticateUserUseCase } from "@/domain/application/use-cases/users/authenticate-user";
+import { BadRequestException, Body, Controller, Inject, Post, UsePipes } from "@nestjs/common";
+import { ApiBody } from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
+import { Fingerprint } from "../../decorators/fingerprint.decorator";
+import { AuthenticateUserDto } from "./dtos/authenticate-user.dto";
+import { Public } from "@/infra/auth/public";
 
 const authenticateUserBodySchema = z.object({
-	email: z.string().email(),
+	email: z.string(),
 	password: z.string(),
 });
 
 type AuthenticateUserBodySchema = z.infer<typeof authenticateUserBodySchema>;
 
-const authenticateUserBodyValidationPipe = new ZodValidationPipe(authenticateUserBodySchema);
-
+@Public()
 @Controller("/users")
 export class AuthenticateUserController {
-	constructor(private readonly authenticateUserUseCase: AuthenticateUserUseCase) {}
+	constructor(
+		@Inject(AuthenticateUserUseCase)
+		private readonly authenticateUserUseCase: AuthenticateUserUseCase
+	) {}
 
 	@Post("/authenticate")
-	@UsePipes(authenticateUserBodyValidationPipe)
-	async handle(@Body() body: AuthenticateUserBodySchema) {
+	@ApiBody({ type: AuthenticateUserDto })
+	async handle(
+		@Body() body: AuthenticateUserBodySchema,
+		@Fingerprint() fingerprint: Fingerprint
+	) {
 		const { email, password } = body;
 
 		const result = await this.authenticateUserUseCase.execute({
 			email,
-			password,
+			fingerprint,
+			password
 		});
 
 		if (isLeft(result)) {
@@ -39,11 +49,20 @@ export class AuthenticateUserController {
 			}
 		}
 
-		const { access_token, refresh_token } = unwrapEither(result);
+		const success = unwrapEither(result)
 
-		return {
-			access_token,
-			refresh_token,
-		};
+		switch (success.type) {
+			case 'authenticated':
+				return {
+					access_token: success.access_token,
+					refresh_token: success.refresh_token,
+				}
+	
+			case 'mfa_required':
+				return {
+					session_id: success.session_id,
+					mfa_required: true,
+				}
+		}
 	}
 }

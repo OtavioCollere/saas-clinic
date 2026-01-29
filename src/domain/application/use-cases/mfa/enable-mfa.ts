@@ -1,3 +1,4 @@
+import { Injectable } from "@nestjs/common";
 import { Either, makeLeft, makeRight } from "@/core/either/either";
 import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
 import { MfaAlreadyEnabledError } from "@/core/errors/mfa-already-enabled-error";
@@ -17,6 +18,7 @@ type EnableMfaUseCaseResponse = Either<
     }
 >
 
+@Injectable()
 export class EnableMfaUseCase{
 
     constructor(

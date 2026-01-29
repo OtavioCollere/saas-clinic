@@ -1,10 +1,10 @@
-export interface MfaService {
-    generateTotpSecret(): string;
-    generateBackupCodes(): {
+export abstract class MfaService {
+    abstract generateTotpSecret(): string;
+    abstract generateBackupCodes(): {
       plainCodes: string[];
       hashedCodes: string[];
     };
-    verifyTotp(code: string, secret: string): boolean;
-    hashBackupCode(code: string): string;
+    abstract verifyTotp(code: string, secret: string): boolean;
+    abstract hashBackupCode(code: string): string;
   }
   

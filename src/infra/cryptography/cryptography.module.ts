@@ -12,8 +12,9 @@ import { Encrypter } from "@/domain/application/cryptography/encrypter";
     {provide : Encrypter, useClass : JwtEncrypter},
   ],
   exports : [
-    BcryptHasher,
-    JwtEncrypter,
+    HashGenerator,
+    HashComparer,
+    Encrypter,
   ]
 })
 export class CryptographyModule {}

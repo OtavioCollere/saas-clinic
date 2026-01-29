@@ -1,17 +1,18 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
+import { Injectable } from "@nestjs/common";
+import { Either, makeLeft, makeRight } from '@/core/either/either';
 import { UniqueEntityId } from '@/core/entities/unique-entity-id';
 import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
 import { UserNotFoundError } from '@/core/errors/user-not-found-error';
-import type { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history';
+import { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history';
 import { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
-import type { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions';
-import type { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history';
-import type { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment';
+import { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions';
+import { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history';
+import { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment';
 import { Patient } from '@/domain/enterprise/entities/patient';
-import type { AnamnesisRepository } from '../../repositories/anamnesis-repository';
-import type { ClinicRepository } from '../../repositories/clinic-repository';
-import type { PatientRepository } from '../../repositories/patient-repository';
-import type { UsersRepository } from '../../repositories/users-repository';
+import { AnamnesisRepository } from '../../repositories/anamnesis-repository';
+import { ClinicRepository } from '../../repositories/clinic-repository';
+import { PatientRepository } from '../../repositories/patient-repository';
+import { UsersRepository } from '../../repositories/users-repository';
 
 interface RegisterPatientUseCaseRequest {
   clinicId: string;
@@ -35,6 +36,7 @@ type RegisterPatientUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class RegisterPatientUseCase {
   constructor(
     private patientRepository: PatientRepository,

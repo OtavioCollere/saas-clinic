@@ -30,11 +30,12 @@ export class Email {
     return email.trim().toLowerCase()
   }
 
-  private static isValid(email: string): boolean {
+  static isValid(email: string): boolean {
+    const normalized = Email.normalize(email);
     // regex simples, suficiente para domínio (não RFC overkill)
     const emailRegex =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-    return emailRegex.test(email)
+    return emailRegex.test(normalized)
   }
 }

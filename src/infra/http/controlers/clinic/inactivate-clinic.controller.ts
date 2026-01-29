@@ -2,7 +2,7 @@ import { isLeft, unwrapEither } from "@/core/either/either";
 import { ClinicHasPendingAppointmentsError } from "@/core/errors/clinic-has-pending-appointments-error";
 import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
-import type { InactivateClinicUseCase } from "@/domain/application/use-cases/clinic/inactivate-clinic";
+import { InactivateClinicUseCase } from "@/domain/application/use-cases/clinic/inactivate-clinic";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";

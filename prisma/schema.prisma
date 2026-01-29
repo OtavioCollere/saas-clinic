@@ -1,18 +1,75 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid())
+  name           String
+  cpf            String   @unique
+  email          String   @unique
+  password       String
+  isEmailVerified Boolean @default(false)
+  role           String   // ADMIN, MEMBER
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sessions           Session[]
+  mfaSettings        MfaSettings?
+  emailVerifications EmailVerification[]
 
   @@map("users")
+  @@index([email])
+}
+
+model Session {
+  id          String       @id @default(uuid())
+  userId      String
+  status      String       // PENDING, ACTIVE, REVOKED, EXPIRED
+  fingerprint Json         // { ip: string, userAgent: string }
+  mfaVerified Boolean      @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime     @default(now())
+  revokedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+  @@index([userId])
+  @@index([status])
+}
+
+model MfaSettings {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  totpEnabled Boolean  @default(false)
+  totpSecret  String?
+  backupCodes String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("mfa_settings")
+  @@index([userId])
+}
+
+model EmailVerification {
+  id         String    @id @default(uuid())
+  userId     String
+  email      String
+  token      String    @unique
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verifications")
+  @@index([userId])
+  @@index([token])
 }
