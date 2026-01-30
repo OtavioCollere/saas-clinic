@@ -55,8 +55,6 @@ Fastify foi escolhido por performance superior e melhor suporte a TypeScript nat
 
 Zod fornece validação em runtime com inferência de tipos TypeScript. Isso garante que dados validados em runtime correspondem aos tipos em compile-time.
 
-**Trade-off:** Zod adiciona overhead de validação em runtime, mas elimina a necessidade de manter schemas separados para validação e tipos.
-
 ## Arquitetura do Sistema
 
 ### Estrutura de Diretórios
