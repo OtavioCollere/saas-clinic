@@ -12,8 +12,8 @@ Sistema backend modular focado em segurança, escalabilidade e manutenibilidade.
 - **Validação:** Zod
 - **Autenticação:** JWT com algoritmo RS256
 - **Banco de Dados:** PostgreSQL com Prisma ORM
-- **Cache/Queue:** Redis (ioredis)
-- **Email:** SendGrid
+- **Cache/Queue:** Redis (ioredis) com BullMQ
+- **Email:** Nodemailer (com BullMQ para processamento assíncrono)
 - **Testes:** Vitest
 - **Linting/Formatting:** Biome
 
@@ -81,7 +81,7 @@ src/
     ├── auth/                # Implementação de autenticação
     ├── cryptography/       # Implementação de criptografia
     ├── database/            # Prisma e configuração de DB
-    ├── email/               # Serviço de email (SendGrid)
+    ├── email/               # Serviço de email (Nodemailer + BullMQ)
     ├── env/                 # Validação de variáveis de ambiente
     └── http/                # Controllers e presenters
 ```
@@ -147,7 +147,7 @@ Implementação de MFA via TOTP (Time-based One-Time Password):
 - **Token:** Gerado aleatoriamente (32 bytes hex)
 - **Expiração:** 1 hora
 - **Comportamento:** Tokens antigos são invalidados ao gerar novo token
-- **Envio:** Atualmente síncrono via SendGrid (planejado: assíncrono com BullMQ)
+- **Envio:** Assíncrono via BullMQ com Nodemailer como provider SMTP
 
 ### Validação de Dados
 
@@ -320,10 +320,17 @@ JWT_EXPIRATION="15m"
 JWT_REFRESH_SECRET="<fallback>"
 JWT_REFRESH_EXPIRATION="7d"
 
-# Email
-SENDGRID_API_KEY="<chave da API SendGrid>"
+# Email (configuração SMTP)
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="user@example.com"
+SMTP_PASS="password"
 EMAIL_FROM="noreply@example.com"
 EMAIL_VERIFY_URL="http://localhost:3000/email-verification/verify"
+
+# Redis (para BullMQ)
+REDIS_HOST="localhost"
+REDIS_PORT="6379"
 
 # Server
 PORT=3000
@@ -410,6 +417,7 @@ npm run start:prod
 - [x] Gerenciamento de sessões com fingerprint
 - [x] MFA (TOTP)
 - [x] Verificação de email
+- [x] Email assíncrono com BullMQ e Nodemailer
 - [x] Validação de dados com Zod
 - [x] Testes unitários
 - [x] Documentação Swagger
@@ -418,7 +426,6 @@ npm run start:prod
 ### Planejado 🚧
 
 - [ ] **Rate Limiting:** Implementação completa de token bucket com Redis
-- [ ] **Email Assíncrono:** Migração de envio de email para BullMQ
 - [ ] **Testes E2E:** Cobertura de fluxos críticos
 - [ ] **Observabilidade:**
   - [ ] Logs estruturados (JSON)
@@ -438,7 +445,7 @@ npm run start:prod
 
 ## Limitações Conhecidas
 
-1. **Email Síncrono:** Envio de email é bloqueante. Planejado migração para BullMQ.
+1. **Rate Limiting:** Guard implementado mas não totalmente integrado. Redis necessário para funcionamento completo.
 2. **Rate Limiting:** Guard implementado mas não totalmente integrado. Redis necessário para funcionamento completo.
 3. **Testes E2E:** Não implementados. Cobertura atual apenas unitária.
 4. **Observabilidade:** Logging básico. Métricas e tracing não implementados.
