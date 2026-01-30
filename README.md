@@ -49,9 +49,7 @@ Utilizamos JWT assinado com algoritmo RS256 (RSA com SHA-256) ao invés de HS256
 
 ### Fastify ao invés de Express
 
-Fastify foi escolhido por performance superior e melhor suporte a TypeScript nativo. O framework oferece validação de schema integrada e menor overhead.
-
-**Trade-off:** Menor ecossistema de middlewares comparado ao Express, mas suficiente para as necessidades do projeto.
+Fastify foi escolhido por performance superior e melhor suporte a TypeScript nativo. 
 
 ### Validação com Zod
 
