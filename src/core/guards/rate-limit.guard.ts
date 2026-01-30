@@ -88,10 +88,10 @@ import { AppRequest } from '../types/fastify-request.type';
       if (!allowed) {
         throw new HttpException(
           {
-            error: 'rate_limited',
-            context: options.context,
-            key: options.key,
-            message: 'Too many requests. Please try again later.',
+          error: 'rate_limited',
+          context: options.context,
+          key: options.key,
+          message: 'Too many requests. Please try again later.',
           },
           HttpStatus.TOO_MANY_REQUESTS,
         );
