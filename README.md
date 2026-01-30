@@ -2,7 +2,7 @@
 
 Backend de autenticação e autorização construído com arquitetura limpa (Clean Architecture) e Domain-Driven Design (DDD). O projeto implementa um sistema de autenticação robusto com suporte a MFA, gerenciamento de sessões baseado em fingerprint e validação rigorosa de dados.
 
-> **Nota:** Este projeto foi desenvolvido como exercício de aprendizado e prática, com o objetivo de aplicar e consolidar conhecimentos sobre arquitetura de software, padrões de design e tecnologias modernas que são utilizadas em projetos profissionais. As decisões arquiteturais e implementações refletem conceitos e desafios similares encontrados em ambientes de trabalho reais.
+> **Nota:** Este projeto foi desenvolvido como exercício de aprendizado e prática, com o objetivo de aplicar e consolidar conhecimentos sobre arquitetura de software, padrões de design e tecnologias modernas que são utilizadas em projetos profissionais.
 
 ## Visão Geral do Projeto
 
