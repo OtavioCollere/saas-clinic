@@ -9,5 +9,10 @@ export default defineConfig({
     include: ['src/**/*.spec.ts'],
     exclude: ['node_modules', 'dist'],
     setupFiles: ['./src/test-setup.ts'],
+    coverage : {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      reportsDirectory: './coverage',
+    }
   },
 });

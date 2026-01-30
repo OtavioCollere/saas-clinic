@@ -1,83 +1,73 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { EmailAlreadyExistsError } from "@/core/errors/email-already-exists-error";
-import { User } from "@/domain/enterprise/entities/user";
-import { Cpf } from "@/domain/enterprise/value-objects/cpf";
-import { Email } from "@/domain/enterprise/value-objects/email";
-import { UserRole } from "@/domain/enterprise/value-objects/user-role";
-import { HashGenerator } from "../../cryptography/hash-generator";
-import { UsersRepository } from "../../repositories/users-repository";
-import { InvalidCpfError } from "@/core/errors/invalid-cpf-error";
-import { InvalidEmailError } from "@/core/errors/invalid-email-error";
-import { CpfAlreadyExistsError } from "@/core/errors/cpf-already-exists-error";
-
-interface RegisterUserUseCaseRequest {
-	name: string;
-	cpf: string;
-	email: string;
-	password: string;
-}
-
-type RegisterUserUseCaseResponse = Either<
-	EmailAlreadyExistsError | InvalidCpfError | InvalidEmailError | CpfAlreadyExistsError,
-	{
-		user: User;
-	}
->;
-
-@Injectable()
-export class RegisterUserUseCase {
+import {
+	Body,
+	Controller,
+	HttpCode,
+	Post,
+  } from '@nestjs/common'
+  import {
+	ApiBadRequestResponse,
+	ApiExtraModels,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+	getSchemaPath,
+  } from '@nestjs/swagger'
+  
+  import { AuthenticateUserUseCase } from '@/domain/application/use-cases/users/authenticate-user'
+  import { RegisterUserUseCase } from '@/domain/application/use-cases/users/register-user'
+  import { AuthenticateUserDto } from './dtos/authenticate-user.dto'
+  import { RegisterUserDto } from './dtos/register-user.dto'
+  import { AuthenticatedResponseDto } from './dtos/authenticated-response.dto'
+  import { MfaRequiredResponseDto } from './dtos/mfa-required-response.dto'
+  
+  @ApiTags('Auth')
+  @ApiExtraModels(AuthenticatedResponseDto, MfaRequiredResponseDto)
+  @Controller('/auth')
+  export class AuthController {
 	constructor(
-		@Inject(UsersRepository)
-		private usersRepository: UsersRepository,
-		@Inject(HashGenerator)
-		private hashGenerator: HashGenerator,
+	  private authenticateUser: AuthenticateUserUseCase,
+	  private registerUser: RegisterUserUseCase,
 	) {}
-
-	async execute({
-		name,
-		cpf,
-		email,
-		password,
-	}: RegisterUserUseCaseRequest): Promise<RegisterUserUseCaseResponse> {
-		const emailExists = await this.usersRepository.findByEmail(email);
-
-		if (emailExists) {
-			return makeLeft(new EmailAlreadyExistsError());
-		}
-
-		const passwordHash = await this.hashGenerator.hash(password);
-
-		const cpfExists = await this.usersRepository.findByCpf(cpf); 
-		if (cpfExists) {
-			return makeLeft(new CpfAlreadyExistsError());
-		}
-
-		const isValidCpf = Cpf.isValid(cpf);
-		if (!isValidCpf) {
-			return makeLeft(new InvalidCpfError());
-		}
-
-		const isValidEmail = Email.isValid(email);
-		if (!isValidEmail) {
-			return makeLeft(new InvalidEmailError());
-		}
-
-		const cpfVO = Cpf.create(cpf);
-		const emailVO = Email.create(email);
-
-		const user = User.create({
-			name,
-			cpf: cpfVO,
-			email: emailVO,
-			password: passwordHash,
-			role: UserRole.member(),
-		});
-
-		await this.usersRepository.create(user);
-
-		return makeRight({
-			user,
-		});
+  
+	@Post('/login')
+	@HttpCode(200)
+	@ApiOperation({ summary: 'Authenticate user' })
+	@ApiOkResponse({
+	  description: 'User authenticated or MFA required',
+	  schema: {
+		oneOf: [
+		  { $ref: getSchemaPath(AuthenticatedResponseDto) },
+		  { $ref: getSchemaPath(MfaRequiredResponseDto) },
+		],
+	  },
+	})
+	@ApiBadRequestResponse({ description: 'Invalid credentials' })
+	async login(@Body() body: AuthenticateUserDto) {
+	  const result = await this.authenticateUser.execute(body)
+  
+	  if (result.isLeft()) {
+		throw new Error('Invalid credentials') // mapeia pra 401 via filter
+	  }
+  
+	  return result.value
 	}
-}
+  
+	@Post('/register')
+	@ApiOperation({ summary: 'Register new user' })
+	@ApiOkResponse({
+	  description: 'User registered successfully',
+	})
+	@ApiBadRequestResponse({
+	  description: 'Email or CPF already exists / Invalid data',
+	})
+	async register(@Body() body: RegisterUserDto) {
+	  const result = await this.registerUser.execute(body)
+  
+	  if (result.isLeft()) {
+		throw new Error('Invalid data')
+	  }
+  
+	  return result.value
+	}
+  }
+  

@@ -46,6 +46,10 @@ export class Appointment extends Entity<AppointmentProps> {
     return this.props.name;
   }
 
+  get durationInMinutes() {
+    return this.props.durationInMinutes;
+  }
+
   get appointmentItems() {
     return this.props.appointmentItems;
   }

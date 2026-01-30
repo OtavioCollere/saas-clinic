@@ -1,3 +1,4 @@
+import type { PaginationParams } from '@/core/types/pagination-params';
 import type { Patient } from '@/domain/enterprise/entities/patient';
 
 export abstract class PatientRepository {
@@ -6,4 +7,5 @@ export abstract class PatientRepository {
   abstract findByUserId(userId: string): Promise<Patient | null>;
   abstract findByClinicId(clinicId: string): Promise<Patient[]>;
   abstract update(patient: Patient): Promise<Patient>;
+  abstract fetch({ query, page, pageSize }: PaginationParams): Promise<Patient[]>;
 }

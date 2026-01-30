@@ -1,5 +1,7 @@
 import {beforeEach, describe, expect, it} from 'vitest'
 import { InMemoryUsersRepository } from 'tests/in-memory-repositories/in-memory-users-repository'
+import { InMemorySessionsRepository } from 'tests/in-memory-repositories/in-memory-sessions-repository'
+import { InMemoryMfaSettingsRepository } from 'tests/in-memory-repositories/in-memory-mfa-settings-repository'
 import { FakeHasher } from 'tests/cryptography/fake-hasher'
 import { isLeft, isRight, unwrapEither } from '@/core/either/either'
 import { makeUser } from 'tests/factories/makeUser'
@@ -12,14 +14,24 @@ describe('AuthenticateUserUseCase Unit Tests', () => {
 
     let sut: AuthenticateUserUseCase
     let inMemoryUsersRepository : InMemoryUsersRepository
+    let inMemorySessionsRepository : InMemorySessionsRepository
+    let inMemoryMfaSettingsRepository : InMemoryMfaSettingsRepository
     let fakeHasher : FakeHasher
     let fakeEncrypter : FakeEncrypter
 
     beforeEach(() => {
         inMemoryUsersRepository = new InMemoryUsersRepository()
+        inMemorySessionsRepository = new InMemorySessionsRepository()
+        inMemoryMfaSettingsRepository = new InMemoryMfaSettingsRepository()
         fakeHasher = new FakeHasher()
         fakeEncrypter = new FakeEncrypter()
-        sut = new AuthenticateUserUseCase(inMemoryUsersRepository, fakeHasher, fakeEncrypter)
+        sut = new AuthenticateUserUseCase(
+            inMemoryUsersRepository, 
+            fakeHasher, 
+            fakeEncrypter,
+            inMemorySessionsRepository,
+            inMemoryMfaSettingsRepository
+        )
     })
 
     it("should be able to authenticate a user", async () => {
@@ -32,13 +44,19 @@ describe('AuthenticateUserUseCase Unit Tests', () => {
 
         const result = await sut.execute({
           email : 'otavio@gmail.com',
-          password : '1234'
+          password : '1234',
+          fingerprint: {
+            ip: '127.0.0.1',
+            userAgent: 'test-agent',
+          }
         })
 
         expect(isRight(result)).toBeTruthy()
         if(isRight(result)) {
-            expect(unwrapEither(result)).toEqual(
+            const response = unwrapEither(result);
+            expect(response).toEqual(
               expect.objectContaining({
+                type: 'authenticated',
                 access_token : 'signed-token',
                 refresh_token : 'refresh-token'
               })
@@ -50,7 +68,11 @@ describe('AuthenticateUserUseCase Unit Tests', () => {
     it("should not be able to authenticate a user with non existent email", async () => {
         const result = await sut.execute({
             email : 'otavio@gmail.com',
-            password : '1234'
+            password : '1234',
+            fingerprint: {
+                ip: '127.0.0.1',
+                userAgent: 'test-agent',
+            }
         })
 
         expect(isLeft(result)).toBeTruthy()
@@ -66,7 +88,11 @@ describe('AuthenticateUserUseCase Unit Tests', () => {
 
         const result = await sut.execute({
             email : 'otavio@gmail.com',
-            password : 'wrong-password'
+            password : 'wrong-password',
+            fingerprint: {
+                ip: '127.0.0.1',
+                userAgent: 'test-agent',
+            }
         })
 
         expect(isLeft(result)).toBeTruthy()
