@@ -1,10 +1,59 @@
 # SaaS Clinic - Backend API
 
-Backend de autenticação e autorização construído com arquitetura limpa (Clean Architecture) e Domain-Driven Design (DDD). O projeto implementa um sistema de autenticação robusto com suporte a MFA, gerenciamento de sessões baseado em fingerprint e validação rigorosa de dados.
+Sistema SaaS completo para gestão de **pequenas e médias clínicas de estética**. Plataforma backend construída com arquitetura limpa (Clean Architecture) e Domain-Driven Design (DDD), oferecendo funcionalidades completas para gerenciamento de clínicas, franquias, pacientes, profissionais, agendamentos, procedimentos e anamneses.
 
 > **Nota:** Este projeto foi desenvolvido como exercício de aprendizado e prática, com o objetivo de aplicar e consolidar conhecimentos sobre arquitetura de software, padrões de design e tecnologias modernas que são utilizadas em projetos profissionais.
 
-## Visão Geral do Projeto
+## Sobre o SaaS Clinic
+
+O **SaaS Clinic** é uma plataforma completa de gestão desenvolvida especificamente para **pequenas e médias clínicas de estética**. O sistema oferece todas as ferramentas necessárias para administrar o dia a dia de uma clínica, desde o cadastro de pacientes até o controle de agendamentos e procedimentos realizados.
+
+### Público-Alvo
+
+- **Pequenas clínicas de estética** (1-5 profissionais)
+- **Médias clínicas de estética** (6-20 profissionais)
+- **Redes de franquias** de clínicas de estética
+- **Profissionais autônomos** que precisam de gestão profissional
+
+### Funcionalidades Principais
+
+#### Gestão de Clínicas e Franquias
+- Cadastro e gerenciamento de clínicas
+- Sistema de franquias (múltiplas unidades)
+- Ativação/desativação de clínicas e franquias
+- Controle de membros e papéis (roles)
+
+#### Gestão de Pacientes
+- Cadastro completo de pacientes
+- Histórico de atendimentos
+- Anamneses detalhadas (histórico médico, condições de saúde, histórico estético, avaliação física)
+- Busca e filtros avançados
+
+#### Gestão de Profissionais
+- Cadastro de profissionais por franquia
+- Vinculação com conselhos profissionais (CRM, CRO, etc.)
+- Controle de especialidades e profissões
+
+#### Agendamentos
+- Sistema completo de agendamentos
+- Controle de status (aguardando, confirmado, cancelado, concluído)
+- Agendamentos por paciente e profissional
+- Itens de agendamento (múltiplos procedimentos por agendamento)
+
+#### Procedimentos
+- Cadastro de procedimentos por franquia
+- Controle de preços e descrições
+- Ativação/desativação de procedimentos
+- Busca e listagem
+
+#### Anamneses
+- Anamnese completa por paciente
+- Histórico médico
+- Condições de saúde
+- Histórico estético
+- Avaliação física
+
+## Visão Geral Técnica
 
 Sistema backend modular focado em segurança, escalabilidade e manutenibilidade. A arquitetura separa responsabilidades em camadas bem definidas, facilitando testes, manutenção e evolução do código.
 
@@ -20,6 +69,14 @@ Sistema backend modular focado em segurança, escalabilidade e manutenibilidade.
 - **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
 - **Testes:** Vitest
 - **Linting/Formatting:** Biome
+
+## Objetivos do Negócio
+
+1. **Gestão Completa:** Sistema unificado para todas as necessidades de uma clínica de estética
+2. **Multi-tenant:** Suporte a múltiplas clínicas e franquias na mesma plataforma
+3. **Escalabilidade:** Preparado para crescer com a clínica, de pequena a média porte
+4. **Facilidade de Uso:** API intuitiva e bem documentada
+5. **Conformidade:** Controle de dados sensíveis e histórico médico completo
 
 ## Objetivos Técnicos
 
@@ -525,36 +582,15 @@ npm run start:prod
 - [ ] Refresh token rotation
 - [ ] Device management
 - [ ] Audit logs
-- [ ] Rate limiting por usuário/IP customizável
 
 ## Limitações Conhecidas
 
 1. **Testes E2E:** Não implementados. Cobertura atual apenas unitária.
-2. **Observabilidade Avançada:** Logging estruturado implementado. Métricas e tracing não implementados.
-3. **Secrets Management:** Variáveis de ambiente em arquivo. Não há integração com serviços de secrets.
-4. **Rate Limiting:** Requer Redis em execução. Sem Redis, o guard não funciona corretamente.
+2. **Observabilidade:** Logging estruturado implementado. Métricas e tracing não implementados.
+3. **Rate Limiting:** Requer Redis em execução. Sem Redis, o guard não funciona corretamente.
 
-## Contribuição
 
-### Padrões de Código
 
-- **TypeScript:** Strict mode habilitado
-- **Linting:** Biome (substitui ESLint + Prettier)
-- **Commits:** Mensagens descritivas em português ou inglês
-- **Branches:** `feature/`, `fix/`, `refactor/`
 
-### Checklist para PRs
 
-- [ ] Testes unitários passando
-- [ ] Código formatado com Biome
-- [ ] Sem erros de lint
-- [ ] Documentação atualizada (se necessário)
-- [ ] Variáveis de ambiente documentadas (se novas)
 
-## Responsáveis Técnicos
-
-Para questões técnicas sobre arquitetura, decisões de design ou problemas críticos, contate a equipe de backend.
-
----
-
-**Última atualização:** Janeiro 2025
