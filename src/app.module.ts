@@ -8,6 +8,7 @@ import { EmailModule } from './infra/email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
 import { DomainErrorFilter } from './shared/filters/domain-error.filter';
+import { AppLoggerModule } from './infra/observability/logger.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DomainErrorFilter } from './shared/filters/domain-error.filter';
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
       },
     }),
+    AppLoggerModule,
     AuthModule,
     HttpModule,
     EnvModule,
