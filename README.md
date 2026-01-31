@@ -16,6 +16,8 @@ Sistema backend modular focado em segurança, escalabilidade e manutenibilidade.
 - **Banco de Dados:** PostgreSQL com Prisma ORM
 - **Cache/Queue:** Redis (ioredis) com BullMQ
 - **Email:** Nodemailer (com BullMQ para processamento assíncrono)
+- **Logging:** Pino (nestjs-pino) com logs estruturados
+- **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
 - **Testes:** Vitest
 - **Linting/Formatting:** Biome
 
@@ -57,17 +59,43 @@ Fastify foi escolhido por performance superior e melhor suporte a TypeScript nat
 
 Zod fornece validação em runtime com inferência de tipos TypeScript. Isso garante que dados validados em runtime correspondem aos tipos em compile-time.
 
+### Rate Limiting com Token Bucket
+
+Implementação de rate limiting usando o algoritmo Token Bucket com Redis:
+
+- **Algoritmo:** Token Bucket (permite bursts controlados)
+- **Implementação:** Script Lua no Redis para operações atômicas
+- **Performance:** Operações atômicas garantem consistência sem locks
+- **Escopo:** Por IP do cliente
+- **Configuração:** Flexível via decorator `@RateLimit()`
+
+**Trade-off:** Requer Redis em execução, mas oferece alta performance e consistência distribuída.
+
+### Logging Estruturado com Pino
+
+Sistema de logging otimizado para performance:
+
+- **Biblioteca:** Pino (via nestjs-pino)
+- **Performance:** Ultra-rápido, mínimo overhead (~5% mais lento que console.log)
+- **Formato:** JSON estruturado em produção, legível em desenvolvimento
+- **Integração:** Automática com NestJS, captura contexto de requests
+
+**Trade-off:** JSON estruturado é menos legível para humanos, mas facilita parsing e análise automatizada.
+
 ## Arquitetura do Sistema
 
 ### Estrutura de Diretórios
 
 ```
 src/
-├── core/                    # Código compartilhado entre camadas
+├── shared/                  # Código compartilhado entre camadas
 │   ├── entities/            # Entidades base
 │   ├── errors/              # Erros de domínio
 │   ├── either/              # Functional error handling
-│   └── types/               # Tipos utilitários
+│   ├── types/               # Tipos utilitários
+│   ├── guards/              # Guards reutilizáveis
+│   ├── decorators/          # Decorators customizados
+│   └── filters/             # Filtros globais
 ├── domain/                  # Camada de domínio
 │   ├── enterprise/          # Entidades e value objects
 │   ├── application/         # Casos de uso
@@ -77,11 +105,14 @@ src/
 │   └── services/           # Serviços de domínio
 └── infra/                   # Camada de infraestrutura
     ├── auth/                # Implementação de autenticação
-    ├── cryptography/       # Implementação de criptografia
+    ├── cryptography/        # Implementação de criptografia
     ├── database/            # Prisma e configuração de DB
     ├── email/               # Serviço de email (Nodemailer + BullMQ)
     ├── env/                 # Validação de variáveis de ambiente
-    └── http/                # Controllers e presenters
+    ├── http/                # Controllers e presenters
+    ├── observability/       # Logging e monitoramento
+    ├── rate-limit/          # Rate limiting (Token Bucket)
+    └── cache/               # Cache com Redis
 ```
 
 ### Fluxo de Dados
@@ -152,6 +183,48 @@ Implementação de MFA via TOTP (Time-based One-Time Password):
 - **Runtime:** Zod schemas validam todos os inputs
 - **Compile-time:** Inferência de tipos TypeScript a partir dos schemas
 - **HTTP:** Validação via pipes do NestJS antes de chegar aos controllers
+
+### Rate Limiting
+
+Implementação de rate limiting usando o algoritmo **Token Bucket**:
+
+- **Algoritmo:** Token Bucket
+- **Implementação:** Redis com script Lua para operações atômicas
+- **Escopo:** Por IP do cliente
+- **Configuração:** Via decorator `@RateLimit()` em controllers ou rotas
+- **Guard Global:** Aplicado automaticamente via `APP_GUARD`
+
+**Exemplo de uso:**
+```typescript
+@RateLimit({ capacity: 5, refillRate: 1 })
+@Controller('/users')
+export class AuthenticateUserController {
+  // ...
+}
+```
+
+**Características:**
+- Operações atômicas via Lua script no Redis
+- Configuração flexível por rota/controller
+- Resposta HTTP 429 (Too Many Requests) quando excedido
+- Recarga automática de tokens baseada em taxa configurada
+
+### Logging e Observabilidade
+
+Sistema de logging estruturado com **Pino**:
+
+- **Biblioteca:** nestjs-pino (integração Pino com NestJS)
+- **Formato:** JSON estruturado em produção
+- **Desenvolvimento:** pino-pretty para logs coloridos e legíveis
+- **Performance:** Ultra-rápido, mínimo overhead
+- **Contexto:** Metadata automática de request/response
+- **Filtros:** HttpExceptionFilter global para captura de erros
+
+**Características:**
+- Logs estruturados facilitam parsing e análise
+- Níveis de log: info, error, warn, debug
+- Contexto rico com método HTTP, URL, status, etc.
+- Tratamento global de exceções com logging automático
 
 ## Fluxos Principais
 
@@ -267,6 +340,13 @@ src/domain/application/use-cases/
           └── authenticate-user.spec.ts
 ```
 
+**Padrão de Testes:**
+- **Happy Path:** Testa o fluxo de sucesso
+- **Sad Path:** Testa casos de erro e validações
+- **Arrange-Act-Assert:** Estrutura clara e organizada
+- **In-Memory Repositories:** Isolamento completo de dependências externas
+- **Fake Services:** Mocks para serviços de criptografia, hash, etc.
+
 ### Testes E2E
 
 Testes end-to-end validam fluxos completos através da API HTTP:
@@ -326,9 +406,11 @@ SMTP_PASS="password"
 EMAIL_FROM="noreply@example.com"
 EMAIL_VERIFY_URL="http://localhost:3000/email-verification/verify"
 
-# Redis (para BullMQ)
+# Redis (para BullMQ e Rate Limiting)
 REDIS_HOST="localhost"
 REDIS_PORT="6379"
+REDIS_PASSWORD=""  # Opcional
+REDIS_DATABASE=""  # Opcional
 
 # Server
 PORT=3000
@@ -371,7 +453,10 @@ Isso inicia:
 - PostgreSQL na porta 5432
 - PgAdmin na porta 5050
 
-**Nota:** Redis não está configurado no docker-compose atual. Adicione manualmente ou use instância local.
+**Nota:** Redis não está configurado no docker-compose atual. Para funcionalidades de rate limiting e filas de email, é necessário ter Redis em execução. Você pode:
+- Instalar Redis localmente
+- Usar Docker: `docker run -d -p 6379:6379 redis:alpine`
+- Usar um serviço gerenciado (Redis Cloud, AWS ElastiCache, etc.)
 
 ### Scripts Disponíveis
 
@@ -419,16 +504,17 @@ npm run start:prod
 - [x] Validação de dados com Zod
 - [x] Testes unitários
 - [x] Documentação Swagger
-- [x] Rate limit guard (estrutura básica)
+- [x] **Rate Limiting:** Token Bucket completo com Redis e Lua script
+- [x] **Logging:** Pino com logs estruturados e pino-pretty em dev
+- [x] **Observabilidade:** HttpExceptionFilter global para tratamento de erros
 
 ### Planejado 🚧
 
-- [ ] **Rate Limiting:** Implementação completa de token bucket com Redis
 - [ ] **Testes E2E:** Cobertura de fluxos críticos
-- [ ] **Observabilidade:**
-  - [ ] Logs estruturados (JSON)
+- [ ] **Observabilidade Avançada:**
   - [ ] Métricas (Prometheus)
   - [ ] Tracing distribuído (OpenTelemetry)
+  - [ ] Dashboard de monitoramento
 - [ ] **Deploy:**
   - [ ] Configuração para Cloud Run
   - [ ] CI/CD pipeline
@@ -443,11 +529,10 @@ npm run start:prod
 
 ## Limitações Conhecidas
 
-1. **Rate Limiting:** Guard implementado mas não totalmente integrado. Redis necessário para funcionamento completo.
-2. **Rate Limiting:** Guard implementado mas não totalmente integrado. Redis necessário para funcionamento completo.
-3. **Testes E2E:** Não implementados. Cobertura atual apenas unitária.
-4. **Observabilidade:** Logging básico. Métricas e tracing não implementados.
-5. **Secrets Management:** Variáveis de ambiente em arquivo. Não há integração com serviços de secrets.
+1. **Testes E2E:** Não implementados. Cobertura atual apenas unitária.
+2. **Observabilidade Avançada:** Logging estruturado implementado. Métricas e tracing não implementados.
+3. **Secrets Management:** Variáveis de ambiente em arquivo. Não há integração com serviços de secrets.
+4. **Rate Limiting:** Requer Redis em execução. Sem Redis, o guard não funciona corretamente.
 
 ## Contribuição
 
@@ -472,4 +557,4 @@ Para questões técnicas sobre arquitetura, decisões de design ou problemas cr�
 
 ---
 
-**Última atualização:** 2024
+**Última atualização:** Janeiro 2025
