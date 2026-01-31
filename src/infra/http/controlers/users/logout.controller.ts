@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { UserNotFoundError } from "@/core/errors/user-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { LogoutUseCase } from "@/domain/application/use-cases/users/logout";
 import { BadRequestException, Controller, NotFoundException, Post } from "@nestjs/common";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";

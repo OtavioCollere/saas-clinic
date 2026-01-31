@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { ProcedureNotFoundError } from '@/core/errors/procedure-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { ProcedureNotFoundError } from '@/shared/errors/procedure-not-found-error';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';
 import { makeProcedure } from 'test/factories/makeProcedure';
 import { InMemoryProcedureRepository } from 'test/in-memory-repositories/in-memory-procedure-repository';

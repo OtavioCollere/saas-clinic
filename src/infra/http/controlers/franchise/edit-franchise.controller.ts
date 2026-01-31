@@ -1,6 +1,6 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { FranchiseNotFoundError } from "@/core/errors/franchise-not-found-error";
-import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
+import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { EditFranchiseUseCase } from "@/domain/application/use-cases/franchise/edit-franchise";
 import { Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";

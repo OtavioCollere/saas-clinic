@@ -1,6 +1,6 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { AppointmentNotFoundError } from '@/core/errors/appointment-not-found-error';
-import { DomainError } from '@/core/errors/domain-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
+import { DomainError } from '@/shared/errors/domain-error';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';

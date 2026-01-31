@@ -1,6 +1,6 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import type { Franchise } from '@/domain/enterprise/entities/franchise';
 import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { FranchiseRepository } from '../../repositories/franchise-repository';

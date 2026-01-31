@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { MfaAlreadyExistsError } from "@/core/errors/mfa-already-exists-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { MfaAlreadyExistsError } from "@/shared/errors/mfa-already-exists-error";
 import { SetupMfaUseCase } from "@/domain/application/use-cases/mfa/setup-mfa";
 import { User } from "@/domain/enterprise/entities/user";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";

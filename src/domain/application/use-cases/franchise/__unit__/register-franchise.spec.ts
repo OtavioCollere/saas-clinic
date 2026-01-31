@@ -1,6 +1,6 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { makeClinic } from 'tests/factories/makeClinic';

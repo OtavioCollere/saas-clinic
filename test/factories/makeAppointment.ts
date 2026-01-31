@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { AppointmentProps } from '@/domain/enterprise/entities/appointment';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';

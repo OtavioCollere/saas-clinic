@@ -1,9 +1,9 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
-import { ProfessionalAlreadyExistsError } from '@/core/errors/professional-already-exists-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { ProfessionalAlreadyExistsError } from '@/shared/errors/professional-already-exists-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { Professional } from '@/domain/enterprise/entities/professional';
 import { Council } from '@/domain/enterprise/value-objects/council';
 import { Profession } from '@/domain/enterprise/value-objects/profession';

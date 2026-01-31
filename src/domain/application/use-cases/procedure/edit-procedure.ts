@@ -1,5 +1,5 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { ProcedureNotFoundError } from '@/core/errors/procedure-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { ProcedureNotFoundError } from '@/shared/errors/procedure-not-found-error';
 import type { Procedure } from '@/domain/enterprise/entities/procedure';
 import type { ProcedureRepository } from '../../repositories/procedure-repository';
 

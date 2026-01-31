@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { ProfessionalNotFoundError } from '@/core/errors/professional-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
 import { Council } from '@/domain/enterprise/value-objects/council';
 import { Profession } from '@/domain/enterprise/value-objects/profession';
 import { makeProfessional } from 'test/factories/makeProfessional';

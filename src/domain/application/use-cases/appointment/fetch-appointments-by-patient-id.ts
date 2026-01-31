@@ -1,4 +1,4 @@
-import { type Either, makeRight } from '@/core/either/either';
+import { type Either, makeRight } from '@/shared/either/either';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
 

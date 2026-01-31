@@ -1,4 +1,4 @@
-import type { PaginationParams } from '@/core/types/pagination-params';
+import type { PaginationParams } from '@/shared/types/pagination-params';
 import type { Patient } from '@/domain/enterprise/entities/patient';
 
 export abstract class PatientRepository {

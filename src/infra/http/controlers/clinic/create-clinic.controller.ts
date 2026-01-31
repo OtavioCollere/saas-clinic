@@ -1,6 +1,6 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ClinicAlreadyExistsError } from "@/core/errors/clinic-already-exists-error";
-import { OwnerNotFoundError } from "@/core/errors/owner-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ClinicAlreadyExistsError } from "@/shared/errors/clinic-already-exists-error";
+import { OwnerNotFoundError } from "@/shared/errors/owner-not-found-error";
 import { CreateClinicUseCase } from "@/domain/application/use-cases/clinic/create-clinic";
 import { BadRequestException, Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
 import z from "zod";

@@ -1,6 +1,6 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
 import { Procedure } from '@/domain/enterprise/entities/procedure';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';
 import type { FranchiseRepository } from '../../repositories/franchise-repository';

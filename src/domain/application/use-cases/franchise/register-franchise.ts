@@ -1,7 +1,7 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import { Franchise } from '@/domain/enterprise/entities/franchise';
 import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';
 import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';

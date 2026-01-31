@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';
 import { makeFranchise } from 'test/factories/makeFranchise';
 import { InMemoryFranchiseRepository } from 'test/in-memory-repositories/in-memory-franchise-repository';

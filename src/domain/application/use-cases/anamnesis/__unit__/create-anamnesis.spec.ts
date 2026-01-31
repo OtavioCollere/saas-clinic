@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { PatientNotFoundError } from '@/core/errors/patient-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import { makePatient } from 'test/factories/makePatient';
 import { InMemoryAnamnesisRepository } from 'test/in-memory-repositories/in-memory-anamnesis-repository';
 import { InMemoryPatientRepository } from 'test/in-memory-repositories/in-memory-patient-repository';

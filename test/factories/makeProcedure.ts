@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { ProcedureProps } from '@/domain/enterprise/entities/procedure';
 import { Procedure } from '@/domain/enterprise/entities/procedure';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';

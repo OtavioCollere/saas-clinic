@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { EnableMfaUseCase } from "../enable-mfa";
 import { InMemoryMfaSettingsRepository } from "tests/in-memory-repositories/in-memory-mfa-settings-repository";
 import { FakeMfaService } from "tests/cryptography/fake-mfa-service";
-import { isLeft, isRight, unwrapEither } from "@/core/either/either";
-import { MfaSettingsNotFoundError } from "@/core/errors/mfa-settings-not-found-error";
-import { MfaAlreadyEnabledError } from "@/core/errors/mfa-already-enabled-error";
-import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
+import { isLeft, isRight, unwrapEither } from "@/shared/either/either";
+import { MfaSettingsNotFoundError } from "@/shared/errors/mfa-settings-not-found-error";
+import { MfaAlreadyEnabledError } from "@/shared/errors/mfa-already-enabled-error";
+import { InvalidTotpCodeError } from "@/shared/errors/invalid-totp-code-error";
 import { makeMfaSettings } from "tests/factories/makeMfaSettings";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 
 describe('EnableMfaUseCase Unit Tests', () => {
 	let sut: EnableMfaUseCase;

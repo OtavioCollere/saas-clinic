@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { ClinicMembership, type ClinicMembershipProps } from '@/domain/enterprise/entities/clinic-membership';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 

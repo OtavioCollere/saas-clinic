@@ -3,10 +3,10 @@ import { InMemoryUsersRepository } from 'tests/in-memory-repositories/in-memory-
 import { InMemorySessionsRepository } from 'tests/in-memory-repositories/in-memory-sessions-repository'
 import { InMemoryMfaSettingsRepository } from 'tests/in-memory-repositories/in-memory-mfa-settings-repository'
 import { FakeHasher } from 'tests/cryptography/fake-hasher'
-import { isLeft, isRight, unwrapEither } from '@/core/either/either'
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either'
 import { makeUser } from 'tests/factories/makeUser'
 import { Email } from '@/domain/enterprise/value-objects/email'
-import { WrongCredentialsError } from '@/core/errors/wrong-credentials-error'
+import { WrongCredentialsError } from '@/shared/errors/wrong-credentials-error'
 import { AuthenticateUserUseCase } from '../authenticate-user'
 import { FakeEncrypter } from 'tests/cryptography/fake-encrypter'
 

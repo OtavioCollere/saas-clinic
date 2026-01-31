@@ -1,8 +1,8 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { EmailAlreadyExistsError } from "@/core/errors/email-already-exists-error";
-import { InvalidCpfError } from "@/core/errors/invalid-cpf-error";
-import { InvalidEmailError } from "@/core/errors/invalid-email-error";
-import { CpfAlreadyExistsError } from "@/core/errors/cpf-already-exists-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { EmailAlreadyExistsError } from "@/shared/errors/email-already-exists-error";
+import { InvalidCpfError } from "@/shared/errors/invalid-cpf-error";
+import { InvalidEmailError } from "@/shared/errors/invalid-email-error";
+import { CpfAlreadyExistsError } from "@/shared/errors/cpf-already-exists-error";
 import { RegisterUserUseCase } from "@/domain/application/use-cases/users/register-user";
 import {
   BadRequestException,
@@ -17,6 +17,7 @@ import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { UserPresenter } from "../../presenters/user-presenter";
 import { Public } from "@/infra/auth/public";
+import { RateLimit } from "@/shared/decorators/rate-limit.decorator";
 
 const registerUserBodySchema = z.object({
   name: z.string(),
@@ -28,6 +29,7 @@ const registerUserBodySchema = z.object({
 type RegisterUserBodySchema = z.infer<typeof registerUserBodySchema>;
 
 @Public()
+@RateLimit({capacity : 5, refillRate : 1})
 @Controller("/users")
 export class RegisterUserController {
   constructor(

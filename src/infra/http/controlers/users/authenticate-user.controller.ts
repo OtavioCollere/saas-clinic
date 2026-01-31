@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { WrongCredentialsError } from "@/core/errors/wrong-credentials-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { WrongCredentialsError } from "@/shared/errors/wrong-credentials-error";
 import { AuthenticateUserUseCase } from "@/domain/application/use-cases/users/authenticate-user";
 import {
   BadRequestException,
@@ -12,6 +12,7 @@ import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { Fingerprint } from "../../decorators/fingerprint.decorator";
 import { Public } from "@/infra/auth/public";
+import { RateLimit } from "@/shared/decorators/rate-limit.decorator";
 
 const authenticateUserBodySchema = z.object({
   email: z.string(),
@@ -21,6 +22,7 @@ const authenticateUserBodySchema = z.object({
 type AuthenticateUserBodySchema = z.infer<typeof authenticateUserBodySchema>;
 
 @Public()
+@RateLimit({capacity : 5, refillRate : 1})
 @Controller("/users")
 export class AuthenticateUserController {
   constructor(

@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { FranchiseNotFoundError } from "@/core/errors/franchise-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { CreateProcedureUseCase } from "@/domain/application/use-cases/procedure/create-procedure";
 import { Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
 import z from "zod";

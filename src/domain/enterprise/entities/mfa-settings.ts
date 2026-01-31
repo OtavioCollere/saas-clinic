@@ -1,6 +1,6 @@
-import { Entity } from "@/core/entities/entity";
-import type { UniqueEntityId } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
+import { Entity } from "@/shared/entities/entity";
+import type { UniqueEntityId } from "@/shared/entities/unique-entity-id";
+import { Optional } from "@/shared/types/optional";
 
 export interface MfaSettingsProps{
   userId: UniqueEntityId;

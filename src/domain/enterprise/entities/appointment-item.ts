@@ -1,6 +1,6 @@
-import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { Entity } from '@/shared/entities/entity';
+import { Optional } from '@/shared/types/optional';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 
 export interface AppointmentItemProps {
   appointmentId: UniqueEntityId;

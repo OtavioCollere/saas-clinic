@@ -1,5 +1,5 @@
 import { Session, type SessionProps } from "@/domain/enterprise/entities/session";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { SessionStatus } from "@/domain/enterprise/value-objects/session-status";
 
 export function makeSession(override: Partial<SessionProps> = {}): Session {

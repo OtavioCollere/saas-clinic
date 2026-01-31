@@ -1,6 +1,6 @@
-import { Entity } from '@/core/entities/entity';
-import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import type { Optional } from '@/core/types/optional';
+import { Entity } from '@/shared/entities/entity';
+import type { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import type { Optional } from '@/shared/types/optional';
 import type { Cpf } from '../value-objects/cpf';
 import type { Email } from '../value-objects/email';
 import type { UserRole } from '../value-objects/user-role';

@@ -1,7 +1,7 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { FranchiseHasPendingAppointmentsError } from '@/core/errors/franchise-has-pending-appointments-error';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { FranchiseHasPendingAppointmentsError } from '@/shared/errors/franchise-has-pending-appointments-error';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import type { Franchise } from '@/domain/enterprise/entities/franchise';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
 import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';

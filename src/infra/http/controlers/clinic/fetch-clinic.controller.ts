@@ -1,4 +1,4 @@
-import { unwrapEither } from "@/core/either/either";
+import { unwrapEither } from "@/shared/either/either";
 import { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-clinic";
 import { Controller, Get, Query, UsePipes } from "@nestjs/common";
 import z from "zod";

@@ -1,6 +1,6 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ProfessionalNotFoundError } from "@/core/errors/professional-not-found-error";
-import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
+import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { EditProfessionalUseCase } from "@/domain/application/use-cases/professional/edit-professional";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";

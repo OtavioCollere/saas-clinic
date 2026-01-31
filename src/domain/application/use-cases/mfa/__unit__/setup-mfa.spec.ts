@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { SetupMfaUseCase } from "../setup-mfa";
 import { InMemoryMfaSettingsRepository } from "tests/in-memory-repositories/in-memory-mfa-settings-repository";
 import { FakeMfaService } from "tests/cryptography/fake-mfa-service";
-import { isLeft, isRight, unwrapEither } from "@/core/either/either";
-import { MfaAlreadyExistsError } from "@/core/errors/mfa-already-exists-error";
+import { isLeft, isRight, unwrapEither } from "@/shared/either/either";
+import { MfaAlreadyExistsError } from "@/shared/errors/mfa-already-exists-error";
 import { makeMfaSettings } from "tests/factories/makeMfaSettings";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 
 describe('SetupMfaUseCase Unit Tests', () => {
 	let sut: SetupMfaUseCase;

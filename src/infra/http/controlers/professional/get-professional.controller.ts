@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ProfessionalNotFoundError } from "@/core/errors/professional-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
 import { GetProfessionalUseCase } from "@/domain/application/use-cases/professional/get-professional";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";

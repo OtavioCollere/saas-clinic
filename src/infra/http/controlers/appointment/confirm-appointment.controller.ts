@@ -1,7 +1,7 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { AppointmentNotFoundError } from "@/core/errors/appointment-not-found-error";
-import { PatientNotFoundError } from "@/core/errors/patient-not-found-error";
-import { DomainError } from "@/core/errors/domain-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { AppointmentNotFoundError } from "@/shared/errors/appointment-not-found-error";
+import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
+import { DomainError } from "@/shared/errors/domain-error";
 import { ConfirmAppointmentUseCase } from "@/domain/application/use-cases/appointment/confirm-appointment";
 import { BadRequestException, Body, Controller, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";

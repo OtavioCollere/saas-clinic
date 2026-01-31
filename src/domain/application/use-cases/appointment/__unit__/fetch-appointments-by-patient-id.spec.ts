@@ -1,4 +1,4 @@
-import { isRight, unwrapEither } from '@/core/either/either';
+import { isRight, unwrapEither } from '@/shared/either/either';
 import { makeAppointment } from 'test/factories/makeAppointment';
 import { makePatient } from 'test/factories/makePatient';
 import { InMemoryAppointmentsRepository } from 'test/in-memory-repositories/in-memory-appointments-repository';

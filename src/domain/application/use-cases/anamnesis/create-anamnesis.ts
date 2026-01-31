@@ -1,6 +1,6 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { PatientNotFoundError } from '@/core/errors/patient-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import type { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
 import type { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history';
 import type { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions';

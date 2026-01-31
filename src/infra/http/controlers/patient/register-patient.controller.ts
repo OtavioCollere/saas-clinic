@@ -1,6 +1,6 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
-import { UserNotFoundError } from "@/core/errors/user-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
+import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { RegisterPatientUseCase } from "@/domain/application/use-cases/patient/register-patient";
 import { Body, Controller, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
 import z from "zod";

@@ -1,8 +1,8 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { FranchiseHasPendingAppointmentsError } from '@/core/errors/franchise-has-pending-appointments-error';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { FranchiseHasPendingAppointmentsError } from '@/shared/errors/franchise-has-pending-appointments-error';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';

@@ -1,4 +1,4 @@
-import { type Either, makeRight } from '@/core/either/either';
+import { type Either, makeRight } from '@/shared/either/either';
 import type { Procedure } from '@/domain/enterprise/entities/procedure';
 import type { ProcedureRepository } from '../../repositories/procedure-repository';
 

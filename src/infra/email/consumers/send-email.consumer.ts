@@ -1,7 +1,7 @@
 import { Processor, Process } from '@nestjs/bull'
 import { Injectable } from '@nestjs/common'
 import { Job } from 'bull'
-import { EmailSender } from '@/core/services/email/email-sender'
+import { EmailSender } from '@/shared/services/email/email-sender'
 
 interface SendEmailJobData {
   to: string

@@ -1,7 +1,7 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicAlreadyExistsError } from '@/core/errors/clinic-already-exists-error';
-import { OwnerNotFoundError } from '@/core/errors/owner-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
+import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
 import { Clinic } from '@/domain/enterprise/entities/clinic';
 import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';

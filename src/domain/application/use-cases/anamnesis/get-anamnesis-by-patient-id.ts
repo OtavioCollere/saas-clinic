@@ -1,5 +1,5 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { PatientNotFoundError } from '@/core/errors/patient-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import type { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
 import type { AnamnesisRepository } from '../../repositories/anamnesis-repository';
 import type { PatientRepository } from '../../repositories/patient-repository';

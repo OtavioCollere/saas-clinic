@@ -1,7 +1,7 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { AppointmentNotFoundError } from '@/core/errors/appointment-not-found-error';
-import { PatientNotFoundError } from '@/core/errors/patient-not-found-error';
-import { DomainError } from '@/core/errors/domain-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { DomainError } from '@/shared/errors/domain-error';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
 import type { PatientRepository } from '../../repositories/patient-repository';

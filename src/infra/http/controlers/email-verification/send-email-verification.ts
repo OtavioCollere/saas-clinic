@@ -2,8 +2,8 @@ import { SendEmailVerificationUseCase } from "@/domain/application/use-cases/ema
 import { BadRequestException, Body, Controller, Inject, NotFoundException, Post, UsePipes } from "@nestjs/common";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
 import { User } from "@prisma/client";
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { UserNotFoundError } from "@/core/errors/user-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { Public } from "@/infra/auth/public";
 
 @Public()

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { WrongCredentialsError } from "@/core/errors/wrong-credentials-error";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
+import { WrongCredentialsError } from "@/shared/errors/wrong-credentials-error";
 import { UsersRepository } from "../../repositories/users-repository";
 import { HashComparer } from "../../cryptography/hash-comparer";
 import { Encrypter } from "../../cryptography/encrypter";

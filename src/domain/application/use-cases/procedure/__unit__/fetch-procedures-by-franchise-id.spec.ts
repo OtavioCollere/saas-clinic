@@ -1,4 +1,4 @@
-import { isRight, unwrapEither } from '@/core/either/either';
+import { isRight, unwrapEither } from '@/shared/either/either';
 import { makeFranchise } from 'test/factories/makeFranchise';
 import { makeProcedure } from 'test/factories/makeProcedure';
 import { InMemoryProcedureRepository } from 'test/in-memory-repositories/in-memory-procedure-repository';

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { UserNotFoundError } from "@/core/errors/user-not-found-error";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
+import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { UsersRepository } from "../../repositories/users-repository";
 import { SessionsRepository } from "../../repositories/sessions-repository";
 

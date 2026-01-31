@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { InMemoryUsersRepository } from 'tests/in-memory-repositories/in-memory-users-repository';
 import { InMemorySessionsRepository } from 'tests/in-memory-repositories/in-memory-sessions-repository';
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
 import { makeUser } from 'tests/factories/makeUser';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { LogoutUseCase } from '../logout';
 import { makeSession } from 'tests/factories/makeSession';
 import { SessionStatus } from '@/domain/enterprise/value-objects/session-status';

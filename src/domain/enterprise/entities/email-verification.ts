@@ -1,7 +1,7 @@
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { Email } from "../value-objects/email";
-import { Entity } from "@/core/entities/entity";
-import type { Optional } from "@/core/types/optional";
+import { Entity } from "@/shared/entities/entity";
+import type { Optional } from "@/shared/types/optional";
 
 // regras de negocio
 // o token dura 60 minutos

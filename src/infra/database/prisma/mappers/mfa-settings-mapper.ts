@@ -1,5 +1,5 @@
 import { MfaSettings } from "@/domain/enterprise/entities/mfa-settings";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import type { Prisma } from "@prisma/client";
 
 export class MfaSettingsMapper {

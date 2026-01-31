@@ -4,12 +4,12 @@ import { InMemoryMfaSettingsRepository } from "tests/in-memory-repositories/in-m
 import { InMemorySessionsRepository } from "tests/in-memory-repositories/in-memory-sessions-repository";
 import { FakeMfaService } from "tests/cryptography/fake-mfa-service";
 import { FakeEncrypter } from "tests/cryptography/fake-encrypter";
-import { isLeft, isRight, unwrapEither } from "@/core/either/either";
-import { MfaSettingsNotFoundError } from "@/core/errors/mfa-settings-not-found-error";
-import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
+import { isLeft, isRight, unwrapEither } from "@/shared/either/either";
+import { MfaSettingsNotFoundError } from "@/shared/errors/mfa-settings-not-found-error";
+import { InvalidTotpCodeError } from "@/shared/errors/invalid-totp-code-error";
 import { makeMfaSettings } from "tests/factories/makeMfaSettings";
 import { makeSession } from "tests/factories/makeSession";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { SessionStatus } from "@/domain/enterprise/value-objects/session-status";
 import { Session } from "@/domain/enterprise/entities/session";
 

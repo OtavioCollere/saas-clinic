@@ -7,7 +7,7 @@ import { EnvModule } from './infra/env/env.module';
 import { EmailModule } from './infra/email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
-import { DomainErrorFilter } from './core/filters/domain-error.filter';
+import { DomainErrorFilter } from './shared/filters/domain-error.filter';
 
 @Module({
   imports: [

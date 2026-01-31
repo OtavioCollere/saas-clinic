@@ -1,4 +1,4 @@
-import type { PaginationParams } from '@/core/types/pagination-params';
+import type { PaginationParams } from '@/shared/types/pagination-params';
 import type { ClinicRepository } from '../../src/domain/application/repositories/clinic-repository';
 import type { Clinic } from '../../src/domain/enterprise/entities/clinic';
 

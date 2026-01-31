@@ -1,7 +1,7 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ClinicHasPendingAppointmentsError } from "@/core/errors/clinic-has-pending-appointments-error";
-import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
-import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ClinicHasPendingAppointmentsError } from "@/shared/errors/clinic-has-pending-appointments-error";
+import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
+import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { InactivateClinicUseCase } from "@/domain/application/use-cases/clinic/inactivate-clinic";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";

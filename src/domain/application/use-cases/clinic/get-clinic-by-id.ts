@@ -1,5 +1,5 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
 import type { Clinic } from '@/domain/enterprise/entities/clinic';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
 

@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { PatientNotFoundError } from "@/core/errors/patient-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
 import { GetPatientByIdUseCase } from "@/domain/application/use-cases/patient/get-patient-by-id";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";

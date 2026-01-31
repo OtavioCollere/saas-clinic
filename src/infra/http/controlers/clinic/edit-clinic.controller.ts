@@ -1,7 +1,7 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ClinicAlreadyExistsError } from "@/core/errors/clinic-already-exists-error";
-import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
-import { UserIsNotOwnerError } from "@/core/errors/user-is-not-owner-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ClinicAlreadyExistsError } from "@/shared/errors/clinic-already-exists-error";
+import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
+import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { EditClinicUseCase } from "@/domain/application/use-cases/clinic/edit-clinic";
 import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
 import z from "zod";

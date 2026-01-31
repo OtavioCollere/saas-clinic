@@ -1,7 +1,7 @@
 import { InjectQueue } from '@nestjs/bull'
 import { Injectable } from '@nestjs/common'
 import { Queue } from 'bull'
-import { EmailQueue } from '@/core/services/email/email-queue'
+import { EmailQueue } from '@/shared/services/email/email-queue'
 
 @Injectable()
 export class BullEmailQueue extends EmailQueue {

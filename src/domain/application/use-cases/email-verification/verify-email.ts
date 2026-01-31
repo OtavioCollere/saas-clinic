@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
 import { EmailVerificationRepository } from "../../repositories/email-verification-repository";
 import { UsersRepository } from "../../repositories/users-repository";
-import { UserNotFoundError } from "@/core/errors/user-not-found-error";
-import { EmailVerificationNotFoundError } from "@/core/errors/email-verification-not-found-error";
-import { InvalidTokenEmailVerificationError } from "@/core/errors/token-email-verification-expired-error";
-import { TokenAlreadyUsedEmailVerificationError } from "@/core/errors/token-already-used-email-verification-error";
+import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
+import { EmailVerificationNotFoundError } from "@/shared/errors/email-verification-not-found-error";
+import { InvalidTokenEmailVerificationError } from "@/shared/errors/token-email-verification-expired-error";
+import { TokenAlreadyUsedEmailVerificationError } from "@/shared/errors/token-already-used-email-verification-error";
 
 interface VerifyEmailUseCaseRequest {
     token: string;

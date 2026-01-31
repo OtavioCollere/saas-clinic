@@ -1,6 +1,6 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
-import { MfaSettingsNotFoundError } from "@/core/errors/mfa-settings-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { InvalidTotpCodeError } from "@/shared/errors/invalid-totp-code-error";
+import { MfaSettingsNotFoundError } from "@/shared/errors/mfa-settings-not-found-error";
 import { MfaVerifyLoginUseCase } from "@/domain/application/use-cases/mfa/mfa-verify-login";
 import { User } from "@/domain/enterprise/entities/user";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";

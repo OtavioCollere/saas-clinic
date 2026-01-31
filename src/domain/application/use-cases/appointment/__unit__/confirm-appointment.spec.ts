@@ -1,7 +1,7 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { AppointmentNotFoundError } from '@/core/errors/appointment-not-found-error';
-import { PatientNotFoundError } from '@/core/errors/patient-not-found-error';
-import { DomainError } from '@/core/errors/domain-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { DomainError } from '@/shared/errors/domain-error';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 import { makeAppointment } from 'test/factories/makeAppointment';
 import { makePatient } from 'test/factories/makePatient';

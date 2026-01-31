@@ -1,5 +1,5 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ProcedureNotFoundError } from "@/core/errors/procedure-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ProcedureNotFoundError } from "@/shared/errors/procedure-not-found-error";
 import { GetProcedureByIdUseCase } from "@/domain/application/use-cases/procedure/get-procedure-by-id";
 import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
 import z from "zod";
