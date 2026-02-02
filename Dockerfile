@@ -1,70 +1,39 @@
-# Stage 1: Dependencies
-FROM node:20-alpine AS dependencies
+FROM node:20.18 AS base
 
-WORKDIR /app
+RUN npm i -g pnpm
 
-# Copiar arquivos de dependências
-COPY package.json package-lock.json ./
+FROM base AS dependencies
 
-# Instalar todas as dependências (incluindo devDependencies para build)
-RUN npm ci
+WORKDIR /usr/src/app
 
-# Stage 2: Build
-FROM node:20-alpine AS build
+COPY package.json pnpm-lock.yaml ./
 
-WORKDIR /app
+RUN pnpm install
 
-# Copiar dependências do stage anterior
-COPY --from=dependencies /app/node_modules ./node_modules
+FROM base AS build
 
-# Copiar código fonte e arquivos de configuração
+WORKDIR /usr/src/app
+
 COPY . .
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 
-# Gerar Prisma Client
-RUN npx prisma generate
+# Gera o Prisma Client antes do build
+RUN pnpm prisma generate
 
-# Build da aplicação
-RUN npm run build
+RUN pnpm build
+RUN pnpm prune --prod
 
-# Stage 3: Production Dependencies
-FROM node:20-alpine AS production-deps
+FROM cgr.dev/chainguard/node:latest AS deploy
 
-WORKDIR /app
+USER 1000
 
-# Copiar apenas package.json para instalar apenas dependências de produção
-COPY package.json package-lock.json ./
+WORKDIR /usr/src/app
 
-# Instalar apenas dependências de produção
-RUN npm ci --only=production && npm cache clean --force
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/package.json ./package.json
+COPY --from=build /usr/src/app/prisma ./prisma
 
-# Stage 4: Production
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-# Criar usuário não-root
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001
-
-# Copiar apenas arquivos necessários para produção
-COPY --from=production-deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/src/generated ./src/generated
-COPY --from=build /app/package.json ./package.json
-
-# Mudar ownership para usuário não-root
-RUN chown -R nestjs:nodejs /app
-
-USER nestjs
-
-# Expor porta
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Comando para iniciar a aplicação
 CMD ["node", "dist/main.js"]
-

@@ -37,6 +37,7 @@
     "@types/passport-jwt": "^4.0.1",
     "bcryptjs": "^3.0.3",
     "bull": "^4.16.5",
+    "fastify": "^5.7.2",
     "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.3",
     "nestjs-pino": "^4.5.0",
