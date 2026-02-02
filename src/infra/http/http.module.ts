@@ -8,7 +8,6 @@ import { RateLimitModule } from '../rate-limit/rate-limit.module';
 import { RateLimitGuard } from '@/shared/guards/rate-limit.guard';
 
 // Controllers
-import { HealthController } from './controlers/health/health.controller';
 import { HealthCheckController } from './controlers/health/health-check.controller';
 import { AuthenticateUserController } from './controlers/users/authenticate-user.controller';
 import { RegisterUserController } from './controlers/users/register-user.controller';
@@ -94,7 +93,6 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     RateLimitModule,
   ],
   controllers: [
-    HealthController,
     HealthCheckController,
     AuthenticateUserController,
     RegisterUserController,

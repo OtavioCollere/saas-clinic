@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
 import { DomainErrorFilter } from './shared/filters/domain-error.filter';
 import { AppLoggerModule } from './infra/observability/logger.module';
+import { HttpExceptionFilter } from './infra/observability/http-exception-filter';
 
 @Module({
   imports: [
@@ -29,6 +30,10 @@ import { AppLoggerModule } from './infra/observability/logger.module';
     EmailModule,
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
     {
       provide: APP_FILTER,
       useClass: DomainErrorFilter,
