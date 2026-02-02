@@ -14,6 +14,10 @@ import { ProfessionalRepository } from '../../repositories/professional-reposito
 import { FranchiseRepository } from '../../repositories/franchise-repository';
 import { PatientRepository } from '../../repositories/patient-repository';
 import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
+import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-error';
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
@@ -44,7 +48,7 @@ export class EditAppointmentUseCase {
     private appointmentsRepository: AppointmentsRepository
   ) {}
 
-  async execute({ professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
+  async execute({ appointmentId, professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
    
     const appointment = await this.appointmentsRepository.findById(appointmentId);
 
@@ -90,7 +94,7 @@ export class EditAppointmentUseCase {
     }
     appointment.status = AppointmentStatus.waiting();
 
-    await this.appointmentsRepository.save(appointment);
+    await this.appointmentsRepository.update(appointment);
 
     return makeRight({
       appointment,

@@ -14,6 +14,9 @@ import { ProfessionalRepository } from '../../repositories/professional-reposito
 import { FranchiseRepository } from '../../repositories/franchise-repository';
 import { PatientRepository } from '../../repositories/patient-repository';
 import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-error';
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';

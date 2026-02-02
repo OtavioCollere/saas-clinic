@@ -50,6 +50,18 @@ export class Session extends Entity<SessionProps>{
     return this.props.mfaVerified;
   }
 
+  get expiresAt() {
+    return this.props.expiresAt;
+  }
+
+  get createdAt() {
+    return this.props.createdAt ?? new Date();
+  }
+
+  get revokedAt() {
+    return this.props.revokedAt;
+  }
+
   revokeSession() {
     this.props.status = SessionStatus.REVOKED;
     this.props.revokedAt = new Date();

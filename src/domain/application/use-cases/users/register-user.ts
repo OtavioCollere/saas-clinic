@@ -1,15 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { EmailAlreadyExistsError } from "@/core/errors/email-already-exists-error";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
+import { EmailAlreadyExistsError } from "@/shared/errors/email-already-exists-error";
 import { User } from "@/domain/enterprise/entities/user";
 import { Cpf } from "@/domain/enterprise/value-objects/cpf";
 import { Email } from "@/domain/enterprise/value-objects/email";
 import { UserRole } from "@/domain/enterprise/value-objects/user-role";
 import { HashGenerator } from "../../cryptography/hash-generator";
 import { UsersRepository } from "../../repositories/users-repository";
-import { InvalidCpfError } from "@/core/errors/invalid-cpf-error";
-import { InvalidEmailError } from "@/core/errors/invalid-email-error";
-import { CpfAlreadyExistsError } from "@/core/errors/cpf-already-exists-error";
+import { InvalidCpfError } from "@/shared/errors/invalid-cpf-error";
+import { InvalidEmailError } from "@/shared/errors/invalid-email-error";
+import { CpfAlreadyExistsError } from "@/shared/errors/cpf-already-exists-error";
 
 interface RegisterUserUseCaseRequest {
 	name: string;
