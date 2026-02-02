@@ -1,7 +1,7 @@
 import { AppointmentStatus } from '../value-objects/appointment-status';
-import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { Entity } from '@/shared/entities/entity';
+import { Optional } from '@/shared/types/optional';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { AppointmentItem } from './appointment-item';
 
 export interface AppointmentProps {
@@ -23,6 +23,7 @@ export class Appointment extends Entity<AppointmentProps> {
     const appointment = new Appointment(
       {
         ...props,
+        status: props.status ?? AppointmentStatus.waiting(),
         createdAt: props.createdAt ?? new Date(),
       },
       id,
@@ -44,6 +45,10 @@ export class Appointment extends Entity<AppointmentProps> {
 
   get name() {
     return this.props.name;
+  }
+
+  get durationInMinutes() {
+    return this.props.durationInMinutes;
   }
 
   get appointmentItems() {

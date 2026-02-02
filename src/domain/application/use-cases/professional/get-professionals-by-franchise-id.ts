@@ -1,5 +1,5 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
 import type { Professional } from '@/domain/enterprise/entities/professional';
 import type { FranchiseRepository } from '../../repositories/franchise-repository';
 import type { ProfessionalRepository } from '../../repositories/professional-repository';

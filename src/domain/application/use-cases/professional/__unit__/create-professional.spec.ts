@@ -1,8 +1,8 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
-import { ProfessionalAlreadyExistsError } from '@/core/errors/professional-already-exists-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { ProfessionalAlreadyExistsError } from '@/shared/errors/professional-already-exists-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { makeClinic } from 'test/factories/makeClinic';
 import { makeClinicMembership } from 'test/factories/makeClinicMembership';

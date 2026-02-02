@@ -1,9 +1,8 @@
-import { Entity } from '@/core/entities/entity';
-import { Optional } from '@/core/types/optional';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { Entity } from '@/shared/entities/entity';
+import { Optional } from '@/shared/types/optional';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 
 export interface AppointmentItemProps {
-  appointmentId: UniqueEntityId;
   procedureId: UniqueEntityId;
   price: number;
   notes?: string;
@@ -15,9 +14,6 @@ export class AppointmentItem extends Entity<AppointmentItemProps> {
     return appointmentItem;
   }
 
-  get appointmentId() {
-    return this.props.appointmentId;
-  }
 
   get procedureId() {
     return this.props.procedureId;
@@ -31,9 +27,6 @@ export class AppointmentItem extends Entity<AppointmentItemProps> {
     return this.props.notes;
   }
 
-  set appointmentId(appointmentId: UniqueEntityId) {
-    this.props.appointmentId = appointmentId;
-  }
 
   set procedureId(procedureId: UniqueEntityId) {
     this.props.procedureId = procedureId;

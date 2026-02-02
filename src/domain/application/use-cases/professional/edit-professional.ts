@@ -1,6 +1,6 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { ProfessionalNotFoundError } from '@/core/errors/professional-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import type { Professional } from '@/domain/enterprise/entities/professional';
 import { Council } from '@/domain/enterprise/value-objects/council';
 import { Profession } from '@/domain/enterprise/value-objects/profession';

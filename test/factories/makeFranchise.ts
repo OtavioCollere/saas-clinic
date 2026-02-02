@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { Franchise, type FranchiseProps } from '@/domain/enterprise/entities/franchise';
 import { FranchiseStatus } from '@/domain/enterprise/value-objects/franchise-status';
 

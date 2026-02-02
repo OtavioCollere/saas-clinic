@@ -1,3 +1,4 @@
+import type { PaginationParams } from '@/shared/types/pagination-params';
 import type { PatientRepository } from '../../src/domain/application/repositories/patient-repository';
 import type { Patient } from '../../src/domain/enterprise/entities/patient';
 
@@ -38,6 +39,19 @@ export class InMemoryPatientRepository implements PatientRepository {
 
     this.items[index] = patient;
     return patient;
+  }
+
+  async fetch({ page, pageSize, query }: PaginationParams): Promise<Patient[]> {
+    const filtered = this.items.filter((item) => {
+      if (!query) return true;
+
+      return item.name.toLowerCase().includes(query.toLowerCase());
+    });
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+
+    return filtered.slice(start, end);
   }
 }
 

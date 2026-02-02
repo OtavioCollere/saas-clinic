@@ -1,6 +1,6 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { ClinicAlreadyExistsError } from '@/core/errors/clinic-already-exists-error';
-import { OwnerNotFoundError } from '@/core/errors/owner-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
+import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
 import { Slug } from '@/domain/enterprise/value-objects/slug';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { makeClinic } from 'tests/factories/makeClinic';

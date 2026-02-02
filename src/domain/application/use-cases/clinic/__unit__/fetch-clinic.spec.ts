@@ -1,4 +1,4 @@
-import { isRight, unwrapEither } from "@/core/either/either";
+import { isRight, unwrapEither } from "@/shared/either/either";
 import { ClinicStatus } from "@/domain/enterprise/value-objects/clinic-status";
 import { makeClinic } from "tests/factories/makeClinic";
 import { makeUser } from "tests/factories/makeUser";

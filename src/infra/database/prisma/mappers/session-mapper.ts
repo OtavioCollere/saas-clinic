@@ -1,5 +1,5 @@
 import { Session } from "@/domain/enterprise/entities/session";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { SessionStatus } from "@/domain/enterprise/value-objects/session-status";
 import type { Prisma } from "@prisma/client";
 
@@ -26,9 +26,9 @@ export class SessionMapper {
       status: session.status,
       fingerprint: session.fingerprint,
       mfaVerified: session.mfaVerified,
-      expiresAt: session.props.expiresAt,
-      createdAt: session.props.createdAt,
-      revokedAt: session.props.revokedAt ?? null,
+      expiresAt: session.expiresAt,
+      createdAt: session.createdAt,
+      revokedAt: session.revokedAt ?? null,
     };
   }
 }

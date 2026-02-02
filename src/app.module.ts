@@ -7,7 +7,9 @@ import { EnvModule } from './infra/env/env.module';
 import { EmailModule } from './infra/email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
-import { DomainErrorFilter } from './core/filters/domain-error.filter';
+import { DomainErrorFilter } from './shared/filters/domain-error.filter';
+import { AppLoggerModule } from './infra/observability/logger.module';
+import { HttpExceptionFilter } from './infra/observability/http-exception-filter';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { DomainErrorFilter } from './core/filters/domain-error.filter';
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
       },
     }),
+    AppLoggerModule,
     AuthModule,
     HttpModule,
     EnvModule,
@@ -29,7 +32,15 @@ import { DomainErrorFilter } from './core/filters/domain-error.filter';
   providers: [
     {
       provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
       useClass: DomainErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })

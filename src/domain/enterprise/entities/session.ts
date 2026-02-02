@@ -1,6 +1,6 @@
-import { Entity } from "@/core/entities/entity";
-import type { UniqueEntityId } from "@/core/entities/unique-entity-id";
-import type { Optional } from "@/core/types/optional";
+import { Entity } from "@/shared/entities/entity";
+import type { UniqueEntityId } from "@/shared/entities/unique-entity-id";
+import type { Optional } from "@/shared/types/optional";
 import { SessionStatus } from "../value-objects/session-status";
 
 export interface SessionProps{
@@ -48,6 +48,18 @@ export class Session extends Entity<SessionProps>{
 
   get mfaVerified() {
     return this.props.mfaVerified;
+  }
+
+  get expiresAt() {
+    return this.props.expiresAt;
+  }
+
+  get createdAt() {
+    return this.props.createdAt ?? new Date();
+  }
+
+  get revokedAt() {
+    return this.props.revokedAt;
   }
 
   revokeSession() {

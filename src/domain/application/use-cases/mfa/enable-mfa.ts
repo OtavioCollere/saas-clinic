@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
-import { MfaAlreadyEnabledError } from "@/core/errors/mfa-already-enabled-error";
-import { MfaSettingsNotFoundError } from "@/core/errors/mfa-settings-not-found-error";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
+import { InvalidTotpCodeError } from "@/shared/errors/invalid-totp-code-error";
+import { MfaAlreadyEnabledError } from "@/shared/errors/mfa-already-enabled-error";
+import { MfaSettingsNotFoundError } from "@/shared/errors/mfa-settings-not-found-error";
 import { MfaSettingsRepository } from "@/domain/application/repositories/mfa-settings-repository";
 import { MfaService } from "@/domain/services/mfa-service";
 

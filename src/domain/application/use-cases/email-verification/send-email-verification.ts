@@ -1,7 +1,7 @@
-import { makeLeft, makeRight } from '@/core/either/either';
+import { makeLeft, makeRight } from '@/shared/either/either';
 import { UsersRepository } from '../../repositories/users-repository';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
-import { EmailQueue } from '@/core/services/email/email-queue';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
+import { EmailQueue } from '@/shared/services/email/email-queue';
 import { Inject, Injectable } from '@nestjs/common';
 import { EmailVerificationRepository } from '../../repositories/email-verification-repository';
 import { EmailVerification } from '@/domain/enterprise/entities/email-verification';

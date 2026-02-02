@@ -1,5 +1,5 @@
 import { User } from "@/domain/enterprise/entities/user";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { Cpf } from "@/domain/enterprise/value-objects/cpf";
 import { Email } from "@/domain/enterprise/value-objects/email";
 import { UserRole } from "@/domain/enterprise/value-objects/user-role";

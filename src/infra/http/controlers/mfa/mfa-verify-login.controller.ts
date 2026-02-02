@@ -1,11 +1,22 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { InvalidTotpCodeError } from "@/core/errors/invalid-totp-code-error";
-import { MfaSettingsNotFoundError } from "@/core/errors/mfa-settings-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { InvalidTotpCodeError } from "@/shared/errors/invalid-totp-code-error";
+import { MfaSettingsNotFoundError } from "@/shared/errors/mfa-settings-not-found-error";
 import { MfaVerifyLoginUseCase } from "@/domain/application/use-cases/mfa/mfa-verify-login";
 import { User } from "@/domain/enterprise/entities/user";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
 import { Fingerprint } from "@/infra/http/decorators/fingerprint.decorator";
-import { BadRequestException, Body, Controller, Post, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 
@@ -16,16 +27,28 @@ const mfaVerifyLoginBodySchema = z.object({
 
 type MfaVerifyLoginBodySchema = z.infer<typeof mfaVerifyLoginBodySchema>;
 
+const mfaVerifyLoginBodyValidationPipe = new ZodValidationPipe(mfaVerifyLoginBodySchema);
+
+@ApiTags("MFA")
 @Controller("/mfa")
 export class MfaVerifyLoginController {
   constructor(private mfaVerifyLoginUseCase: MfaVerifyLoginUseCase) {}
 
   @Post("/verify-login")
-  @UsePipes(new ZodValidationPipe(mfaVerifyLoginBodySchema))
+  @ApiOperation({
+    summary: "Verify MFA login",
+    description: "Verifies TOTP code and completes MFA authentication.",
+  })
+  @ApiOkResponse({
+    description: "MFA verified successfully",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid TOTP code",
+  })
   async handle(
     @CurrentUser() user: User,
     @Fingerprint() fingerprint: Fingerprint,
-    @Body() body: MfaVerifyLoginBodySchema
+    @Body(mfaVerifyLoginBodyValidationPipe) body: MfaVerifyLoginBodySchema
   ) {
     const result = await this.mfaVerifyLoginUseCase.execute({
       userId: user.id.toString(),

@@ -1,6 +1,6 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { makeClinic } from 'test/factories/makeClinic';
 import { makeUser } from 'test/factories/makeUser';
 import { InMemoryAnamnesisRepository } from 'test/in-memory-repositories/in-memory-anamnesis-repository';

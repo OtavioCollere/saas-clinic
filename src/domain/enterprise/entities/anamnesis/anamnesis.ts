@@ -1,6 +1,6 @@
-import { Entity } from '@/core/entities/entity';
-import type { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import type { Optional } from '@/core/types/optional';
+import { Entity } from '@/shared/entities/entity';
+import type { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import type { Optional } from '@/shared/types/optional';
 import type { AestheticHistory } from './aesthetic-history';
 import type { HealthConditions } from './health-conditions';
 import type { MedicalHistory } from './medical-history';

@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from "@/core/either/either";
-import { EmailAlreadyExistsError } from "@/core/errors/email-already-exists-error";
+import { isLeft, isRight, unwrapEither } from "@/shared/either/either";
+import { EmailAlreadyExistsError } from "@/shared/errors/email-already-exists-error";
 import { Cpf } from "@/domain/enterprise/value-objects/cpf";
 import { Email } from "@/domain/enterprise/value-objects/email";
 import { UserRole } from "@/domain/enterprise/value-objects/user-role";

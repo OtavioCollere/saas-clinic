@@ -1,4 +1,4 @@
-import { DomainError } from '../../../core/errors/domain-error';
+import { DomainError } from '../../../shared/errors/domain-error';
 
 export type ClinicStatusType = 'ACTIVE' | 'INACTIVE';
 

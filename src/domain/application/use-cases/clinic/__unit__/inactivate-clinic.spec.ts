@@ -1,8 +1,8 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicHasPendingAppointmentsError } from '@/core/errors/clinic-has-pending-appointments-error';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { UserIsNotOwnerError } from '@/core/errors/user-is-not-owner-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { ClinicHasPendingAppointmentsError } from '@/shared/errors/clinic-has-pending-appointments-error';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
+import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 import { ClinicStatus } from '@/domain/enterprise/value-objects/clinic-status';

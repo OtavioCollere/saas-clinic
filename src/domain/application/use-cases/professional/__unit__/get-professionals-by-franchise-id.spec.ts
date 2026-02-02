@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from '@/core/either/either';
-import { FranchiseNotFoundError } from '@/core/errors/franchise-not-found-error';
+import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
 import { Council } from '@/domain/enterprise/value-objects/council';
 import { Profession } from '@/domain/enterprise/value-objects/profession';
 import { makeFranchise } from 'test/factories/makeFranchise';

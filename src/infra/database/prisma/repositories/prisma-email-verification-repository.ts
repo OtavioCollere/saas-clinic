@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { EmailVerificationRepository } from "@/domain/application/repositories/email-verification-repository";
 import { EmailVerification } from "@/domain/enterprise/entities/email-verification";
 import { PrismaService } from "../../prisma.service";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { Email } from "@/domain/enterprise/value-objects/email";
 
 @Injectable()

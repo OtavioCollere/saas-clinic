@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from "@/core/either/either";
-import { UniqueEntityId } from "@/core/entities/unique-entity-id";
-import { MfaAlreadyExistsError } from "@/core/errors/mfa-already-exists-error";
+import { Either, makeLeft, makeRight } from "@/shared/either/either";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
+import { MfaAlreadyExistsError } from "@/shared/errors/mfa-already-exists-error";
 import { MfaSettingsRepository } from "@/domain/application/repositories/mfa-settings-repository";
 import { MfaSettings } from "@/domain/enterprise/entities/mfa-settings";
 import { MfaService } from "@/domain/services/mfa-service";

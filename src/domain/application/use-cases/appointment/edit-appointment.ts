@@ -1,7 +1,7 @@
-import { type Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicAlreadyExistsError } from '@/core/errors/clinic-already-exists-error';
-import { OwnerNotFoundError } from '@/core/errors/owner-not-found-error';
+import { type Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
+import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
 import { Clinic } from '@/domain/enterprise/entities/clinic';
 import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
@@ -13,7 +13,11 @@ import { AppointmentItem } from '@/domain/enterprise/entities/appointment-item';
 import { ProfessionalRepository } from '../../repositories/professional-repository';
 import { FranchiseRepository } from '../../repositories/franchise-repository';
 import { PatientRepository } from '../../repositories/patient-repository';
-import { ProfessionalNotFoundError } from '@/core/errors/professional-not-found-error';
+import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
+import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-error';
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
@@ -44,7 +48,7 @@ export class EditAppointmentUseCase {
     private appointmentsRepository: AppointmentsRepository
   ) {}
 
-  async execute({ professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
+  async execute({ appointmentId, professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
    
     const appointment = await this.appointmentsRepository.findById(appointmentId);
 
@@ -90,7 +94,7 @@ export class EditAppointmentUseCase {
     }
     appointment.status = AppointmentStatus.waiting();
 
-    await this.appointmentsRepository.save(appointment);
+    await this.appointmentsRepository.update(appointment);
 
     return makeRight({
       appointment,

@@ -1,15 +1,36 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { MfaAlreadyExistsError } from "@/core/errors/mfa-already-exists-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { MfaAlreadyExistsError } from "@/shared/errors/mfa-already-exists-error";
 import { SetupMfaUseCase } from "@/domain/application/use-cases/mfa/setup-mfa";
 import { User } from "@/domain/enterprise/entities/user";
 import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
-import { BadRequestException, Controller, Post } from "@nestjs/common";
+import {
+	BadRequestException,
+	Controller,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 
+@ApiTags("MFA")
 @Controller("/mfa")
 export class SetupMfaController{
   constructor(private setupMfaUseCase: SetupMfaUseCase){}
   
   @Post("/setup")
+  @ApiOperation({
+    summary: "Setup MFA",
+    description: "Sets up multi-factor authentication for the authenticated user.",
+  })
+  @ApiOkResponse({
+    description: "MFA setup successfully",
+  })
+  @ApiBadRequestResponse({
+    description: "MFA already exists",
+  })
   async handle(@CurrentUser() user: User){
 
     const result = await this.setupMfaUseCase.execute({ userId: user.id.toString() });

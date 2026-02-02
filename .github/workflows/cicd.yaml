@@ -1,49 +1,35 @@
-name: Deploy to Cloud Run
-
-env:
-  SERVICE_NAME: saas-clinic
-  PROJECT_ID: steel-fin-480413-f8
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/steel-fin-480413-f8/saas-clinic/saas-clinic
+name: cliniker-backend pipeline
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  dockerize-and-deploy:
+  build-and-push:
+    name: Build and Push Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-      - name: Google Cloud Auth
-        uses: 'google-github-actions/auth@v2'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          project_id: ${{ env.PROJECT_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Configure Docker
+      - name: Build, tag and push image
+        env:
+          ECR_REGISTRY: 145153152615.dkr.ecr.us-east-2.amazonaws.com
+          ECR_REPOSITORY: cliniker-backend-ecr
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t ${{ env.DOCKER_IMAGE_URL }}:latest -f Dockerfile.prod .
-          docker push ${{ env.DOCKER_IMAGE_URL }}:latest
-
-      - name: Deploy to Cloud Run
-        run: |
-          echo SERVICE_NAME $SERVICE_NAME
-          gcloud run deploy $SERVICE_NAME \
-            --image ${{ env.DOCKER_IMAGE_URL }}:latest \
-            --platform managed \
-            --region us-east1 \
-            --allow-unauthenticated
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

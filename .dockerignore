@@ -22,8 +22,6 @@ tests
 *.spec.ts
 *.test.ts
 vitest.config.ts
-tsconfig*.json
-nest-cli.json
 README.md
 .eslintrc*
 .prettierrc*

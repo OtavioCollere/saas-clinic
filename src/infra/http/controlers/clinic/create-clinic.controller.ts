@@ -1,8 +1,21 @@
-import { isLeft, unwrapEither } from "@/core/either/either";
-import { ClinicAlreadyExistsError } from "@/core/errors/clinic-already-exists-error";
-import { OwnerNotFoundError } from "@/core/errors/owner-not-found-error";
+import { isLeft, unwrapEither } from "@/shared/either/either";
+import { ClinicAlreadyExistsError } from "@/shared/errors/clinic-already-exists-error";
+import { OwnerNotFoundError } from "@/shared/errors/owner-not-found-error";
 import { CreateClinicUseCase } from "@/domain/application/use-cases/clinic/create-clinic";
-import { BadRequestException, Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	NotFoundException,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ClinicPresenter } from "../../presenters/clinic-presenter";
@@ -18,13 +31,26 @@ type CreateClinicBodySchema = z.infer<typeof createClinicBodySchema>;
 
 const createClinicBodyValidationPipe = new ZodValidationPipe(createClinicBodySchema);
 
+@ApiTags("Clinics")
 @Controller("/clinics")
 export class CreateClinicController {
 	constructor(private readonly createClinicUseCase: CreateClinicUseCase) {}
 
 	@Post()
-	@UsePipes(createClinicBodyValidationPipe)
-	async handle(@Body() body: CreateClinicBodySchema) {
+	@ApiOperation({
+		summary: "Create clinic",
+		description: "Creates a new clinic with the provided owner.",
+	})
+	@ApiOkResponse({
+		description: "Clinic created successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Owner not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data or clinic already exists",
+	})
+	async handle(@Body(createClinicBodyValidationPipe) body: CreateClinicBodySchema) {
 		const { name, ownerId, description, avatarUrl } = body;
 
 		const result = await this.createClinicUseCase.execute({

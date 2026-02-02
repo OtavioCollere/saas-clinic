@@ -1,6 +1,15 @@
-import { unwrapEither } from "@/core/either/either";
+import { unwrapEither } from "@/shared/either/either";
 import { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-clinic";
-import { Controller, Get, Query, UsePipes } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	Query,
+} from "@nestjs/common";
+import {
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ClinicPresenter } from "../../presenters/clinic-presenter";
@@ -15,11 +24,19 @@ type FetchClinicQuerySchema = z.infer<typeof fetchClinicQuerySchema>;
 
 const fetchClinicQueryValidationPipe = new ZodValidationPipe(fetchClinicQuerySchema);
 
+@ApiTags("Clinics")
 @Controller("/clinics")
 export class FetchClinicController {
 	constructor(private readonly fetchClinicUseCase: FetchClinicUseCase) {}
 
 	@Get()
+	@ApiOperation({
+		summary: "Fetch clinics",
+		description: "Retrieves a paginated list of clinics with optional search query.",
+	})
+	@ApiOkResponse({
+		description: "Clinics retrieved successfully",
+	})
 	async handle(@Query(fetchClinicQueryValidationPipe) query: FetchClinicQuerySchema) {
 		const { page, pageSize, query: searchQuery } = query;
 

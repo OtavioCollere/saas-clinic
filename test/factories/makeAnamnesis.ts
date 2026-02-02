@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { Anamnesis, type AnamnesisProps } from '@/domain/enterprise/entities/anamnesis/anamnesis';
 
 export function makeAnamnesis(override: Partial<AnamnesisProps> = {}): Anamnesis {

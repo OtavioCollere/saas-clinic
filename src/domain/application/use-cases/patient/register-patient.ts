@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from '@/core/either/either';
-import { UniqueEntityId } from '@/core/entities/unique-entity-id';
-import { ClinicNotFoundError } from '@/core/errors/clinic-not-found-error';
-import { UserNotFoundError } from '@/core/errors/user-not-found-error';
+import { Either, makeLeft, makeRight } from '@/shared/either/either';
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
+import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
+import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history';
 import { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
 import { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions';

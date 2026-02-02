@@ -1,5 +1,5 @@
-import { isLeft, isRight, unwrapEither } from "@/core/either/either";
-import { ClinicNotFoundError } from "@/core/errors/clinic-not-found-error";
+import { isLeft, isRight, unwrapEither } from "@/shared/either/either";
+import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
 import { ClinicStatus } from "@/domain/enterprise/value-objects/clinic-status";
 import { makeClinic } from "tests/factories/makeClinic";
 import { makeUser } from "tests/factories/makeUser";
