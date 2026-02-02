@@ -1,15 +1,40 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Inject } from "@nestjs/common";
 import { PrismaService } from "../../../database/prisma.service";
+import { Public } from "@/infra/auth/public";
 
+@Public()
 @Controller("health")
 export class HealthController {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		@Inject(PrismaService)
+		private readonly prisma: PrismaService
+	) {}
 
 	@Get()
 	async check() {
 		try {
+			// Verifica se o PrismaService foi injetado corretamente
+			if (!this.prisma) {
+				return {
+					status: "error",
+					info: {},
+					error: {
+						database: {
+							status: "down",
+							message: "PrismaService is not available",
+						},
+					},
+					details: {
+						database: {
+							status: "down",
+							message: "PrismaService is not available",
+						},
+					},
+				};
+			}
+
 			// Verifica conexão com o banco de dados usando $queryRaw
-			await (this.prisma as any).$queryRaw`SELECT 1`;
+			await this.prisma.$queryRaw`SELECT 1`;
 
 			return {
 				status: "ok",

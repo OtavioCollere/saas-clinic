@@ -1,5 +1,6 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
+import { Public } from '@/infra/auth/public';
 
 interface HealthStatus {
   status: 'healthy' | 'unhealthy';
@@ -16,6 +17,7 @@ interface HealthCheckResult {
   };
 }
 
+@Public()
 @Controller('/health')
 export class HealthCheckController {
   constructor(private readonly prisma: PrismaService) {}
