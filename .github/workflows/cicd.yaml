@@ -26,8 +26,8 @@ jobs:
 
       - name: Build, tag and push image
         env:
-          ECR_REGISTRY: 403429280851.dkr.ecr.us-east-2.amazonaws.com
-          ECR_REPOSITORY: rocketseat/widget-server
+          ECR_REGISTRY: 145153152615.dkr.ecr.us-east-2.amazonaws.com
+          ECR_REPOSITORY: cliniker-backend-ecr
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
