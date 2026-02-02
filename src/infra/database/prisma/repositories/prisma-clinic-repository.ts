@@ -58,3 +58,4 @@ export class PrismaClinicRepository extends ClinicRepository {
   }
 }
 
+

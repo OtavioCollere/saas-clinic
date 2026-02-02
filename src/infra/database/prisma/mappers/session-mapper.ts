@@ -26,9 +26,9 @@ export class SessionMapper {
       status: session.status,
       fingerprint: session.fingerprint,
       mfaVerified: session.mfaVerified,
-      expiresAt: session.props.expiresAt,
-      createdAt: session.props.createdAt,
-      revokedAt: session.props.revokedAt ?? null,
+      expiresAt: session.expiresAt,
+      createdAt: session.createdAt,
+      revokedAt: session.revokedAt ?? null,
     };
   }
 }
