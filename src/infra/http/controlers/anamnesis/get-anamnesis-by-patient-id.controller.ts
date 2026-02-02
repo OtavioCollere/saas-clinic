@@ -1,7 +1,19 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
 import { GetAnamnesisByPatientIdUseCase } from "@/domain/application/use-cases/anamnesis/get-anamnesis-by-patient-id";
-import { Controller, Get, NotFoundException, Param, UsePipes } from "@nestjs/common";
+import {
+	Controller,
+	Get,
+	NotFoundException,
+	Param,
+} from "@nestjs/common";
+import {
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { AnamnesisPresenter } from "../../presenters/anamnesis-presenter";
@@ -14,11 +26,27 @@ type GetAnamnesisByPatientIdParamsSchema = z.infer<typeof getAnamnesisByPatientI
 
 const getAnamnesisByPatientIdParamsValidationPipe = new ZodValidationPipe(getAnamnesisByPatientIdParamsSchema);
 
+@ApiTags("Anamnesis")
 @Controller("/patients")
 export class GetAnamnesisByPatientIdController {
 	constructor(private readonly getAnamnesisByPatientIdUseCase: GetAnamnesisByPatientIdUseCase) {}
 
 	@Get("/:patientId/anamnesis")
+	@ApiOperation({
+		summary: "Get anamnesis by patient",
+		description: "Retrieves anamnesis information for a specific patient.",
+	})
+	@ApiParam({
+		name: "patientId",
+		type: String,
+		description: "Patient identifier",
+	})
+	@ApiOkResponse({
+		description: "Anamnesis retrieved successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Patient not found",
+	})
 	async handle(@Param(getAnamnesisByPatientIdParamsValidationPipe) params: GetAnamnesisByPatientIdParamsSchema) {
 		const { patientId } = params;
 

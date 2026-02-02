@@ -3,7 +3,24 @@ import { ClinicHasPendingAppointmentsError } from "@/shared/errors/clinic-has-pe
 import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { InactivateClinicUseCase } from "@/domain/application/use-cases/clinic/inactivate-clinic";
-import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	ForbiddenException,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ClinicPresenter } from "../../presenters/clinic-presenter";
@@ -22,11 +39,33 @@ type InactivateClinicParamsSchema = z.infer<typeof inactivateClinicParamsSchema>
 const inactivateClinicBodyValidationPipe = new ZodValidationPipe(inactivateClinicBodySchema);
 const inactivateClinicParamsValidationPipe = new ZodValidationPipe(inactivateClinicParamsSchema);
 
+@ApiTags("Clinics")
 @Controller("/clinics")
 export class InactivateClinicController {
 	constructor(private readonly inactivateClinicUseCase: InactivateClinicUseCase) {}
 
 	@Patch("/:clinicId/inactivate")
+	@ApiOperation({
+		summary: "Inactivate clinic",
+		description: "Inactivates a clinic if the authenticated user is the clinic owner and there are no pending appointments.",
+	})
+	@ApiParam({
+		name: "clinicId",
+		type: String,
+		description: "Clinic identifier",
+	})
+	@ApiOkResponse({
+		description: "Clinic inactivated successfully",
+	})
+	@ApiForbiddenResponse({
+		description: "User is not the clinic owner",
+	})
+	@ApiNotFoundResponse({
+		description: "Clinic not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Clinic has pending appointments",
+	})
 	async handle(
 		@Param(inactivateClinicParamsValidationPipe) params: InactivateClinicParamsSchema,
 		@Body(inactivateClinicBodyValidationPipe) body: InactivateClinicBodySchema,

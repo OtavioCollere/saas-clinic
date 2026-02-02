@@ -1,7 +1,7 @@
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
-import { DomainError } from '@/shared/errors/domain-error';
+import { AppointmentNotWaitingError } from '@/shared/errors/appointment-not-waiting-error';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
 import type { PatientRepository } from '../../repositories/patient-repository';
@@ -12,7 +12,7 @@ interface ConfirmAppointmentUseCaseRequest {
 }
 
 type ConfirmAppointmentUseCaseResponse = Either<
-  AppointmentNotFoundError | PatientNotFoundError | DomainError,
+  AppointmentNotFoundError | PatientNotFoundError | AppointmentNotWaitingError,
   {
     appointment: Appointment;
   }
@@ -37,18 +37,15 @@ export class ConfirmAppointmentUseCase {
       return makeLeft(new AppointmentNotFoundError());
     }
 
-    try {
-      appointment.status = appointment.status.confirm();
-      appointment.updatedAt = new Date();
-
-      await this.appointmentsRepository.update(appointment);
-
-      return makeRight({ appointment });
-    } catch (error) {
-      if (error instanceof DomainError) {
-        return makeLeft(error);
-      }
-      throw error;
+    if (!appointment.status.isWaiting()) {
+      return makeLeft(new AppointmentNotWaitingError());
     }
+
+    appointment.status = appointment.status.confirm();
+    appointment.updatedAt = new Date();
+
+    await this.appointmentsRepository.update(appointment);
+
+    return makeRight({ appointment });
   }
 }

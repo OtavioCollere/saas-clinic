@@ -44,6 +44,7 @@ import { CreateAnamnesisController } from './controlers/anamnesis/create-anamnes
 import { GetAnamnesisByPatientIdController } from './controlers/anamnesis/get-anamnesis-by-patient-id.controller';
 import { CancelAppointmentController } from './controlers/appointment/cancel-appointment.controller';
 import { ConfirmAppointmentController } from './controlers/appointment/confirm-appointment.controller';
+import { CreateAppointmentController } from './controlers/appointment/create-appointment.controller';
 import { FetchAppointmentsByPatientIdController } from './controlers/appointment/fetch-appointments-by-patient-id.controller';
 
 // Use Cases
@@ -82,6 +83,7 @@ import { CreateAnamnesisUseCase } from '@/domain/application/use-cases/anamnesis
 import { GetAnamnesisByPatientIdUseCase } from '@/domain/application/use-cases/anamnesis/get-anamnesis-by-patient-id';
 import { CancelAppointmentUseCase } from '@/domain/application/use-cases/appointment/cancel-appointment';
 import { ConfirmAppointmentUseCase } from '@/domain/application/use-cases/appointment/confirm-appointment';
+import { CreateAppointmentUseCase } from '@/domain/application/use-cases/appointment/create-appointment';
 import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-cases/appointment/fetch-appointments-by-patient-id';
 
 @Module({
@@ -129,6 +131,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     GetAnamnesisByPatientIdController,
     CancelAppointmentController,
     ConfirmAppointmentController,
+    CreateAppointmentController,
     FetchAppointmentsByPatientIdController,
   ],
   providers: [
@@ -168,6 +171,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     GetAnamnesisByPatientIdUseCase,
     CancelAppointmentUseCase,
     ConfirmAppointmentUseCase,
+    CreateAppointmentUseCase,
     FetchAppointmentsByPatientIdUseCase,
   ],
 })

@@ -2,7 +2,20 @@ import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
 import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { RegisterPatientUseCase } from "@/domain/application/use-cases/patient/register-patient";
-import { Body, Controller, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	NotFoundException,
+	Param,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { PatientPresenter } from "../../presenters/patient-presenter";
@@ -22,11 +35,28 @@ const registerPatientBodySchema = z.object({
 type RegisterPatientBodySchema = z.infer<typeof registerPatientBodySchema>;
 
 const registerPatientBodyValidationPipe = new ZodValidationPipe(registerPatientBodySchema);
+
+@ApiTags("Patients")
 @Controller("/clinics")
 export class RegisterPatientController {
 	constructor(private readonly registerPatientUseCase: RegisterPatientUseCase) {}
 
 	@Post("/:clinicId/patients")
+	@ApiOperation({
+		summary: "Register patient",
+		description: "Creates a new patient for a clinic.",
+	})
+	@ApiParam({
+		name: "clinicId",
+		type: String,
+		description: "Clinic identifier",
+	})
+	@ApiOkResponse({
+		description: "Patient created successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Clinic or user not found",
+	})
 	async handle(
 		@CurrentUser() user: User,
 		@Body(registerPatientBodyValidationPipe) body: RegisterPatientBodySchema,

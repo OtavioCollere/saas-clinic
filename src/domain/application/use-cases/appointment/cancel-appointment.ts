@@ -1,8 +1,7 @@
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
-import { DomainError } from '@/shared/errors/domain-error';
+import { AppointmentNotWaitingError } from '@/shared/errors/appointment-not-waiting-error';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
-import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 import type { AppointmentsRepository } from '../../repositories/appointments-repository';
 
 interface CancelAppointmentUseCaseRequest {
@@ -10,7 +9,7 @@ interface CancelAppointmentUseCaseRequest {
 }
 
 type CancelAppointmentUseCaseResponse = Either<
-  AppointmentNotFoundError | DomainError,
+  AppointmentNotFoundError | AppointmentNotWaitingError,
   {
     appointment: Appointment;
   }
@@ -29,21 +28,14 @@ export class CancelAppointmentUseCase {
     }
 
     if (!appointment.status.isWaiting()) {
-      return makeLeft(new DomainError('Only waiting appointments can be canceled'));
+      return makeLeft(new AppointmentNotWaitingError());
     }
 
-    try {
-      appointment.status = appointment.status.cancel();
-      appointment.updatedAt = new Date();
+    appointment.status = appointment.status.cancel();
+    appointment.updatedAt = new Date();
 
-      await this.appointmentsRepository.update(appointment);
+    await this.appointmentsRepository.update(appointment);
 
-      return makeRight({ appointment });
-    } catch (error) {
-      if (error instanceof DomainError) {
-        return makeLeft(error);
-      }
-      throw error;
-    }
+    return makeRight({ appointment });
   }
 }

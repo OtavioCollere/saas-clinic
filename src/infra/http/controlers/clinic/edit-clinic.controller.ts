@@ -3,7 +3,24 @@ import { ClinicAlreadyExistsError } from "@/shared/errors/clinic-already-exists-
 import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { EditClinicUseCase } from "@/domain/application/use-cases/clinic/edit-clinic";
-import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	ForbiddenException,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ClinicPresenter } from "../../presenters/clinic-presenter";
@@ -25,11 +42,33 @@ type EditClinicParamsSchema = z.infer<typeof editClinicParamsSchema>;
 const editClinicBodyValidationPipe = new ZodValidationPipe(editClinicBodySchema);
 const editClinicParamsValidationPipe = new ZodValidationPipe(editClinicParamsSchema);
 
+@ApiTags("Clinics")
 @Controller("/clinics")
 export class EditClinicController {
 	constructor(private readonly editClinicUseCase: EditClinicUseCase) {}
 
 	@Patch("/:clinicId")
+	@ApiOperation({
+		summary: "Edit clinic",
+		description: "Updates clinic information if the authenticated user is the clinic owner.",
+	})
+	@ApiParam({
+		name: "clinicId",
+		type: String,
+		description: "Clinic identifier",
+	})
+	@ApiOkResponse({
+		description: "Clinic updated successfully",
+	})
+	@ApiForbiddenResponse({
+		description: "User is not the clinic owner",
+	})
+	@ApiNotFoundResponse({
+		description: "Clinic not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data or clinic name already exists",
+	})
 	async handle(
 		@Param(editClinicParamsValidationPipe) params: EditClinicParamsSchema,
 		@Body(editClinicBodyValidationPipe) body: EditClinicBodySchema,

@@ -1,9 +1,24 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { AppointmentNotFoundError } from "@/shared/errors/appointment-not-found-error";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
-import { DomainError } from "@/shared/errors/domain-error";
+import { AppointmentNotWaitingError } from "@/shared/errors/appointment-not-waiting-error";
 import { ConfirmAppointmentUseCase } from "@/domain/application/use-cases/appointment/confirm-appointment";
-import { BadRequestException, Body, Controller, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { AppointmentPresenter } from "../../presenters/appointment-presenter";
@@ -22,11 +37,30 @@ type ConfirmAppointmentBodySchema = z.infer<typeof confirmAppointmentBodySchema>
 const confirmAppointmentParamsValidationPipe = new ZodValidationPipe(confirmAppointmentParamsSchema);
 const confirmAppointmentBodyValidationPipe = new ZodValidationPipe(confirmAppointmentBodySchema);
 
+@ApiTags("Appointments")
 @Controller("/appointments")
 export class ConfirmAppointmentController {
 	constructor(private readonly confirmAppointmentUseCase: ConfirmAppointmentUseCase) {}
 
 	@Patch("/:appointmentId/confirm")
+	@ApiOperation({
+		summary: "Confirm appointment",
+		description: "Confirms a waiting appointment.",
+	})
+	@ApiParam({
+		name: "appointmentId",
+		type: String,
+		description: "Appointment identifier",
+	})
+	@ApiOkResponse({
+		description: "Appointment confirmed successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Appointment or patient not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Appointment is not in waiting status",
+	})
 	async handle(
 		@Param(confirmAppointmentParamsValidationPipe) params: ConfirmAppointmentParamsSchema,
 		@Body(confirmAppointmentBodyValidationPipe) body: ConfirmAppointmentBodySchema
@@ -44,7 +78,7 @@ export class ConfirmAppointmentController {
 					throw new NotFoundException(error.message);
 				case PatientNotFoundError:
 					throw new NotFoundException(error.message);
-				case DomainError:
+				case AppointmentNotWaitingError:
 					throw new BadRequestException(error.message);
 				default:
 					throw new BadRequestException(error.message);

@@ -2,7 +2,23 @@ import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
 import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { ActivateClinicUseCase } from "@/domain/application/use-cases/clinic/activate-clinic";
-import { Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	ForbiddenException,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ClinicPresenter } from "../../presenters/clinic-presenter";
@@ -21,14 +37,40 @@ type ActivateClinicParamsSchema = z.infer<typeof activateClinicParamsSchema>;
 const activateClinicBodyValidationPipe = new ZodValidationPipe(activateClinicBodySchema);
 const activateClinicParamsValidationPipe = new ZodValidationPipe(activateClinicParamsSchema);
 
+@ApiTags("Clinics")
 @Controller("/clinics")
 export class ActivateClinicController {
-	constructor(private readonly activateClinicUseCase: ActivateClinicUseCase) {}
+	constructor(
+		private readonly activateClinicUseCase: ActivateClinicUseCase,
+	) {}
 
 	@Patch("/:clinicId/activate")
+	@ApiOperation({
+		summary: "Activate clinic",
+		description: "Activates a clinic if the authenticated user is the clinic owner.",
+	})
+	@ApiParam({
+		name: "clinicId",
+		type: String,
+		description: "Clinic identifier",
+	})
+	@ApiOkResponse({
+		description: "Clinic activated successfully",
+	})
+	@ApiForbiddenResponse({
+		description: "User is not the clinic owner",
+	})
+	@ApiNotFoundResponse({
+		description: "Clinic not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data",
+	})
 	async handle(
-		@Param(activateClinicParamsValidationPipe) params: ActivateClinicParamsSchema,
-		@Body(activateClinicBodyValidationPipe) body: ActivateClinicBodySchema,
+		@Param(activateClinicParamsValidationPipe)
+		params: ActivateClinicParamsSchema,
+		@Body(activateClinicBodyValidationPipe)
+		body: ActivateClinicBodySchema,
 	) {
 		const { clinicId } = params;
 		const { userId } = body;

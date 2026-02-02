@@ -3,7 +3,24 @@ import { FranchiseHasPendingAppointmentsError } from "@/shared/errors/franchise-
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { InactivateFranchiseUseCase } from "@/domain/application/use-cases/franchise/inactivate-franchise";
-import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	ForbiddenException,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { FranchisePresenter } from "../../presenters/franchise-presenter";
@@ -22,11 +39,33 @@ type InactivateFranchiseParamsSchema = z.infer<typeof inactivateFranchiseParamsS
 const inactivateFranchiseBodyValidationPipe = new ZodValidationPipe(inactivateFranchiseBodySchema);
 const inactivateFranchiseParamsValidationPipe = new ZodValidationPipe(inactivateFranchiseParamsSchema);
 
+@ApiTags("Franchises")
 @Controller("/franchises")
 export class InactivateFranchiseController {
 	constructor(private readonly inactivateFranchiseUseCase: InactivateFranchiseUseCase) {}
 
 	@Patch("/:franchiseId/inactivate")
+	@ApiOperation({
+		summary: "Inactivate franchise",
+		description: "Inactivates a franchise if the authenticated user is the clinic owner and there are no pending appointments.",
+	})
+	@ApiParam({
+		name: "franchiseId",
+		type: String,
+		description: "Franchise identifier",
+	})
+	@ApiOkResponse({
+		description: "Franchise inactivated successfully",
+	})
+	@ApiForbiddenResponse({
+		description: "User is not the clinic owner",
+	})
+	@ApiNotFoundResponse({
+		description: "Franchise not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Franchise has pending appointments",
+	})
 	async handle(
 		@Param(inactivateFranchiseParamsValidationPipe) params: InactivateFranchiseParamsSchema,
 		@Body(inactivateFranchiseBodyValidationPipe) body: InactivateFranchiseBodySchema,

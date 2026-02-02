@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { InMemoryUsersRepository } from 'tests/in-memory-repositories/in-memory-users-repository';
-import { InMemorySessionsRepository } from 'tests/in-memory-repositories/in-memory-sessions-repository';
+import { InMemoryUsersRepository } from 'test/in-memory-repositories/in-memory-users-repository';
+import { InMemorySessionsRepository } from 'test/in-memory-repositories/in-memory-sessions-repository';
 import { isLeft, isRight, unwrapEither } from '@/shared/either/either';
-import { makeUser } from 'tests/factories/makeUser';
+import { makeUser } from 'test/factories/makeUser';
 import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
 import { LogoutUseCase } from '../logout';
-import { makeSession } from 'tests/factories/makeSession';
+import { makeSession } from 'test/factories/makeSession';
 import { SessionStatus } from '@/domain/enterprise/value-objects/session-status';
 
 describe('LogoutUseCase Unit Tests', () => {

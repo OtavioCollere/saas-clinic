@@ -1,7 +1,18 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { CreateProcedureUseCase } from "@/domain/application/use-cases/procedure/create-procedure";
-import { Body, Controller, NotFoundException, Post, UsePipes } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	NotFoundException,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ProcedurePresenter } from "../../presenters/procedure-presenter";
@@ -17,11 +28,22 @@ type CreateProcedureBodySchema = z.infer<typeof createProcedureBodySchema>;
 
 const createProcedureBodyValidationPipe = new ZodValidationPipe(createProcedureBodySchema);
 
+@ApiTags("Procedures")
 @Controller("/procedures")
 export class CreateProcedureController {
 	constructor(private readonly createProcedureUseCase: CreateProcedureUseCase) {}
 
 	@Post()
+	@ApiOperation({
+		summary: "Create procedure",
+		description: "Creates a new procedure for a franchise.",
+	})
+	@ApiOkResponse({
+		description: "Procedure created successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Franchise not found",
+	})
 	async handle(@Body(createProcedureBodyValidationPipe) body: CreateProcedureBodySchema) {
 		const { franchiseId, name, price, notes } = body;
 

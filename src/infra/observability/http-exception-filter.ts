@@ -25,22 +25,61 @@ import {
           ? exception.getStatus()
           : 500;
   
-      // Loga o erro com contexto
-      this.logger.error(
-        {
-          err: exception,       // stack trace
-          method: request.method,
-          url: request.url,
-          status,
-        },
-        'Unhandled exception',
-      );
+      // Se for HttpException, pega a resposta do erro
+      // Senão, usa mensagem padrão
+      const message =
+        exception instanceof HttpException
+          ? exception.getResponse()
+          : 'Internal server error';
   
-      // Resposta padrão para o cliente
-      response.status(status).json({
-        statusCode: status,
-        message: 'Internal server error',
-      });
+      // Loga o erro com contexto
+      if (exception instanceof HttpException) {
+        // Para erros HTTP conhecidos, loga como warn ou error dependendo do status
+        if (status >= 500) {
+          this.logger.error(
+            {
+              err: exception,
+              method: request.method,
+              url: request.url,
+              status,
+              body: request.body,
+            },
+            'HTTP error',
+          );
+        } else {
+          this.logger.warn(
+            {
+              method: request.method,
+              url: request.url,
+              status,
+              message,
+            },
+            'HTTP client error',
+          );
+        }
+      } else {
+        // Para erros não tratados, sempre loga como error
+        this.logger.error(
+          {
+            err: exception,
+            method: request.method,
+            url: request.url,
+            status,
+            body: request.body,
+          },
+          'Unhandled exception',
+        );
+      }
+  
+      // Resposta para o cliente
+      response.status(status).json(
+        typeof message === 'string'
+          ? {
+              statusCode: status,
+              message,
+            }
+          : message,
+      );
     }
   }
   

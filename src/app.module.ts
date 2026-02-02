@@ -38,6 +38,10 @@ import { HttpExceptionFilter } from './infra/observability/http-exception-filter
       provide: APP_FILTER,
       useClass: DomainErrorFilter,
     },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
   ],
 })
 export class AppModule {}

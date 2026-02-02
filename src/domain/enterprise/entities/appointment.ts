@@ -23,6 +23,7 @@ export class Appointment extends Entity<AppointmentProps> {
     const appointment = new Appointment(
       {
         ...props,
+        status: props.status ?? AppointmentStatus.waiting(),
         createdAt: props.createdAt ?? new Date(),
       },
       id,

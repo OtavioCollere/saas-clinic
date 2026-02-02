@@ -1,7 +1,22 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
 import { EditPatientUseCase } from "@/domain/application/use-cases/patient/edit-patient";
-import { BadRequestException, Body, Controller, NotFoundException, Param, Patch, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	NotFoundException,
+	Param,
+	Patch,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { PatientPresenter } from "../../presenters/patient-presenter";
@@ -23,11 +38,30 @@ type EditPatientParamsSchema = z.infer<typeof editPatientParamsSchema>;
 const editPatientBodyValidationPipe = new ZodValidationPipe(editPatientBodySchema);
 const editPatientParamsValidationPipe = new ZodValidationPipe(editPatientParamsSchema);
 
+@ApiTags("Patients")
 @Controller("/patients")
 export class EditPatientController {
 	constructor(private readonly editPatientUseCase: EditPatientUseCase) {}
 
 	@Patch("/:patientId")
+	@ApiOperation({
+		summary: "Edit patient",
+		description: "Updates patient information.",
+	})
+	@ApiParam({
+		name: "patientId",
+		type: String,
+		description: "Patient identifier",
+	})
+	@ApiOkResponse({
+		description: "Patient updated successfully",
+	})
+	@ApiNotFoundResponse({
+		description: "Patient not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data",
+	})
 	async handle(
 		@Param(editPatientParamsValidationPipe) params: EditPatientParamsSchema,
 		@Body(editPatientBodyValidationPipe) body: EditPatientBodySchema,

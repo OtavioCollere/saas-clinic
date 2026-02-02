@@ -3,6 +3,7 @@ import { Either, makeLeft, makeRight } from "@/shared/either/either";
 import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { UsersRepository } from "../../repositories/users-repository";
 import { SessionsRepository } from "../../repositories/sessions-repository";
+import { SessionStatus } from "@/domain/enterprise/value-objects/session-status";
 
 interface LogoutUseCaseRequest {
     userId: string;

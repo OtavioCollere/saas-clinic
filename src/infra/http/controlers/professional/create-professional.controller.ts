@@ -4,7 +4,24 @@ import { ProfessionalAlreadyExistsError } from "@/shared/errors/professional-alr
 import { UserIsNotOwnerError } from "@/shared/errors/user-is-not-owner-error";
 import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { CreateProfessionalUseCase } from "@/domain/application/use-cases/professional/create-professional";
-import { BadRequestException, Body, Controller, ForbiddenException, NotFoundException, Param, Post, UsePipes } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	ForbiddenException,
+	NotFoundException,
+	Param,
+	Post,
+} from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ProfessionalPresenter } from "../../presenters/professional-presenter";
@@ -28,11 +45,33 @@ type CreateProfessionalParamsSchema = z.infer<typeof createProfessionalParamsSch
 const createProfessionalBodyValidationPipe = new ZodValidationPipe(createProfessionalBodySchema);
 const createProfessionalParamsValidationPipe = new ZodValidationPipe(createProfessionalParamsSchema);
 
+@ApiTags("Professionals")
 @Controller("/franchises")
 export class CreateProfessionalController {
 	constructor(private readonly createProfessionalUseCase: CreateProfessionalUseCase) {}
 
 	@Post("/:franchiseId/professionals")
+	@ApiOperation({
+		summary: "Create professional",
+		description: "Creates a new professional for a franchise if the authenticated user is the clinic owner.",
+	})
+	@ApiParam({
+		name: "franchiseId",
+		type: String,
+		description: "Franchise identifier",
+	})
+	@ApiOkResponse({
+		description: "Professional created successfully",
+	})
+	@ApiForbiddenResponse({
+		description: "User is not the clinic owner",
+	})
+	@ApiNotFoundResponse({
+		description: "User or franchise not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data or professional already exists",
+	})
 	async handle(
 		@Param(createProfessionalParamsValidationPipe) params: CreateProfessionalParamsSchema,
 		@Body(createProfessionalBodyValidationPipe) body: CreateProfessionalBodySchema,

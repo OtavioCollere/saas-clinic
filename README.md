@@ -67,6 +67,8 @@ Sistema backend modular focado em segurança, escalabilidade e manutenibilidade.
 - **Email:** Nodemailer (com BullMQ para processamento assíncrono)
 - **Logging:** Pino (nestjs-pino) com logs estruturados
 - **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
+- **Logging:** Pino (nestjs-pino) com logs estruturados
+- **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
 - **Testes:** Vitest
 - **Linting/Formatting:** Biome
 
@@ -139,6 +141,29 @@ Sistema de logging otimizado para performance:
 
 **Trade-off:** JSON estruturado é menos legível para humanos, mas facilita parsing e análise automatizada.
 
+### Rate Limiting com Token Bucket
+
+Implementação de rate limiting usando o algoritmo Token Bucket com Redis:
+
+- **Algoritmo:** Token Bucket (permite bursts controlados)
+- **Implementação:** Script Lua no Redis para operações atômicas
+- **Performance:** Operações atômicas garantem consistência sem locks
+- **Escopo:** Por IP do cliente
+- **Configuração:** Flexível via decorator `@RateLimit()`
+
+**Trade-off:** Requer Redis em execução, mas oferece alta performance e consistência distribuída.
+
+### Logging Estruturado com Pino
+
+Sistema de logging otimizado para performance:
+
+- **Biblioteca:** Pino (via nestjs-pino)
+- **Performance:** Ultra-rápido, mínimo overhead (~5% mais lento que console.log)
+- **Formato:** JSON estruturado em produção, legível em desenvolvimento
+- **Integração:** Automática com NestJS, captura contexto de requests
+
+**Trade-off:** JSON estruturado é menos legível para humanos, mas facilita parsing e análise automatizada.
+
 ## Arquitetura do Sistema
 
 ### Estrutura de Diretórios
@@ -146,9 +171,14 @@ Sistema de logging otimizado para performance:
 ```
 src/
 ├── shared/                  # Código compartilhado entre camadas
+├── shared/                  # Código compartilhado entre camadas
 │   ├── entities/            # Entidades base
 │   ├── errors/              # Erros de domínio
 │   ├── either/              # Functional error handling
+│   ├── types/               # Tipos utilitários
+│   ├── guards/              # Guards reutilizáveis
+│   ├── decorators/          # Decorators customizados
+│   └── filters/             # Filtros globais
 │   ├── types/               # Tipos utilitários
 │   ├── guards/              # Guards reutilizáveis
 │   ├── decorators/          # Decorators customizados
@@ -163,9 +193,14 @@ src/
 └── infra/                   # Camada de infraestrutura
     ├── auth/                # Implementação de autenticação
     ├── cryptography/        # Implementação de criptografia
+    ├── cryptography/        # Implementação de criptografia
     ├── database/            # Prisma e configuração de DB
     ├── email/               # Serviço de email (Nodemailer + BullMQ)
     ├── env/                 # Validação de variáveis de ambiente
+    ├── http/                # Controllers e presenters
+    ├── observability/       # Logging e monitoramento
+    ├── rate-limit/          # Rate limiting (Token Bucket)
+    └── cache/               # Cache com Redis
     ├── http/                # Controllers e presenters
     ├── observability/       # Logging e monitoramento
     ├── rate-limit/          # Rate limiting (Token Bucket)
@@ -240,6 +275,48 @@ Implementação de MFA via TOTP (Time-based One-Time Password):
 - **Runtime:** Zod schemas validam todos os inputs
 - **Compile-time:** Inferência de tipos TypeScript a partir dos schemas
 - **HTTP:** Validação via pipes do NestJS antes de chegar aos controllers
+
+### Rate Limiting
+
+Implementação de rate limiting usando o algoritmo **Token Bucket**:
+
+- **Algoritmo:** Token Bucket
+- **Implementação:** Redis com script Lua para operações atômicas
+- **Escopo:** Por IP do cliente
+- **Configuração:** Via decorator `@RateLimit()` em controllers ou rotas
+- **Guard Global:** Aplicado automaticamente via `APP_GUARD`
+
+**Exemplo de uso:**
+```typescript
+@RateLimit({ capacity: 5, refillRate: 1 })
+@Controller('/users')
+export class AuthenticateUserController {
+  // ...
+}
+```
+
+**Características:**
+- Operações atômicas via Lua script no Redis
+- Configuração flexível por rota/controller
+- Resposta HTTP 429 (Too Many Requests) quando excedido
+- Recarga automática de tokens baseada em taxa configurada
+
+### Logging e Observabilidade
+
+Sistema de logging estruturado com **Pino**:
+
+- **Biblioteca:** nestjs-pino (integração Pino com NestJS)
+- **Formato:** JSON estruturado em produção
+- **Desenvolvimento:** pino-pretty para logs coloridos e legíveis
+- **Performance:** Ultra-rápido, mínimo overhead
+- **Contexto:** Metadata automática de request/response
+- **Filtros:** HttpExceptionFilter global para captura de erros
+
+**Características:**
+- Logs estruturados facilitam parsing e análise
+- Níveis de log: info, error, warn, debug
+- Contexto rico com método HTTP, URL, status, etc.
+- Tratamento global de exceções com logging automático
 
 ### Rate Limiting
 
@@ -404,6 +481,13 @@ src/domain/application/use-cases/
 - **In-Memory Repositories:** Isolamento completo de dependências externas
 - **Fake Services:** Mocks para serviços de criptografia, hash, etc.
 
+**Padrão de Testes:**
+- **Happy Path:** Testa o fluxo de sucesso
+- **Sad Path:** Testa casos de erro e validações
+- **Arrange-Act-Assert:** Estrutura clara e organizada
+- **In-Memory Repositories:** Isolamento completo de dependências externas
+- **Fake Services:** Mocks para serviços de criptografia, hash, etc.
+
 ### Testes E2E
 
 Testes end-to-end validam fluxos completos através da API HTTP:
@@ -464,8 +548,11 @@ EMAIL_FROM="noreply@example.com"
 EMAIL_VERIFY_URL="http://localhost:3000/email-verification/verify"
 
 # Redis (para BullMQ e Rate Limiting)
+# Redis (para BullMQ e Rate Limiting)
 REDIS_HOST="localhost"
 REDIS_PORT="6379"
+REDIS_PASSWORD=""  # Opcional
+REDIS_DATABASE=""  # Opcional
 REDIS_PASSWORD=""  # Opcional
 REDIS_DATABASE=""  # Opcional
 
@@ -510,6 +597,10 @@ Isso inicia:
 - PostgreSQL na porta 5432
 - PgAdmin na porta 5050
 
+**Nota:** Redis não está configurado no docker-compose atual. Para funcionalidades de rate limiting e filas de email, é necessário ter Redis em execução. Você pode:
+- Instalar Redis localmente
+- Usar Docker: `docker run -d -p 6379:6379 redis:alpine`
+- Usar um serviço gerenciado (Redis Cloud, AWS ElastiCache, etc.)
 **Nota:** Redis não está configurado no docker-compose atual. Para funcionalidades de rate limiting e filas de email, é necessário ter Redis em execução. Você pode:
 - Instalar Redis localmente
 - Usar Docker: `docker run -d -p 6379:6379 redis:alpine`
@@ -564,13 +655,18 @@ npm run start:prod
 - [x] **Rate Limiting:** Token Bucket completo com Redis e Lua script
 - [x] **Logging:** Pino com logs estruturados e pino-pretty em dev
 - [x] **Observabilidade:** HttpExceptionFilter global para tratamento de erros
+- [x] **Rate Limiting:** Token Bucket completo com Redis e Lua script
+- [x] **Logging:** Pino com logs estruturados e pino-pretty em dev
+- [x] **Observabilidade:** HttpExceptionFilter global para tratamento de erros
 
 ### Planejado 🚧
 
 - [ ] **Testes E2E:** Cobertura de fluxos críticos
 - [ ] **Observabilidade Avançada:**
+- [ ] **Observabilidade Avançada:**
   - [ ] Métricas (Prometheus)
   - [ ] Tracing distribuído (OpenTelemetry)
+  - [ ] Dashboard de monitoramento
   - [ ] Dashboard de monitoramento
 - [ ] **Deploy:**
   - [ ] Configuração para Cloud Run

@@ -1,14 +1,5 @@
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
-import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
-import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
-import { Clinic } from '@/domain/enterprise/entities/clinic';
-import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
-import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
-import { Slug } from '@/domain/enterprise/value-objects/slug';
-import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
-import type { ClinicRepository } from '../../repositories/clinic-repository';
-import type { UsersRepository } from '../../repositories/users-repository';
 import { AppointmentItem } from '@/domain/enterprise/entities/appointment-item';
 import { ProfessionalRepository } from '../../repositories/professional-repository';
 import { FranchiseRepository } from '../../repositories/franchise-repository';
@@ -20,6 +11,9 @@ import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-e
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
+import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
+import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
+import { AppointmentConflictError } from '@/shared/errors/apoointment-conflict-error';
 
 interface CreateAppointmentUseCaseRequest {
   professionalId : string
@@ -32,9 +26,9 @@ interface CreateAppointmentUseCaseRequest {
 }
 
 type CreateAppointmentUseCaseResponse = Either<
-  OwnerNotFoundError | ClinicAlreadyExistsError,
+  ProfessionalNotFoundError | FranchiseNotFoundError | PatientNotFoundError | AppointmentConflictError,
   {
-    clinic: Clinic;
+    appointment: Appointment;
   }
 >;
 
@@ -71,7 +65,7 @@ export class CreateAppointmentUseCase {
     const appointmentConflict = await this.appointmentsRepository.findByProfessionalIdAndHourRange(professionalId, startAt, endAt);
 
     if(appointmentConflict) {
-      return makeLeft(new AppointmentConflictError());
+      return makeLeft(new AppointmentConflictError(appointmentConflict.startAt));
     }
     
     const appointment = Appointment.create({

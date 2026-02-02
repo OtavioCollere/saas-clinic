@@ -5,14 +5,20 @@ import { InvalidEmailError } from "@/shared/errors/invalid-email-error";
 import { CpfAlreadyExistsError } from "@/shared/errors/cpf-already-exists-error";
 import { RegisterUserUseCase } from "@/domain/application/use-cases/users/register-user";
 import {
-  BadRequestException,
-  Body,
-  ConflictException,
-  Controller,
-  Inject,
-  Post,
-  UsePipes,
+	BadRequestException,
+	Body,
+	ConflictException,
+	Controller,
+	Inject,
+	Post,
 } from "@nestjs/common";
+import {
+	ApiBadRequestResponse,
+	ApiConflictResponse,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from "@nestjs/swagger";
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { UserPresenter } from "../../presenters/user-presenter";
@@ -28,8 +34,11 @@ const registerUserBodySchema = z.object({
 
 type RegisterUserBodySchema = z.infer<typeof registerUserBodySchema>;
 
+const registerUserBodyValidationPipe = new ZodValidationPipe(registerUserBodySchema);
+
 @Public()
 @RateLimit({capacity : 5, refillRate : 1})
+@ApiTags("Users")
 @Controller("/users")
 export class RegisterUserController {
   constructor(
@@ -38,8 +47,20 @@ export class RegisterUserController {
   ) {}
 
   @Post("/register-user")
-  @UsePipes(new ZodValidationPipe(registerUserBodySchema))
-  async handle(@Body() body: RegisterUserBodySchema) {
+  @ApiOperation({
+    summary: "Register user",
+    description: "Creates a new user account.",
+  })
+  @ApiOkResponse({
+    description: "User created successfully",
+  })
+  @ApiConflictResponse({
+    description: "Email or CPF already exists",
+  })
+  @ApiBadRequestResponse({
+    description: "Invalid request data",
+  })
+  async handle(@Body(registerUserBodyValidationPipe) body: RegisterUserBodySchema) {
     const { name, cpf, email, password } = body;
 
     const result = await this.registerUser.execute({
