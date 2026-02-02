@@ -11,9 +11,6 @@ import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-e
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
-import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
-import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
-import { AppointmentConflictError } from '@/shared/errors/apoointment-conflict-error';
 
 interface CreateAppointmentUseCaseRequest {
   professionalId : string

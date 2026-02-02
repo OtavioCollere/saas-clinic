@@ -32,8 +32,8 @@ export class ServiceOrderItem extends Entity<ServiceOrderItemProps> {
         return this.props.appointmentItemId;
     }
 
-    get description() {
-        return this.props.description;
+    get name() {
+        return this.props.name;
     }
 
     get price() {

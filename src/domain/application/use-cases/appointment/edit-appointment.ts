@@ -1,14 +1,5 @@
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
-import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
-import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
-import { Clinic } from '@/domain/enterprise/entities/clinic';
-import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
-import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
-import { Slug } from '@/domain/enterprise/value-objects/slug';
-import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
-import type { ClinicRepository } from '../../repositories/clinic-repository';
-import type { UsersRepository } from '../../repositories/users-repository';
 import { AppointmentItem } from '@/domain/enterprise/entities/appointment-item';
 import { ProfessionalRepository } from '../../repositories/professional-repository';
 import { FranchiseRepository } from '../../repositories/franchise-repository';
@@ -34,9 +25,9 @@ interface EditAppointmentUseCaseRequest {
 }
 
 type EditAppointmentUseCaseResponse = Either<
-  OwnerNotFoundError | ClinicAlreadyExistsError,
+  AppointmentNotFoundError | ProfessionalNotFoundError | FranchiseNotFoundError | PatientNotFoundError | AppointmentConflictError,
   {
-    clinic: Clinic;
+    appointment: Appointment;
   }
 >;
 

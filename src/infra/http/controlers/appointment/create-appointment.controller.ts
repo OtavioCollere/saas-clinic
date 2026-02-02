@@ -2,7 +2,7 @@ import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
-import { AppointmentConflictError } from "@/shared/errors/apoointment-conflict-error";
+import { AppointmentConflictError } from "@/shared/errors/appointment-conflict-error";
 import { CreateAppointmentUseCase } from "@/domain/application/use-cases/appointment/create-appointment";
 import {
 	BadRequestException,
@@ -69,7 +69,6 @@ export class CreateAppointmentController {
 		const appointmentItemsEntities = appointmentItems.map(
 			(item) =>
 				AppointmentItem.create({
-					appointmentId: new UniqueEntityId(), // Will be set when appointment is created
 					procedureId: new UniqueEntityId(item.procedureId),
 					price: item.price,
 					notes: item.notes,
