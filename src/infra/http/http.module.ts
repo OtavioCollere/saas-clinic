@@ -3,7 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
 import { CryptographyModule } from '../cryptography/cryptography.module';
-import { CacheModule } from '../cache/cache.module';
+// import { CacheModule } from '../cache/cache.module';
 import { RateLimitModule } from '../rate-limit/rate-limit.module';
 import { RateLimitGuard } from '@/shared/guards/rate-limit.guard';
 import { AuthModule } from '../auth/auth.module';
@@ -92,7 +92,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     DatabaseModule,
     CryptographyModule,
     EmailModule,
-    CacheModule,
+    // CacheModule, // Comentado temporariamente
     RateLimitModule,
     AuthModule,
   ],
