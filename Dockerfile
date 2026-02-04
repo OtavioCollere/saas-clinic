@@ -55,7 +55,10 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/package.json ./package.json
 COPY --from=build /usr/src/app/prisma ./prisma
-COPY --from=build /usr/src/app/newrelic.js ./newrelic.js
+
+# Copia newrelic.js se existir no build stage (opcional)
+RUN --mount=type=bind,from=build,source=/usr/src/app,target=/mnt/build \
+    test -f /mnt/build/newrelic.js && cp /mnt/build/newrelic.js ./newrelic.js || true
 
 USER node
 
