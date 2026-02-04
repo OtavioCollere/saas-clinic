@@ -6,6 +6,8 @@ import { JwtAuthGuard } from './jwt-auth.guard'
 import { EnvService } from '../env/env.service'
 import { EnvModule } from '../env/env.module'
 import { JwtStrategy } from './jwt-strategy'
+import { TotpMfaService } from './mfa/totp-mfa.service'
+import { MfaService } from '@/domain/services/mfa-service'
 
 @Module({
   imports: [
@@ -30,9 +32,14 @@ import { JwtStrategy } from './jwt-strategy'
     JwtStrategy,
     EnvService,
     {
+      provide: MfaService,
+      useClass: TotpMfaService,
+    },
+    {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
   ],
+  exports: [MfaService],
 })
 export class AuthModule {}

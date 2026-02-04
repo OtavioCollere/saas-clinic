@@ -8,6 +8,7 @@ import { Module } from "@nestjs/common";
     {
       provide: CacheService,
       useFactory: () => {
+
         const host = process.env.REDIS_HOST || 'localhost';
         const port = process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379;
         const password = process.env.REDIS_PASSWORD || '';
@@ -20,8 +21,9 @@ import { Module } from "@nestjs/common";
           db: database
         });
 
-        return new RedisCache(redis);
+        return redis
       },
+      inject: [Redis],
     },
   ],
   exports: [CacheService],
