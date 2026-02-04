@@ -6,6 +6,7 @@ import { CryptographyModule } from '../cryptography/cryptography.module';
 import { CacheModule } from '../cache/cache.module';
 import { RateLimitModule } from '../rate-limit/rate-limit.module';
 import { RateLimitGuard } from '@/shared/guards/rate-limit.guard';
+import { AuthModule } from '../auth/auth.module';
 
 // Controllers
 import { HealthCheckController } from './controlers/health/health-check.controller';
@@ -93,6 +94,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     EmailModule,
     CacheModule,
     RateLimitModule,
+    AuthModule,
   ],
   controllers: [
     HealthCheckController,

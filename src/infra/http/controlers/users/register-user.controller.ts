@@ -14,6 +14,7 @@ import {
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
+	ApiBody,
 	ApiConflictResponse,
 	ApiOkResponse,
 	ApiOperation,
@@ -50,6 +51,18 @@ export class RegisterUserController {
   @ApiOperation({
     summary: "Register user",
     description: "Creates a new user account.",
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'João Silva' },
+        cpf: { type: 'string', example: '12345678900' },
+        email: { type: 'string', format: 'email', example: 'joao@example.com' },
+        password: { type: 'string', format: 'password', example: 'senha123' },
+      },
+      required: ['name', 'cpf', 'email', 'password'],
+    },
   })
   @ApiOkResponse({
     description: "User created successfully",

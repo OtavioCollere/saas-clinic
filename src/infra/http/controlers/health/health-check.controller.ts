@@ -1,5 +1,7 @@
-import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
+import { Public } from '@/infra/auth/public';
+import { PinoLogger } from 'nestjs-pino';
 
 interface HealthStatus {
   status: 'healthy' | 'unhealthy';
@@ -16,22 +18,40 @@ interface HealthCheckResult {
   };
 }
 
+@Public()
 @Controller('/health')
 export class HealthCheckController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService)
+    private readonly prisma: PrismaService,
+
+    @Inject(PinoLogger)
+    private readonly logger: PinoLogger,
+  ) {}
 
   @Get()
   async check(): Promise<HealthCheckResult> {
-    const dbHealth = await this.checkDatabaseHealth();
+    try {
 
-    return {
-      status: this.determineOverallStatus(dbHealth),
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      checks: {
-        database: dbHealth,
-      },
-    };
+      this.logger.info('HealthCheckController.check() - Iniciando');
+
+      const dbHealth = await this.checkDatabaseHealth();
+
+      const result = {
+        status: this.determineOverallStatus(dbHealth),
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        checks: {
+          database: dbHealth,
+        },
+      };
+
+      console.log('HealthCheckController.check() - Retornando resultado:', result);
+      return result;
+    } catch (error) {
+      console.error('HealthCheckController.check() - ERRO:', error);
+      throw error;
+    }
   }
 
   @Get('database')

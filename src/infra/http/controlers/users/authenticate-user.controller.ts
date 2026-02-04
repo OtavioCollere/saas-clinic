@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
+	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
 	ApiTags,
@@ -43,6 +44,16 @@ export class AuthenticateUserController {
   @ApiOperation({
     summary: "Authenticate user",
     description: "Authenticates a user and returns access tokens or MFA challenge.",
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', format: 'email', example: 'joao@example.com' },
+        password: { type: 'string', format: 'password', example: 'senha123' },
+      },
+      required: ['email', 'password'],
+    },
   })
   @ApiOkResponse({
     description: "User authenticated successfully",

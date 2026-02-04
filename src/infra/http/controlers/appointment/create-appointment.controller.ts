@@ -2,7 +2,7 @@ import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
-import { AppointmentConflictError } from "@/shared/errors/apoointment-conflict-error";
+import { AppointmentConflictError } from "@/shared/errors/appointment-conflict-error";
 import { CreateAppointmentUseCase } from "@/domain/application/use-cases/appointment/create-appointment";
 import {
 	BadRequestException,
@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
+	ApiBody,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
@@ -54,6 +55,32 @@ export class CreateAppointmentController {
 		summary: "Create appointment",
 		description: "Creates a new appointment for a patient with a professional.",
 	})
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				professionalId: { type: 'string', example: 'uuid-do-profissional' },
+				franchiseId: { type: 'string', example: 'uuid-da-franquia' },
+				patientId: { type: 'string', example: 'uuid-do-paciente' },
+				name: { type: 'string', example: 'Consulta de avaliação' },
+				appointmentItems: {
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							procedureId: { type: 'string', example: 'uuid-do-procedimento' },
+							price: { type: 'number', example: 150.00 },
+							notes: { type: 'string', example: 'Observações opcionais', nullable: true },
+						},
+						required: ['procedureId', 'price'],
+					},
+				},
+				startAt: { type: 'string', format: 'date-time', example: '2026-02-03T10:00:00Z' },
+				durationInMinutes: { type: 'number', example: 60 },
+			},
+			required: ['professionalId', 'franchiseId', 'patientId', 'name', 'appointmentItems', 'startAt', 'durationInMinutes'],
+		},
+	})
 	@ApiOkResponse({
 		description: "Appointment created successfully",
 	})
@@ -69,7 +96,6 @@ export class CreateAppointmentController {
 		const appointmentItemsEntities = appointmentItems.map(
 			(item) =>
 				AppointmentItem.create({
-					appointmentId: new UniqueEntityId(), // Will be set when appointment is created
 					procedureId: new UniqueEntityId(item.procedureId),
 					price: item.price,
 					notes: item.notes,
