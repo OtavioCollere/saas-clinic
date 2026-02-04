@@ -27,5 +27,11 @@ export class ServiceOrderStatus {
         return this.value === 'PENDING';
     }
     
+    isWaitingPayment(): boolean {
+        return this.value === 'WAITING_PAYMENT';
+    }
     
+    isPaid(): boolean {
+        return this.value === 'PAID';
+    }
 }       
