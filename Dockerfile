@@ -1,15 +1,27 @@
-FROM node:20.18 AS base
+############################
+# Base
+############################
+FROM node:20.18-alpine AS base
 
-RUN npm i -g pnpm
+ENV NODE_ENV=production
 
+RUN npm install -g pnpm
+
+############################
+# Dependencies
+############################
 FROM base AS dependencies
 
 WORKDIR /usr/src/app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install
+# instala TODAS deps (newrelic incluso)
+RUN pnpm install --frozen-lockfile
 
+############################
+# Build
+############################
 FROM base AS build
 
 WORKDIR /usr/src/app
@@ -17,23 +29,38 @@ WORKDIR /usr/src/app
 COPY . .
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 
-# Gera o Prisma Client antes do build
+# Prisma client
 RUN pnpm prisma generate
 
+# Build Nest
 RUN pnpm build
+
+# Remove dev deps (mantém newrelic)
 RUN pnpm prune --prod
 
-FROM cgr.dev/chainguard/node:latest AS deploy
+############################
+# Runtime (Deploy)
+############################
+FROM node:20.18-alpine AS deploy
 
-USER 1000
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
+# usuário não-root (ECS best practice)
+RUN addgroup -g 1000 -S nodejs && \
+    adduser -S nodejs -u 1000
+
+# Copia apenas o necessário
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/package.json ./package.json
 COPY --from=build /usr/src/app/prisma ./prisma
+COPY --from=build /usr/src/app/newrelic.js ./newrelic.js
+
+USER nodejs
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+# New Relic SEMPRE no preload
+CMD ["/usr/local/bin/node", "-r", "newrelic", "dist/src/main.js"]
