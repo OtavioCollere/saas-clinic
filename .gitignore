@@ -9,3 +9,8 @@ dist
 
 /data
 data
+
+# New Relic logs (caso ainda existam)
+newrelic_agent.log
+newrelic.js
+newrelic.cjs

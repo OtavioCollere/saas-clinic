@@ -48,8 +48,7 @@ ENV NODE_ENV=production
 WORKDIR /usr/src/app
 
 # usuário não-root (ECS best practice)
-RUN addgroup -g 1000 -S nodejs && \
-    adduser -S nodejs -u 1000
+# A imagem node:20.18-alpine já vem com o usuário 'node', vamos usar ele
 
 # Copia apenas o necessário
 COPY --from=build /usr/src/app/dist ./dist
@@ -58,7 +57,7 @@ COPY --from=build /usr/src/app/package.json ./package.json
 COPY --from=build /usr/src/app/prisma ./prisma
 COPY --from=build /usr/src/app/newrelic.js ./newrelic.js
 
-USER nodejs
+USER node
 
 EXPOSE 3000
 
