@@ -6,23 +6,6 @@ Sistema estruturado para suportar **múltiplas clínicas e franquias**, com regr
 
 ---
 
-## Visão Geral
-
-
-
-API responsável por:
-
-- Autenticação e autorização segura
-- Gestão de clínicas, franquias, usuários e profissionais
-- Agendamentos com múltiplos procedimentos
-- Histórico de pacientes e anamneses
-- Processamento assíncrono de tarefas críticas
-- Observabilidade e monitoramento em produção
-
-Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **facilidade de evolução**.
-
----
-
 ## Stack Tecnológica
 
 - **Backend:** Node.js, TypeScript, NestJS, Fastify
@@ -34,6 +17,23 @@ Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **f
 - **Observability:** Pino, New Relic APM
 - **Infra:** Docker, AWS ECS (Fargate), ALB
 - **CI/CD:** GitHub Actions
+
+---
+
+## Visão Geral do Sistema
+
+![Swagger Documentation](./img/swagger.png)
+
+API responsável por:
+
+- Autenticação e autorização segura
+- Gestão de clínicas, franquias, usuários e profissionais
+- Agendamentos com múltiplos procedimentos
+- Histórico de pacientes e anamneses
+- Processamento assíncrono de tarefas críticas
+- Observabilidade e monitoramento em produção
+
+Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **facilidade de evolução**.
 
 ---
 
@@ -82,8 +82,6 @@ Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **f
 
 ## Arquitetura da Aplicação
 
-
-
 Separação clara de responsabilidades:
 
 - **Domain:** regras de negócio puras
@@ -96,7 +94,7 @@ Essa abordagem reduz acoplamento, facilita testes e permite evolução segura do
 
 ## Infraestrutura e Deploy (AWS)
 
-
+![AWS Infrastructure](./img/aws.jpeg)
 
 Deploy automatizado em ambiente cloud com:
 
