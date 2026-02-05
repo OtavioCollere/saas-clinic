@@ -66,8 +66,7 @@ Sistema backend modular focado em segurança, escalabilidade e manutenibilidade.
 - **Cache/Queue:** Redis (ioredis) com BullMQ
 - **Email:** Nodemailer (com BullMQ para processamento assíncrono)
 - **Logging:** Pino (nestjs-pino) com logs estruturados
-- **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
-- **Logging:** Pino (nestjs-pino) com logs estruturados
+- **Monitoramento:** New Relic APM
 - **Rate Limiting:** Token Bucket algorithm com Redis (Lua script)
 - **Testes:** Vitest
 - **Linting/Formatting:** Biome
@@ -141,28 +140,17 @@ Sistema de logging otimizado para performance:
 
 **Trade-off:** JSON estruturado é menos legível para humanos, mas facilita parsing e análise automatizada.
 
-### Rate Limiting com Token Bucket
+### Monitoramento com New Relic
 
-Implementação de rate limiting usando o algoritmo Token Bucket com Redis:
+Sistema de monitoramento e observabilidade em produção:
 
-- **Algoritmo:** Token Bucket (permite bursts controlados)
-- **Implementação:** Script Lua no Redis para operações atômicas
-- **Performance:** Operações atômicas garantem consistência sem locks
-- **Escopo:** Por IP do cliente
-- **Configuração:** Flexível via decorator `@RateLimit()`
+- **APM:** New Relic Application Performance Monitoring
+- **Métricas:** Performance de transações, throughput, tempo de resposta
+- **Erros:** Rastreamento automático de erros e exceções
+- **Integração:** Agente Node.js integrado ao NestJS
+- **Dashboard:** Visualização de métricas em tempo real
 
-**Trade-off:** Requer Redis em execução, mas oferece alta performance e consistência distribuída.
-
-### Logging Estruturado com Pino
-
-Sistema de logging otimizado para performance:
-
-- **Biblioteca:** Pino (via nestjs-pino)
-- **Performance:** Ultra-rápido, mínimo overhead (~5% mais lento que console.log)
-- **Formato:** JSON estruturado em produção, legível em desenvolvimento
-- **Integração:** Automática com NestJS, captura contexto de requests
-
-**Trade-off:** JSON estruturado é menos legível para humanos, mas facilita parsing e análise automatizada.
+**Trade-off:** Requer licença New Relic, mas oferece visibilidade completa da aplicação em produção.
 
 ## Arquitetura do Sistema
 
@@ -171,14 +159,9 @@ Sistema de logging otimizado para performance:
 ```
 src/
 ├── shared/                  # Código compartilhado entre camadas
-├── shared/                  # Código compartilhado entre camadas
 │   ├── entities/            # Entidades base
 │   ├── errors/              # Erros de domínio
 │   ├── either/              # Functional error handling
-│   ├── types/               # Tipos utilitários
-│   ├── guards/              # Guards reutilizáveis
-│   ├── decorators/          # Decorators customizados
-│   └── filters/             # Filtros globais
 │   ├── types/               # Tipos utilitários
 │   ├── guards/              # Guards reutilizáveis
 │   ├── decorators/          # Decorators customizados
@@ -193,16 +176,10 @@ src/
 └── infra/                   # Camada de infraestrutura
     ├── auth/                # Implementação de autenticação
     ├── cryptography/        # Implementação de criptografia
-    ├── cryptography/        # Implementação de criptografia
     ├── database/            # Prisma e configuração de DB
     ├── email/               # Serviço de email (Nodemailer + BullMQ)
     ├── env/                 # Validação de variáveis de ambiente
     ├── http/                # Controllers e presenters
-    ├── observability/       # Logging e monitoramento
-    ├── rate-limit/          # Rate limiting (Token Bucket)
-    └── cache/               # Cache com Redis
-    ├── http/                # Controllers e presenters
-    ├── observability/       # Logging e monitoramento
     ├── rate-limit/          # Rate limiting (Token Bucket)
     └── cache/               # Cache com Redis
 ```
@@ -318,47 +295,21 @@ Sistema de logging estruturado com **Pino**:
 - Contexto rico com método HTTP, URL, status, etc.
 - Tratamento global de exceções com logging automático
 
-### Rate Limiting
+### Monitoramento com New Relic
 
-Implementação de rate limiting usando o algoritmo **Token Bucket**:
+Sistema de monitoramento e observabilidade em produção:
 
-- **Algoritmo:** Token Bucket
-- **Implementação:** Redis com script Lua para operações atômicas
-- **Escopo:** Por IP do cliente
-- **Configuração:** Via decorator `@RateLimit()` em controllers ou rotas
-- **Guard Global:** Aplicado automaticamente via `APP_GUARD`
-
-**Exemplo de uso:**
-```typescript
-@RateLimit({ capacity: 5, refillRate: 1 })
-@Controller('/users')
-export class AuthenticateUserController {
-  // ...
-}
-```
+- **APM:** New Relic Application Performance Monitoring integrado
+- **Métricas:** Performance de transações, throughput, tempo de resposta
+- **Erros:** Rastreamento automático de erros e exceções
+- **Dashboard:** Visualização de métricas em tempo real
+- **Alertas:** Configuração de alertas para métricas críticas
 
 **Características:**
-- Operações atômicas via Lua script no Redis
-- Configuração flexível por rota/controller
-- Resposta HTTP 429 (Too Many Requests) quando excedido
-- Recarga automática de tokens baseada em taxa configurada
-
-### Logging e Observabilidade
-
-Sistema de logging estruturado com **Pino**:
-
-- **Biblioteca:** nestjs-pino (integração Pino com NestJS)
-- **Formato:** JSON estruturado em produção
-- **Desenvolvimento:** pino-pretty para logs coloridos e legíveis
-- **Performance:** Ultra-rápido, mínimo overhead
-- **Contexto:** Metadata automática de request/response
-- **Filtros:** HttpExceptionFilter global para captura de erros
-
-**Características:**
-- Logs estruturados facilitam parsing e análise
-- Níveis de log: info, error, warn, debug
-- Contexto rico com método HTTP, URL, status, etc.
-- Tratamento global de exceções com logging automático
+- Monitoramento de performance de endpoints
+- Rastreamento de dependências externas (banco de dados, APIs)
+- Análise de erros e stack traces
+- Métricas de negócio customizadas
 
 ## Fluxos Principais
 
@@ -481,13 +432,6 @@ src/domain/application/use-cases/
 - **In-Memory Repositories:** Isolamento completo de dependências externas
 - **Fake Services:** Mocks para serviços de criptografia, hash, etc.
 
-**Padrão de Testes:**
-- **Happy Path:** Testa o fluxo de sucesso
-- **Sad Path:** Testa casos de erro e validações
-- **Arrange-Act-Assert:** Estrutura clara e organizada
-- **In-Memory Repositories:** Isolamento completo de dependências externas
-- **Fake Services:** Mocks para serviços de criptografia, hash, etc.
-
 ### Testes E2E
 
 Testes end-to-end validam fluxos completos através da API HTTP:
@@ -514,6 +458,10 @@ http://localhost:3000/api
 - Gerenciamento de usuários
 - Operações de clínicas, franquias e profissionais
 - Health checks
+
+![Swagger Documentation](./img/swagger.png)
+
+*Documentação interativa da API via Swagger/OpenAPI*
 
 ## Configuração e Execução Local
 
@@ -548,13 +496,14 @@ EMAIL_FROM="noreply@example.com"
 EMAIL_VERIFY_URL="http://localhost:3000/email-verification/verify"
 
 # Redis (para BullMQ e Rate Limiting)
-# Redis (para BullMQ e Rate Limiting)
 REDIS_HOST="localhost"
 REDIS_PORT="6379"
 REDIS_PASSWORD=""  # Opcional
 REDIS_DATABASE=""  # Opcional
-REDIS_PASSWORD=""  # Opcional
-REDIS_DATABASE=""  # Opcional
+
+# New Relic (monitoramento)
+NEW_RELIC_APP_NAME="saas-clinic"
+NEW_RELIC_LICENSE_KEY="<sua-licenca-new-relic>"
 
 # Server
 PORT=3000
@@ -601,10 +550,6 @@ Isso inicia:
 - Instalar Redis localmente
 - Usar Docker: `docker run -d -p 6379:6379 redis:alpine`
 - Usar um serviço gerenciado (Redis Cloud, AWS ElastiCache, etc.)
-**Nota:** Redis não está configurado no docker-compose atual. Para funcionalidades de rate limiting e filas de email, é necessário ter Redis em execução. Você pode:
-- Instalar Redis localmente
-- Usar Docker: `docker run -d -p 6379:6379 redis:alpine`
-- Usar um serviço gerenciado (Redis Cloud, AWS ElastiCache, etc.)
 
 ### Scripts Disponíveis
 
@@ -621,7 +566,54 @@ npm run format         # Formatação (Biome)
 
 ## Deploy
 
-### Build de Produção
+### Deploy na AWS
+
+A aplicação está configurada para deploy automatizado na AWS utilizando **Amazon ECS (Fargate)** com **ECR** para armazenamento de imagens Docker.
+
+#### Arquitetura de Infraestrutura
+
+A infraestrutura na AWS foi configurada com os seguintes componentes:
+
+- **VPC (Virtual Private Cloud):** Isolamento de rede para os recursos
+- **Subnets:**
+  - **Subnets Públicas:** Para o Application Load Balancer
+  - **Subnets Privadas:** Para os containers ECS (segurança)
+- **NAT Gateway:** Permite que containers em subnets privadas acessem a internet (para pull de imagens, logs, etc.)
+- **Route Tables:** Configuração de rotas para subnets públicas e privadas
+- **Application Load Balancer (ALB):** Distribuição de carga e roteamento de tráfego
+- **ECS Cluster:** Cluster Fargate para execução de containers
+- **ECS Service:** Serviço com **3 réplicas** da aplicação para alta disponibilidade
+- **ECR (Elastic Container Registry):** Repositório de imagens Docker
+
+![AWS Infrastructure](./img/aws.jpeg)
+
+*Arquitetura de infraestrutura na AWS: VPC, Subnets, NAT Gateway, Load Balancer e ECS*
+
+#### Pipeline CI/CD
+
+O deploy é automatizado via **GitHub Actions** com o seguinte fluxo:
+
+1. **Build:** Construção da imagem Docker
+2. **Push para ECR:** Envio da imagem para o repositório ECR
+3. **Atualização de Task Definition:** Download e sanitização da task definition atual
+4. **Deploy no ECS:** Atualização do serviço ECS com a nova imagem
+
+**Arquivo de configuração:** `.github/workflows/cicd.yaml`
+
+#### Configuração do ECS
+
+- **Plataforma:** Fargate (serverless)
+- **CPU:** 1024 (1 vCPU)
+- **Memória:** 2048 MB (2 GB)
+- **Réplicas:** 3 tasks rodando simultaneamente
+- **Network Mode:** awsvpc (cada task recebe seu próprio IP)
+- **Health Checks:** Configurados no ALB e ECS
+
+#### Variáveis de Ambiente
+
+Todas as variáveis de ambiente são configuradas via **ECS Task Definition** e podem ser gerenciadas através do console AWS ou via IaC (Infrastructure as Code).
+
+#### Build de Produção
 
 ```bash
 npm run build
@@ -630,15 +622,12 @@ npm run start:prod
 
 ### Considerações de Deploy
 
-- **Variáveis de Ambiente:** Todas as variáveis devem estar configuradas no ambiente de produção
+- **Variáveis de Ambiente:** Todas as variáveis devem estar configuradas no ECS Task Definition
 - **Chaves RSA:** Gerar par de chaves específico para produção
 - **Database Migrations:** Executar migrations antes do deploy
-- **Health Checks:** Endpoint `/health` disponível para monitoramento
-
-**Plataformas Consideradas:**
-- Google Cloud Run
-- AWS ECS/Fargate
-- Kubernetes
+- **Health Checks:** Endpoint `/health` disponível para monitoramento via ALB
+- **Secrets:** Utilizar AWS Secrets Manager ou Systems Manager Parameter Store para dados sensíveis
+- **Logs:** Logs da aplicação são enviados para CloudWatch Logs automaticamente
 
 ## Roadmap
 
@@ -655,23 +644,21 @@ npm run start:prod
 - [x] **Rate Limiting:** Token Bucket completo com Redis e Lua script
 - [x] **Logging:** Pino com logs estruturados e pino-pretty em dev
 - [x] **Observabilidade:** HttpExceptionFilter global para tratamento de erros
-- [x] **Rate Limiting:** Token Bucket completo com Redis e Lua script
-- [x] **Logging:** Pino com logs estruturados e pino-pretty em dev
-- [x] **Observabilidade:** HttpExceptionFilter global para tratamento de erros
+- [x] **Monitoramento:** New Relic APM integrado
+- [x] **Deploy AWS:** Pipeline CI/CD completo com ECR e ECS Fargate
+- [x] **Infraestrutura AWS:** VPC, Subnets, NAT Gateway, Load Balancer configurados
 
 ### Planejado 🚧
 
 - [ ] **Testes E2E:** Cobertura de fluxos críticos
 - [ ] **Observabilidade Avançada:**
-- [ ] **Observabilidade Avançada:**
   - [ ] Métricas (Prometheus)
   - [ ] Tracing distribuído (OpenTelemetry)
-  - [ ] Dashboard de monitoramento
-  - [ ] Dashboard de monitoramento
-- [ ] **Deploy:**
-  - [ ] Configuração para Cloud Run
-  - [ ] CI/CD pipeline
-  - [ ] Secrets management
+  - [ ] Dashboard de monitoramento customizado
+- [ ] **Infraestrutura:**
+  - [ ] Auto Scaling baseado em métricas
+  - [ ] Multi-region deployment
+  - [ ] Disaster recovery plan
 
 ### Futuro 🔮
 
@@ -682,8 +669,9 @@ npm run start:prod
 ## Limitações Conhecidas
 
 1. **Testes E2E:** Não implementados. Cobertura atual apenas unitária.
-2. **Observabilidade:** Logging estruturado implementado. Métricas e tracing não implementados.
+2. **Observabilidade:** Logging estruturado e New Relic implementados. Métricas Prometheus e tracing OpenTelemetry não implementados.
 3. **Rate Limiting:** Requer Redis em execução. Sem Redis, o guard não funciona corretamente.
+4. **Auto Scaling:** ECS Service configurado com réplicas fixas (3). Auto scaling baseado em métricas não implementado.
 
 
 
