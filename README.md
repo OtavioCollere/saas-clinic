@@ -2,11 +2,11 @@
 
 Backend de uma plataforma **SaaS multi-tenant** para gestão de clínicas de estética, projetado com foco em **segurança, escalabilidade e qualidade arquitetural**.
 
-O sistema foi estruturado para suportar **múltiplas clínicas e franquias**, com regras de negócio isoladas, processamento assíncrono, observabilidade em produção e deploy automatizado em cloud.
+Sistema estruturado para suportar **múltiplas clínicas e franquias**, com regras de negócio isoladas, processamento assíncrono, observabilidade em produção e deploy automatizado em cloud.
 
 ---
 
-## Visão Geral do Sistema
+## Visão Geral
 
 
 
@@ -20,6 +20,20 @@ API responsável por:
 - Observabilidade e monitoramento em produção
 
 Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **facilidade de evolução**.
+
+---
+
+## Stack Tecnológica
+
+- **Backend:** Node.js, TypeScript, NestJS, Fastify
+- **Dados:** PostgreSQL, Prisma ORM
+- **Cache / Queue:** Redis, BullMQ
+- **Segurança:** JWT (RS256), MFA (TOTP)
+- **Validação:** Zod
+- **Testes:** Vitest (unitários)
+- **Observability:** Pino, New Relic APM
+- **Infra:** Docker, AWS ECS (Fargate), ALB
+- **CI/CD:** GitHub Actions
 
 ---
 
@@ -63,20 +77,6 @@ Arquitetura pensada para **crescimento horizontal**, **baixo acoplamento** e **f
 - Monitoramento de performance com New Relic APM
 - Health checks para Load Balancer
 - Tratamento global de exceções
-
----
-
-## Stack Tecnológica
-
-- **Backend:** Node.js, TypeScript, NestJS, Fastify
-- **Dados:** PostgreSQL, Prisma ORM
-- **Cache / Queue:** Redis, BullMQ
-- **Segurança:** JWT (RS256), MFA (TOTP)
-- **Validação:** Zod
-- **Testes:** Vitest (unitários)
-- **Observability:** Pino, New Relic APM
-- **Infra:** Docker, AWS ECS (Fargate), ALB
-- **CI/CD:** GitHub Actions
 
 ---
 
