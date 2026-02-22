@@ -1,10 +1,11 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-error';
 import { Procedure } from '@/domain/enterprise/entities/procedure';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';
-import type { FranchiseRepository } from '../../repositories/franchise-repository';
-import type { ProcedureRepository } from '../../repositories/procedure-repository';
+import { FranchiseRepository } from '../../repositories/franchise-repository';
+import { ProcedureRepository } from '../../repositories/procedure-repository';
 
 interface CreateProcedureUseCaseRequest {
   franchiseId: string;
@@ -20,9 +21,12 @@ type CreateProcedureUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class CreateProcedureUseCase {
   constructor(
+    @Inject(ProcedureRepository)
     private procedureRepository: ProcedureRepository,
+    @Inject(FranchiseRepository)
     private franchiseRepository: FranchiseRepository
   ) {}
 

@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { AppointmentItem } from '@/domain/enterprise/entities/appointment-item';
@@ -29,11 +30,16 @@ type CreateAppointmentUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class CreateAppointmentUseCase {
   constructor(
+    @Inject(ProfessionalRepository)
     private professionalRepository: ProfessionalRepository,
+    @Inject(FranchiseRepository)
     private franchiseRepository: FranchiseRepository,
+    @Inject(PatientRepository)
     private patientRepository: PatientRepository,
+    @Inject(AppointmentsRepository)
     private appointmentsRepository: AppointmentsRepository
   ) {}
 

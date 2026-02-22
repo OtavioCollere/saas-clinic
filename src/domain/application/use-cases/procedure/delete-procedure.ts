@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { ProcedureNotFoundError } from '@/shared/errors/procedure-not-found-error';
-import type { Procedure } from '@/domain/enterprise/entities/procedure';
+import { ProcedureHasAppointmentsError } from '@/shared/errors/procedure-has-appointments-error';
 import { ProcedureRepository } from '../../repositories/procedure-repository';
 
-interface GetProcedureByIdUseCaseRequest {
+interface DeleteProcedureUseCaseRequest {
   procedureId: string;
 }
 
-type GetProcedureByIdUseCaseResponse = Either<
-  ProcedureNotFoundError,
-  { procedure: Procedure }
+type DeleteProcedureUseCaseResponse = Either<
+  ProcedureNotFoundError | ProcedureHasAppointmentsError,
+  void
 >;
 
 @Injectable()
-export class GetProcedureByIdUseCase {
+export class DeleteProcedureUseCase {
   constructor(
     @Inject(ProcedureRepository)
     private procedureRepository: ProcedureRepository
@@ -22,13 +22,24 @@ export class GetProcedureByIdUseCase {
 
   async execute({
     procedureId,
-  }: GetProcedureByIdUseCaseRequest): Promise<GetProcedureByIdUseCaseResponse> {
+  }: DeleteProcedureUseCaseRequest): Promise<DeleteProcedureUseCaseResponse> {
     const procedure = await this.procedureRepository.findById(procedureId);
 
     if (!procedure) {
       return makeLeft(new ProcedureNotFoundError());
     }
 
-    return makeRight({ procedure });
+    const hasAppointments = await this.procedureRepository.hasAppointments(procedureId);
+
+    if (hasAppointments) {
+      return makeLeft(new ProcedureHasAppointmentsError());
+    }
+
+    await this.procedureRepository.delete(procedureId);
+
+    return makeRight(undefined);
   }
 }
+
+
+

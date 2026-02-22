@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { AppointmentItem } from '@/domain/enterprise/entities/appointment-item';
@@ -14,14 +15,14 @@ import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
 
 interface EditAppointmentUseCaseRequest {
-    appointmentId : string
-  professionalId : string
-  franchiseId : string
-  patientId : string
-  name : string
-  appointmentItems : AppointmentItem[]
-  startAt : Date
-  durationInMinutes : number
+  appointmentId: string;
+  professionalId: string;
+  franchiseId: string;
+  patientId: string;
+  name: string;
+  appointmentItems: AppointmentItem[];
+  startAt: Date;
+  durationInMinutes: number;
 }
 
 type EditAppointmentUseCaseResponse = Either<
@@ -31,11 +32,16 @@ type EditAppointmentUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class EditAppointmentUseCase {
   constructor(
+    @Inject(ProfessionalRepository)
     private professionalRepository: ProfessionalRepository,
+    @Inject(FranchiseRepository)
     private franchiseRepository: FranchiseRepository,
+    @Inject(PatientRepository)
     private patientRepository: PatientRepository,
+    @Inject(AppointmentsRepository)
     private appointmentsRepository: AppointmentsRepository
   ) {}
 
@@ -67,22 +73,20 @@ export class EditAppointmentUseCase {
 
     const endAt = new Date(startAt.getTime() + durationInMinutes * 60000);
 
-    const appointmentConflict = await this.appointmentsRepository.findByProfessionalIdAndHourRange(professionalId, startAt, endAt);
+    const appointmentConflict = await this.appointmentsRepository.findByProfessionalIdAndHourRangeExcludingId(professionalId, startAt, endAt, appointmentId);
 
     if(appointmentConflict) {
-      return makeLeft(new AppointmentConflictError());
+      return makeLeft(new AppointmentConflictError(appointmentConflict.startAt));
     }
     
-    if (professionalId) appointment.professionalId = new UniqueEntityId(professionalId) ;
-    if (franchiseId) appointment.franchiseId = new UniqueEntityId(franchiseId) ;
-    if (patientId) appointment.patientId = new UniqueEntityId(patientId) ;
-    if (name) appointment.name = name;
-    if (appointmentItems) appointment.appointmentItems = appointmentItems;
+    appointment.professionalId = new UniqueEntityId(professionalId);
+    appointment.franchiseId = new UniqueEntityId(franchiseId);
+    appointment.patientId = new UniqueEntityId(patientId);
+    appointment.name = name;
+    appointment.appointmentItems = appointmentItems;
     appointment.startAt = startAt;
-    if (durationInMinutes) {
-      const newEndAt = new Date(startAt.getTime() + durationInMinutes * 60000);
-      appointment.endAt = newEndAt;
-    }
+    appointment.durationInMinutes = durationInMinutes;
+    appointment.endAt = endAt;
     appointment.status = AppointmentStatus.waiting();
 
     await this.appointmentsRepository.update(appointment);
