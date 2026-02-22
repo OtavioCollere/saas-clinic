@@ -1,12 +1,13 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { ProfessionalNotFoundError } from '@/shared/errors/professional-not-found-error';
 import { UserIsNotOwnerError } from '@/shared/errors/user-is-not-owner-error';
 import type { Professional } from '@/domain/enterprise/entities/professional';
 import { Council } from '@/domain/enterprise/value-objects/council';
 import { Profession } from '@/domain/enterprise/value-objects/profession';
-import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
-import type { FranchiseRepository } from '../../repositories/franchise-repository';
-import type { ProfessionalRepository } from '../../repositories/professional-repository';
+import { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
+import { FranchiseRepository } from '../../repositories/franchise-repository';
+import { ProfessionalRepository } from '../../repositories/professional-repository';
 
 interface EditProfessionalUseCaseRequest {
   professionalId: string;
@@ -24,10 +25,14 @@ type EditProfessionalUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class EditProfessionalUseCase {
   constructor(
+    @Inject(ProfessionalRepository)
     private professionalRepository: ProfessionalRepository,
+    @Inject(FranchiseRepository)
     private franchiseRepository: FranchiseRepository,
+    @Inject(ClinicMembershipRepository)
     private clinicMembershipRepository: ClinicMembershipRepository
   ) {}
 
