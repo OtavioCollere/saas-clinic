@@ -11,13 +11,23 @@ export class JwtEncrypter implements Encrypter {
   ){}
 
   async sign(payload: Record<string, unknown>): Promise<string> {
-    return this.jwtService.signAsync(payload, 
+    // Converte userId para sub (padrão JWT)
+    const jwtPayload = payload.userId 
+      ? { sub: payload.userId }
+      : payload;
+    
+    return this.jwtService.signAsync(jwtPayload, 
     { expiresIn : '15m' }
     )
   }
 
   async refresh(payload: Record<string, unknown>): Promise<string> {
-    return this.jwtService.signAsync(payload, 
+    // Converte userId para sub (padrão JWT)
+    const jwtPayload = payload.userId 
+      ? { sub: payload.userId }
+      : payload;
+    
+    return this.jwtService.signAsync(jwtPayload, 
       { expiresIn : '7d' }
     )
   }
