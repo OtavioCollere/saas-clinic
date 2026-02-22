@@ -1,12 +1,16 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { WrongCredentialsError } from "@/shared/errors/wrong-credentials-error";
+import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
+import { ClinicMembershipNotFoundError } from "@/shared/errors/clinic-membership-not-found-error";
 import { AuthenticateUserUseCase } from "@/domain/application/use-cases/users/authenticate-user";
 import {
 	BadRequestException,
 	Body,
 	Controller,
+	HttpCode,
 	Inject,
 	Post,
+  Res,
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
@@ -18,6 +22,7 @@ import {
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { Fingerprint } from "../../decorators/fingerprint.decorator";
+import { Tenant } from "../../decorators/tenant.decorator";
 import { Public } from "@/infra/auth/public";
 import { RateLimit } from "@/shared/decorators/rate-limit.decorator";
 
@@ -61,17 +66,25 @@ export class AuthenticateUserController {
   @ApiBadRequestResponse({
     description: "Invalid credentials",
   })
+  @HttpCode(200)
   async handle(
     @Body(authenticateUserBodyValidationPipe)
     body: AuthenticateUserBodySchema,
     @Fingerprint() fingerprint: Fingerprint,
+    @Tenant() clinicSlug: string,
+    @Res({passthrough: true}) reply,
   ) {
+    if (!clinicSlug) {
+      throw new BadRequestException('Tenant (clinic slug) is required. Provide it via X-Tenant-ID header or ?tenant= query parameter.');
+    }
+
     const { email, password } = body;
 
     const result = await this.authenticateUserUseCase.execute({
       email,
       password,
       fingerprint,
+      clinicSlug,
     });
 
     if (isLeft(result)) {
@@ -80,25 +93,47 @@ export class AuthenticateUserController {
       switch (error.constructor) {
         case WrongCredentialsError:
           throw new BadRequestException(error.message);
+        case ClinicNotFoundError:
+          throw new BadRequestException(error.message);
+        case ClinicMembershipNotFoundError:
+          throw new BadRequestException(error.message);
         default:
           throw new BadRequestException(error.message);
       }
     }
 
-    const success = unwrapEither(result);
+    const response = unwrapEither(result);
 
-    switch (success.type) {
-      case "authenticated":
+    switch (response.type) {
+      case "authenticated": {
+        const isProduction = process.env.NODE_ENV === "production";
+        
+        reply.setCookie("access_token", response.access_token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "strict" : "lax",
+          path: "/",
+          maxAge: 60 * 15,
+        })
+
+        reply.setCookie("refresh_token", response.refresh_token, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "strict" : "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        })
+
         return {
-          access_token: success.access_token,
-          refresh_token: success.refresh_token,
+          message: "User authenticated successfully",
         };
-
-      case "mfa_required":
+      }
+      case "mfa_required": {
         return {
-          session_id: success.session_id,
+          session_id: response.session_id,
           mfa_required: true,
         };
+      }
     }
   }
 }

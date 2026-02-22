@@ -4,8 +4,11 @@ import { LogoutUseCase } from "@/domain/application/use-cases/users/logout";
 import {
 	BadRequestException,
 	Controller,
+	Inject,
 	NotFoundException,
 	Post,
+	Res,
+	Req,
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
@@ -14,13 +17,16 @@ import {
 	ApiOperation,
 	ApiTags,
 } from "@nestjs/swagger";
-import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
-import { User } from "@/domain/enterprise/entities/user";
+import type { FastifyRequest } from 'fastify';
+import type { UserPayload } from "@/infra/auth/jwt-strategy";
 
 @ApiTags("Users")
 @Controller("/users")
 export class LogoutController {
-	constructor(private readonly logoutUseCase: LogoutUseCase) {}
+	constructor(
+		@Inject(LogoutUseCase)
+		private readonly logoutUseCase: LogoutUseCase,
+	) {}
 
 	@Post("/logout")
 	@ApiOperation({
@@ -36,9 +42,15 @@ export class LogoutController {
 	@ApiBadRequestResponse({
 		description: "Invalid request",
 	})
-	async handle(@CurrentUser() user: User) {
+	async handle(@Req() request: FastifyRequest & { user?: UserPayload }, @Res() reply) {
+		const user = request.user;
+		
+		if (!user || !user.sub) {
+			throw new NotFoundException('User not found');
+		}
+
 		const result = await this.logoutUseCase.execute({
-			userId: user.id.toString(),
+			userId: user.sub,
 		});
 
 		if (isLeft(result)) {
@@ -51,6 +63,24 @@ export class LogoutController {
 					throw new BadRequestException(error.message);
 			}
 		}
+
+		// Limpa os cookies de autenticação
+		// As opções devem corresponder às usadas ao criar os cookies
+		const isProduction = process.env.NODE_ENV === "production";
+		
+		(reply as any).clearCookie('access_token', {
+			path: '/',
+			httpOnly: true,
+			secure: isProduction,
+			sameSite: isProduction ? "strict" : "lax",
+		});
+
+		(reply as any).clearCookie('refresh_token', {
+			path: '/',
+			httpOnly: true,
+			secure: isProduction,
+			sameSite: isProduction ? "strict" : "lax",
+		});
 
 		return {
 			message: 'Logout successful',
