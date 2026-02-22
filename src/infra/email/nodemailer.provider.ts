@@ -1,13 +1,23 @@
 import * as nodemailer from 'nodemailer'
 
-export const createNodemailerTransporter = () => {
-  return nodemailer.createTransport({
+export const createNodemailerTransporter = async () => {
+  // Cria uma conta de teste do Ethereal Email dinamicamente
+  // Isso garante que as credenciais sempre estejam válidas
+  const testAccount = await nodemailer.createTestAccount();
+
+  const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
+    secure: false, // true para 465, false para outras portas
     auth: {
-      user: 'pearline.ruecker76@ethereal.email',
-      pass: 'gEYP8bpVTU82vwgSxg',
+      user: testAccount.user,
+      pass: testAccount.pass,
     },
-  })
+  });
+
+  // Verifica a conexão
+  await transporter.verify();
+
+  return transporter;
 }
 

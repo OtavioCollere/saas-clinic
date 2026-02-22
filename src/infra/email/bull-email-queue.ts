@@ -18,7 +18,7 @@ export class BullEmailQueue extends EmailQueue {
     text?: string
     html?: string
   }): Promise<void> {
-    await this.emailQueue.add('send-email', data)
+    await this.emailQueue.add('send-email', data);
   }
 }
 

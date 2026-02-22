@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './infra/auth/auth.module';
 import { HttpModule } from './infra/http/http.module';
 import { EnvModule } from './infra/env/env.module';
 import { EmailModule } from './infra/email/email.module';
+import { EventsModule } from './infra/events/events.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
 import { DomainErrorFilter } from './shared/filters/domain-error.filter';
@@ -16,6 +18,7 @@ import { LoggerModule } from 'nestjs-pino';
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
@@ -39,6 +42,7 @@ import { LoggerModule } from 'nestjs-pino';
     HttpModule,
     EnvModule,
     EmailModule,
+    EventsModule,
   ],
   providers: [
     {

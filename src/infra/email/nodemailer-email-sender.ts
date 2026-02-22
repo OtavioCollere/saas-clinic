@@ -17,12 +17,31 @@ export class NodemailerEmailSender extends EmailSender {
     text?: string
     html?: string
   }): Promise<void> {
-    await this.transporter.sendMail({
+    const info = await this.transporter.sendMail({
       from: 'Free foo <foo@example.com>',
       to,
       subject,
       text,
       html,
+    });
+
+    // Mostra a URL de preview do Ethereal Email para testes
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (previewUrl) {
+      console.log('🔗 Email preview URL:', previewUrl);
+    }
+  }
+
+  async sendWelcomeEmail(email: string, password: string): Promise<void> {
+    await this.send({
+      to: email,
+      subject: 'Bem vindo ao Cliniker',
+      html: `
+        <h1>Bem vindo ao Cliniker</h1>
+        <p>Sua senha de acesso é: ${password}</p>
+        <p>Você pode acessar o sistema em <a href="https://cliniker.com.br">https://cliniker.com.br</a></p>
+        <p>Se você não solicitou este acesso, por favor, ignore este email.</p>
+      `,
     })
   }
 }
