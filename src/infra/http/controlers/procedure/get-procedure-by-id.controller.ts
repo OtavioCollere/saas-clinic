@@ -1,3 +1,4 @@
+import { Inject } from "@nestjs/common";
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProcedureNotFoundError } from "@/shared/errors/procedure-not-found-error";
 import { GetProcedureByIdUseCase } from "@/domain/application/use-cases/procedure/get-procedure-by-id";
@@ -29,7 +30,10 @@ const getProcedureByIdParamsValidationPipe = new ZodValidationPipe(getProcedureB
 @ApiTags("Procedures")
 @Controller("/procedures")
 export class GetProcedureByIdController {
-	constructor(private readonly getProcedureByIdUseCase: GetProcedureByIdUseCase) {}
+	constructor(
+		@Inject(GetProcedureByIdUseCase)
+		private readonly getProcedureByIdUseCase: GetProcedureByIdUseCase
+	) {}
 
 	@Get("/:procedureId")
 	@ApiOperation({

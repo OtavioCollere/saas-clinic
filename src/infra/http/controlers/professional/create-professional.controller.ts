@@ -9,9 +9,11 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	Inject,
 	NotFoundException,
 	Param,
 	Post,
+	Req,
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
@@ -25,13 +27,16 @@ import {
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { ProfessionalPresenter } from "../../presenters/professional-presenter";
+import type { FastifyRequest } from 'fastify';
+import type { UserPayload } from "@/infra/auth/jwt-strategy";
 
 const createProfessionalBodySchema = z.object({
-	userId: z.string(),
-	ownerId: z.string(),
-	council: z.string(),
-	councilNumber: z.string(),
-	councilState: z.string(),
+	name: z.string(),
+	cpf: z.string(),
+	email: z.string().email(),
+	council: z.string().optional(),
+	councilNumber: z.string().optional(),
+	councilState: z.string().optional(),
 	profession: z.string(),
 });
 
@@ -48,7 +53,10 @@ const createProfessionalParamsValidationPipe = new ZodValidationPipe(createProfe
 @ApiTags("Professionals")
 @Controller("/franchises")
 export class CreateProfessionalController {
-	constructor(private readonly createProfessionalUseCase: CreateProfessionalUseCase) {}
+	constructor(
+		@Inject(CreateProfessionalUseCase)
+		private readonly createProfessionalUseCase: CreateProfessionalUseCase
+	) {}
 
 	@Post("/:franchiseId/professionals")
 	@ApiOperation({
@@ -75,13 +83,24 @@ export class CreateProfessionalController {
 	async handle(
 		@Param(createProfessionalParamsValidationPipe) params: CreateProfessionalParamsSchema,
 		@Body(createProfessionalBodyValidationPipe) body: CreateProfessionalBodySchema,
+		@Req() request: FastifyRequest & { user?: UserPayload },
 	) {
 		const { franchiseId } = params;
-		const { userId, ownerId, council, councilNumber, councilState, profession } = body;
+		const { name, cpf, email, council, councilNumber, councilState, profession } = body;
+
+		const user = request.user;
+		
+		if (!user || !user.sub) {
+			throw new ForbiddenException('User not authenticated');
+		}
+
+		const ownerId = user.sub;
 
 		const result = await this.createProfessionalUseCase.execute({
 			franchiseId,
-			userId,
+			name,
+			cpf,
+			email,
 			ownerId,
 			council,
 			councilNumber,

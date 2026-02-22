@@ -4,6 +4,7 @@ import { GetProfessionalUseCase } from "@/domain/application/use-cases/professio
 import {
 	Controller,
 	Get,
+	Inject,
 	NotFoundException,
 	Param,
 } from "@nestjs/common";
@@ -29,7 +30,10 @@ const getProfessionalParamsValidationPipe = new ZodValidationPipe(getProfessiona
 @ApiTags("Professionals")
 @Controller("/professionals")
 export class GetProfessionalController {
-	constructor(private readonly getProfessionalUseCase: GetProfessionalUseCase) {}
+	constructor(
+		@Inject(GetProfessionalUseCase)
+		private readonly getProfessionalUseCase: GetProfessionalUseCase
+	) {}
 
 	@Get("/:professionalId")
 	@ApiOperation({
@@ -65,6 +69,6 @@ export class GetProfessionalController {
 
 		const { professional } = unwrapEither(result);
 
-		return ProfessionalPresenter.toHTTP(professional);
+		return ProfessionalPresenter.toHTTP(professional, null);
 	}
 }

@@ -1,3 +1,4 @@
+import { Inject } from "@nestjs/common";
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProcedureNotFoundError } from "@/shared/errors/procedure-not-found-error";
 import { InactivateProcedureUseCase } from "@/domain/application/use-cases/procedure/inactivate-procedure";
@@ -29,7 +30,10 @@ const inactivateProcedureParamsValidationPipe = new ZodValidationPipe(inactivate
 @ApiTags("Procedures")
 @Controller("/procedures")
 export class InactivateProcedureController {
-	constructor(private readonly inactivateProcedureUseCase: InactivateProcedureUseCase) {}
+	constructor(
+		@Inject(InactivateProcedureUseCase)
+		private readonly inactivateProcedureUseCase: InactivateProcedureUseCase
+	) {}
 
 	@Patch("/:procedureId/inactivate")
 	@ApiOperation({
