@@ -2,10 +2,13 @@ import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { ClinicAlreadyExistsError } from '@/shared/errors/clinic-already-exists-error';
 import { OwnerNotFoundError } from '@/shared/errors/owner-not-found-error';
+import { InvalidCnpjError } from '@/shared/errors/invalid-cnpj-error';
+import { CnpjAlreadyExistsError } from '@/shared/errors/cnpj-already-exists-error';
 import { Clinic } from '@/domain/enterprise/entities/clinic';
 import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
 import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { Slug } from '@/domain/enterprise/value-objects/slug';
+import { Cnpj } from '@/domain/enterprise/value-objects/cnpj';
 import type { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import type { ClinicRepository } from '../../repositories/clinic-repository';
 import type { UsersRepository } from '../../repositories/users-repository';
@@ -13,12 +16,13 @@ import type { UsersRepository } from '../../repositories/users-repository';
 interface CreateClinicUseCaseRequest {
   name: string;
   ownerId: string;
+  cnpj: string;
   description?: string;
   avatarUrl?: string;
 }
 
 type CreateClinicUseCaseResponse = Either<
-  OwnerNotFoundError | ClinicAlreadyExistsError,
+  OwnerNotFoundError | ClinicAlreadyExistsError | InvalidCnpjError | CnpjAlreadyExistsError,
   {
     clinic: Clinic;
   }
@@ -31,11 +35,21 @@ export class CreateClinicUseCase {
     private clinicMembershipRepository: ClinicMembershipRepository
   ) {}
 
-  async execute({ name, ownerId, description, avatarUrl }: CreateClinicUseCaseRequest) {
+  async execute({ name, ownerId, cnpj, description, avatarUrl }: CreateClinicUseCaseRequest) {
     const user = await this.usersRepository.findById(ownerId);
 
     if (!user) {
       return makeLeft(new OwnerNotFoundError());
+    }
+
+    const isValidCnpj = Cnpj.isValid(cnpj);
+    if (!isValidCnpj) {
+      return makeLeft(new InvalidCnpjError());
+    }
+
+    const cnpjExists = await this.clinicRepository.findByCnpj(cnpj);
+    if (cnpjExists) {
+      return makeLeft(new CnpjAlreadyExistsError());
     }
 
     const slug = Slug.create(name);
@@ -45,9 +59,12 @@ export class CreateClinicUseCase {
       return makeLeft(new ClinicAlreadyExistsError());
     }
 
+    const cnpjVO = Cnpj.create(cnpj);
+
     const clinic = Clinic.create({
       name,
       ownerId: new UniqueEntityId(ownerId),
+      cnpj: cnpjVO,
       description,
       avatarUrl,
     });

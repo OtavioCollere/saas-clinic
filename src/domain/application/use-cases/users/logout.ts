@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Either, makeLeft, makeRight } from "@/shared/either/either";
 import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
 import { UsersRepository } from "../../repositories/users-repository";
@@ -14,7 +14,9 @@ type LogoutUseCaseResponse = Either<UserNotFoundError, void>;
 @Injectable()
 export class LogoutUseCase {
     constructor(
+        @Inject(UsersRepository)
         private readonly usersRepository: UsersRepository,
+        @Inject(SessionsRepository)
         private readonly sessionsRepository: SessionsRepository,
     ) {}
 
