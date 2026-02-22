@@ -18,14 +18,20 @@
     "test:cov": "vitest --coverage",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "check": "biome check --write ."
+    "check": "biome check --write .",
+    "seed": "pnpm prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/static": "^9.0.0",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.11",
+    "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-fastify": "^11.1.11",
@@ -39,6 +45,7 @@
     "@types/passport-jwt": "^4.0.1",
     "bcryptjs": "^3.0.3",
     "bull": "^4.16.5",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.2",
     "ioredis": "^5.9.2",
