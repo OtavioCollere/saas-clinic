@@ -3,6 +3,7 @@ import { UsersRepository } from "@/domain/application/repositories/users-reposit
 import { User } from "@/domain/enterprise/entities/user";
 import { PrismaService } from "../../prisma.service";
 import { UserMapper } from "../mappers/user-mapper";
+import type { Prisma } from "@prisma/client";
 
 @Injectable()
 export class PrismaUsersRepository extends UsersRepository {
@@ -12,10 +13,11 @@ export class PrismaUsersRepository extends UsersRepository {
     super();
   }
 
-  async create(user: User): Promise<User> {
+  async create(user: User, tx?: unknown): Promise<User> {
     const data = UserMapper.toPrisma(user);
+    const prismaClient = (tx as Prisma.TransactionClient) || this.prisma;
 
-    const raw = await this.prisma.user.create({
+    const raw = await prismaClient.user.create({
       data,
     });
 
@@ -77,6 +79,10 @@ export class PrismaUsersRepository extends UsersRepository {
     if (!raw) return null;
 
     return UserMapper.toDomain(raw);
+  }
+
+  async save(user: User): Promise<User> {
+    return this.update(user);
   }
 }
 

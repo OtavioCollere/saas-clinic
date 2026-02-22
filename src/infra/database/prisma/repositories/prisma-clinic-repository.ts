@@ -17,44 +17,93 @@ export class PrismaClinicRepository extends ClinicRepository {
   }
 
   async create(clinic: Clinic): Promise<Clinic> {
-    // TODO: Implementar quando tabela Clinic for criada no schema.prisma
-    // const data = ClinicMapper.toPrisma(clinic);
-    // const raw = await this.prisma.clinic.create({ data });
-    // return ClinicMapper.toDomain(raw);
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const data = ClinicMapper.toPrisma(clinic);
+    const raw = await this.prisma.clinic.create({ data });
+    return ClinicMapper.toDomain(raw);
   }
 
   async findById(id: string): Promise<Clinic | null> {
-    // TODO: Implementar quando tabela Clinic for criada
-    // const raw = await this.prisma.clinic.findUnique({ where: { id } });
-    // if (!raw) return null;
-    // return ClinicMapper.toDomain(raw);
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const raw = await this.prisma.clinic.findUnique({ where: { id } });
+    if (!raw) return null;
+    return ClinicMapper.toDomain(raw);
   }
 
   async findBySlug(slug: string): Promise<Clinic | null> {
-    // TODO: Implementar quando tabela Clinic for criada
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const raw = await this.prisma.clinic.findUnique({
+      where: { slug },
+    });
+
+    if (!raw) return null;
+
+    return ClinicMapper.toDomain(raw);
+  }
+
+  async findByName(name: string): Promise<Clinic | null> {
+    const raw = await this.prisma.clinic.findFirst({
+      where: { name },
+    });
+
+    if (!raw) return null;
+
+    return ClinicMapper.toDomain(raw);
+  }
+
+  async findByCnpj(cnpj: string): Promise<Clinic | null> {
+    const raw = await this.prisma.clinic.findUnique({
+      where: { cnpj },
+    });
+
+    if (!raw) return null;
+
+    return ClinicMapper.toDomain(raw);
   }
 
   async findByOwnerId(ownerId: string): Promise<Clinic | null> {
-    // TODO: Implementar quando tabela Clinic for criada
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const raw = await this.prisma.clinic.findFirst({
+      where: { ownerId },
+    });
+
+    if (!raw) return null;
+
+    return ClinicMapper.toDomain(raw);
   }
 
   async update(clinic: Clinic): Promise<Clinic> {
-    // TODO: Implementar quando tabela Clinic for criada
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const data = ClinicMapper.toPrisma(clinic);
+    const raw = await this.prisma.clinic.update({
+      where: { id: clinic.id.toString() },
+      data,
+    });
+    return ClinicMapper.toDomain(raw);
   }
 
   async delete(id: string): Promise<void> {
-    // TODO: Implementar quando tabela Clinic for criada
-    throw new Error("Clinic table not yet created in Prisma schema");
+    await this.prisma.clinic.delete({
+      where: { id },
+    });
   }
 
   async fetch({ query, page, pageSize }: PaginationParams): Promise<Clinic[]> {
-    // TODO: Implementar quando tabela Clinic for criada
-    throw new Error("Clinic table not yet created in Prisma schema");
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    const where = query
+      ? {
+          name: {
+            contains: query,
+            mode: 'insensitive' as const,
+          },
+        }
+      : {};
+
+    const raw = await this.prisma.clinic.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return raw.map(ClinicMapper.toDomain);
   }
 }
 

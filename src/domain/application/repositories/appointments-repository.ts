@@ -6,7 +6,10 @@ export abstract class AppointmentsRepository {
   abstract findByProfessionalId(professionalId: string): Promise<Appointment[]>;
   abstract findByPatientId(patientId: string): Promise<Appointment[]>;
   abstract findByProfessionalIdAndHourRange(professionalId: string, startAt: Date, endAt: Date): Promise<Appointment | null>;
+  abstract findByProfessionalIdAndHourRangeExcludingId(professionalId: string, startAt: Date, endAt: Date, excludeId: string): Promise<Appointment | null>;
   abstract findPendingByClinicId(clinicId: string): Promise<Appointment[]>;
   abstract findPendingByFranchiseId(franchiseId: string): Promise<Appointment[]>;
+  abstract findByClinicId(clinicId: string): Promise<Appointment[]>;
+  abstract findByClinicIdAndWeek(clinicId: string, weekStart: Date, weekEnd: Date): Promise<Appointment[]>;
   abstract update(appointment: Appointment): Promise<Appointment>;
 }
