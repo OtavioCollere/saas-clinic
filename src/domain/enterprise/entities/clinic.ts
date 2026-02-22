@@ -3,11 +3,13 @@ import type { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { Optional } from '@/shared/types/optional';
 import { ClinicStatus } from '../value-objects/clinic-status';
 import { Slug } from '../value-objects/slug';
+import { Cnpj } from '../value-objects/cnpj';
 
 export interface ClinicProps {
   ownerId: UniqueEntityId;
   name: string;
   slug: Slug;
+  cnpj: Cnpj;
   description?: string;
   avatarUrl?: string;
   status: ClinicStatus;
@@ -42,6 +44,10 @@ export class Clinic extends Entity<ClinicProps> {
     return this.props.slug;
   }
 
+  get cnpj() {
+    return this.props.cnpj;
+  }
+
   get description() {
     return this.props.description;
   }
@@ -72,6 +78,10 @@ export class Clinic extends Entity<ClinicProps> {
 
   set slug(slug: Slug) {
     this.props.slug = slug;
+  }
+
+  set cnpj(cnpj: Cnpj) {
+    this.props.cnpj = cnpj;
   }
 
   set description(description: string | undefined) {

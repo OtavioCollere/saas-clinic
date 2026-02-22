@@ -6,7 +6,7 @@ import type { Anamnesis } from './anamnesis/anamnesis';
 export interface PatientProps {
   clinicId: UniqueEntityId;
   userId: UniqueEntityId;
-  anamnesis: Anamnesis;
+  anamnesis?: Anamnesis;
   name: string;
   birthDay: Date;
   address: string;

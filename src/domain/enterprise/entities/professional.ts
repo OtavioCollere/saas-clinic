@@ -7,9 +7,9 @@ import type { Profession } from '../value-objects/profession';
 export interface ProfessionalProps {
   franchiseId: UniqueEntityId;
   userId: UniqueEntityId;
-  council: Council;
-  councilNumber: string;
-  councilState: string;
+  council?: Council;
+  councilNumber?: string;
+  councilState?: string;
   profession: Profession;
   createdAt: Date;
   updatedAt?: Date;
@@ -17,7 +17,7 @@ export interface ProfessionalProps {
 
 export class Professional extends Entity<ProfessionalProps> {
   static create(
-    props: Optional<ProfessionalProps, 'createdAt' | 'updatedAt'>,
+    props: Optional<ProfessionalProps, 'createdAt' | 'updatedAt' | 'council' | 'councilNumber' | 'councilState'>,
     id?: UniqueEntityId
   ) {
     const professional = new Professional(
@@ -70,15 +70,15 @@ export class Professional extends Entity<ProfessionalProps> {
     this.props.userId = userId;
   }
 
-  set council(council: Council) {
+  set council(council: Council | undefined) {
     this.props.council = council;
   }
 
-  set councilNumber(councilNumber: string) {
+  set councilNumber(councilNumber: string | undefined) {
     this.props.councilNumber = councilNumber;
   }
 
-  set councilState(councilState: string) {
+  set councilState(councilState: string | undefined) {
     this.props.councilState = councilState;
   }
 
