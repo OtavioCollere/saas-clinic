@@ -18,9 +18,14 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  sessions           Session[]
-  mfaSettings        MfaSettings?
-  emailVerifications EmailVerification[]
+  sessions             Session[]
+  mfaSettings          MfaSettings?
+  emailVerifications   EmailVerification[]
+  passwordVerifications PasswordVerification[]
+  ownedClinics         Clinic[]              @relation("ClinicOwner")
+  clinicMemberships    ClinicMembership[]
+  professionals        Professional[]
+  patients             Patient[]
 
   @@map("users")
   @@index([email])
@@ -72,4 +77,199 @@ model EmailVerification {
   @@map("email_verifications")
   @@index([userId])
   @@index([token])
+}
+
+model PasswordVerification {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_verifications")
+  @@index([userId])
+  @@index([token])
+}
+
+model Clinic {
+  id          String   @id @default(uuid())
+  ownerId     String
+  name        String
+  slug        String   @unique
+  cnpj        String   @unique
+  description String?
+  avatarUrl   String?
+  status      String   // ACTIVE, INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner            User                @relation("ClinicOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  memberships      ClinicMembership[]
+  franchises       Franchise[]
+  patients         Patient[]
+
+  @@map("clinics")
+  @@index([ownerId])
+  @@index([slug])
+  @@index([cnpj])
+  @@index([status])
+}
+
+model ClinicMembership {
+  id        String   @id @default(uuid())
+  userId    String
+  clinicId  String
+  role      String   // OWNER, ADMIN, PROFESSIONAL, PATIENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@map("clinic_memberships")
+  @@unique([userId, clinicId])
+  @@index([userId])
+  @@index([clinicId])
+}
+
+model Franchise {
+  id          String   @id @default(uuid())
+  clinicId    String
+  name        String
+  address     String
+  zipCode     String
+  status      String   // ACTIVE, INACTIVE
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  professionals Professional[]
+  procedures    Procedure[]
+  appointments  Appointment[]
+
+  @@map("franchises")
+  @@index([clinicId])
+  @@index([status])
+}
+
+model Professional {
+  id            String   @id @default(uuid())
+  franchiseId  String
+  userId       String
+  council      String?  // CRM, CRBM
+  councilNumber String?
+  councilState  String?
+  profession   String   // MEDICO, BIOMEDICO
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  franchise   Franchise    @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@map("professionals")
+  @@unique([userId, franchiseId])
+  @@index([franchiseId])
+  @@index([userId])
+}
+
+model Patient {
+  id        String   @id @default(uuid())
+  clinicId  String
+  userId    String
+  name      String
+  birthDay  DateTime
+  address   String
+  zipCode   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clinic      Clinic      @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anamnesis   Anamnesis?
+  appointments Appointment[]
+
+  @@map("patients")
+  @@index([clinicId])
+  @@index([userId])
+}
+
+model Anamnesis {
+  id                String   @id @default(uuid())
+  patientId         String   @unique
+  aestheticHistory  Json     // AestheticHistory
+  healthConditions  Json     // HealthConditions
+  medicalHistory    Json     // MedicalHistory
+  physicalAssessment Json    // PhysicalAssessment
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("anamnesis")
+  @@index([patientId])
+}
+
+model Procedure {
+  id         String   @id @default(uuid())
+  franchiseId String
+  name       String
+  price      Decimal  @db.Decimal(10, 2)
+  notes      String?
+  status     String   // ACTIVE, INACTIVE
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  franchise       Franchise       @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  appointmentItems AppointmentItem[]
+
+  @@map("procedures")
+  @@index([franchiseId])
+  @@index([status])
+}
+
+model Appointment {
+  id                String   @id @default(uuid())
+  professionalId    String
+  franchiseId       String
+  patientId         String
+  name              String
+  durationInMinutes Int
+  startAt           DateTime
+  endAt             DateTime
+  status            String   // WAITING, CONFIRMED, DONE, CANCELED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  professional   Professional   @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  franchise      Franchise      @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointmentItems AppointmentItem[]
+
+  @@map("appointments")
+  @@index([professionalId])
+  @@index([franchiseId])
+  @@index([patientId])
+  @@index([status])
+  @@index([startAt])
+}
+
+model AppointmentItem {
+  id            String   @id @default(uuid())
+  appointmentId String
+  procedureId   String
+  price         Decimal  @db.Decimal(10, 2)
+  notes         String?
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  procedure   Procedure   @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+
+  @@map("appointment_items")
+  @@index([appointmentId])
+  @@index([procedureId])
 }
