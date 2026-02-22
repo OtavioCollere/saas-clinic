@@ -4,6 +4,7 @@ import { CreateAnamnesisUseCase } from "@/domain/application/use-cases/anamnesis
 import {
 	Body,
 	Controller,
+	Inject,
 	NotFoundException,
 	Param,
 	Post,
@@ -39,7 +40,10 @@ const createAnamnesisBodyValidationPipe = new ZodValidationPipe(createAnamnesisB
 @ApiTags("Anamnesis")
 @Controller("/patients")
 export class CreateAnamnesisController {
-	constructor(private readonly createAnamnesisUseCase: CreateAnamnesisUseCase) {}
+	constructor(
+		@Inject(CreateAnamnesisUseCase)
+		private readonly createAnamnesisUseCase: CreateAnamnesisUseCase
+	) {}
 
 	@Post("/:patientId/anamnesis")
 	@ApiOperation({

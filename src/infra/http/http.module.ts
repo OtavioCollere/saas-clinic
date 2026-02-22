@@ -13,6 +13,7 @@ import { HealthCheckController } from './controlers/health/health-check.controll
 import { AuthenticateUserController } from './controlers/users/authenticate-user.controller';
 import { RegisterUserController } from './controlers/users/register-user.controller';
 import { LogoutController } from './controlers/users/logout.controller';
+import { MeController } from './controlers/users/me.controller';
 import { SetupMfaController } from './controlers/mfa/setup-mfa.controller';
 import { EnableMfaController } from './controlers/mfa/enable-mfa.controller';
 import { MfaVerifyLoginController } from './controlers/mfa/mfa-verify-login.controller';
@@ -23,6 +24,7 @@ import { ActivateClinicController } from './controlers/clinic/activate-clinic.co
 import { InactivateClinicController } from './controlers/clinic/inactivate-clinic.controller';
 import { GetClinicByIdController } from './controlers/clinic/get-clinic-by-id.controller';
 import { FetchClinicController } from './controlers/clinic/fetch-clinic.controller';
+import { GetUsersByClinicIdController } from './controlers/clinic/get-users-by-clinic-id.controller';
 import { RegisterFranchiseController } from './controlers/franchise/register-franchise.controller';
 import { EditFranchiseController } from './controlers/franchise/edit-franchise.controller';
 import { ActivateFranchiseController } from './controlers/franchise/activate-franchise.controller';
@@ -32,26 +34,36 @@ import { RegisterPatientController } from './controlers/patient/register-patient
 import { EditPatientController } from './controlers/patient/edit-patient.controller';
 import { GetPatientByIdController } from './controlers/patient/get-patient-by-id.controller';
 import { FetchPatientsController } from './controlers/patient/fetch-patients.controller';
+import { FetchPatientsByClinicIdController } from './controlers/patient/fetch-patients-by-clinic-id.controller';
 import { CreateProfessionalController } from './controlers/professional/create-professional.controller';
 import { EditProfessionalController } from './controlers/professional/edit-professional.controller';
 import { GetProfessionalController } from './controlers/professional/get-professional.controller';
 import { GetProfessionalsByFranchiseIdController } from './controlers/professional/get-professionals-by-franchise-id.controller';
+import { GetProfessionalsByClinicIdController } from './controlers/professional/get-professionals-by-clinic-id.controller';
 import { CreateProcedureController } from './controlers/procedure/create-procedure.controller';
 import { EditProcedureController } from './controlers/procedure/edit-procedure.controller';
 import { GetProcedureByIdController } from './controlers/procedure/get-procedure-by-id.controller';
 import { FetchProceduresByFranchiseIdController } from './controlers/procedure/fetch-procedures-by-franchise-id.controller';
+import { FetchProceduresByClinicIdController } from './controlers/procedure/fetch-procedures-by-clinic-id.controller';
+import { DeleteProcedureController } from './controlers/procedure/delete-procedure.controller';
 import { InactivateProcedureController } from './controlers/procedure/inactivate-procedure.controller';
 import { CreateAnamnesisController } from './controlers/anamnesis/create-anamnesis.controller';
 import { GetAnamnesisByPatientIdController } from './controlers/anamnesis/get-anamnesis-by-patient-id.controller';
 import { CancelAppointmentController } from './controlers/appointment/cancel-appointment.controller';
 import { ConfirmAppointmentController } from './controlers/appointment/confirm-appointment.controller';
 import { CreateAppointmentController } from './controlers/appointment/create-appointment.controller';
+import { EditAppointmentController } from './controlers/appointment/edit-appointment.controller';
+import { GetAppointmentByIdController } from './controlers/appointment/get-appointment-by-id.controller';
 import { FetchAppointmentsByPatientIdController } from './controlers/appointment/fetch-appointments-by-patient-id.controller';
+import { FetchAppointmentsByProfessionalIdController } from './controlers/appointment/fetch-appointments-by-professional-id.controller';
+import { FetchAppointmentsByClinicIdController } from './controlers/appointment/fetch-appointments-by-clinic-id.controller';
+import { FetchAppointmentsByClinicIdWeekController } from './controlers/appointment/fetch-appointments-by-clinic-id-week.controller';
 
 // Use Cases
 import { AuthenticateUserUseCase } from '@/domain/application/use-cases/users/authenticate-user';
 import { RegisterUserUseCase } from '@/domain/application/use-cases/users/register-user';
 import { LogoutUseCase } from '@/domain/application/use-cases/users/logout';
+import { GetCurrentUserUseCase } from '@/domain/application/use-cases/users/get-current-user';
 import { SetupMfaUseCase } from '@/domain/application/use-cases/mfa/setup-mfa';
 import { EnableMfaUseCase } from '@/domain/application/use-cases/mfa/enable-mfa';
 import { MfaVerifyLoginUseCase } from '@/domain/application/use-cases/mfa/mfa-verify-login';
@@ -62,6 +74,7 @@ import { ActivateClinicUseCase } from '@/domain/application/use-cases/clinic/act
 import { InactivateClinicUseCase } from '@/domain/application/use-cases/clinic/inactivate-clinic';
 import { GetClinicByIdUseCase } from '@/domain/application/use-cases/clinic/get-clinic-by-id';
 import { FetchClinicUseCase } from '@/domain/application/use-cases/clinic/fetch-clinic';
+import { GetUsersByClinicIdUseCase } from '@/domain/application/use-cases/clinic/get-users-by-clinic-id';
 import { RegisterFranchiseUseCase } from '@/domain/application/use-cases/franchise/register-franchise';
 import { EditFranchiseUseCase } from '@/domain/application/use-cases/franchise/edit-franchise';
 import { ActivateFranchiseUseCase } from '@/domain/application/use-cases/franchise/activate-franchise';
@@ -71,21 +84,30 @@ import { RegisterPatientUseCase } from '@/domain/application/use-cases/patient/r
 import { EditPatientUseCase } from '@/domain/application/use-cases/patient/edit-patient';
 import { GetPatientByIdUseCase } from '@/domain/application/use-cases/patient/get-patient-by-id';
 import { FetchPatientsUseCase } from '@/domain/application/use-cases/patient/fetch-patients';
+import { FetchPatientsByClinicIdUseCase } from '@/domain/application/use-cases/patient/fetch-patients-by-clinic-id';
 import { CreateProfessionalUseCase } from '@/domain/application/use-cases/professional/create-professional';
 import { EditProfessionalUseCase } from '@/domain/application/use-cases/professional/edit-professional';
 import { GetProfessionalUseCase } from '@/domain/application/use-cases/professional/get-professional';
 import { GetProfessionalsByFranchiseIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-franchise-id';
+import { GetProfessionalsByClinicIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-clinic-id';
 import { CreateProcedureUseCase } from '@/domain/application/use-cases/procedure/create-procedure';
 import { EditProcedureUseCase } from '@/domain/application/use-cases/procedure/edit-procedure';
 import { GetProcedureByIdUseCase } from '@/domain/application/use-cases/procedure/get-procedure-by-id';
 import { FetchProceduresByFranchiseIdUseCase } from '@/domain/application/use-cases/procedure/fetch-procedures-by-franchise-id';
+import { FetchProceduresByClinicIdUseCase } from '@/domain/application/use-cases/procedure/fetch-procedures-by-clinic-id';
+import { DeleteProcedureUseCase } from '@/domain/application/use-cases/procedure/delete-procedure';
 import { InactivateProcedureUseCase } from '@/domain/application/use-cases/procedure/inactivate-procedure';
 import { CreateAnamnesisUseCase } from '@/domain/application/use-cases/anamnesis/create-anamnesis';
 import { GetAnamnesisByPatientIdUseCase } from '@/domain/application/use-cases/anamnesis/get-anamnesis-by-patient-id';
 import { CancelAppointmentUseCase } from '@/domain/application/use-cases/appointment/cancel-appointment';
 import { ConfirmAppointmentUseCase } from '@/domain/application/use-cases/appointment/confirm-appointment';
 import { CreateAppointmentUseCase } from '@/domain/application/use-cases/appointment/create-appointment';
+import { EditAppointmentUseCase } from '@/domain/application/use-cases/appointment/edit-appointment';
+import { GetAppointmentByIdUseCase } from '@/domain/application/use-cases/appointment/get-appointment-by-id';
 import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-cases/appointment/fetch-appointments-by-patient-id';
+import { FetchAppointmentsByProfessionalIdUseCase } from '@/domain/application/use-cases/appointment/fetch-appointments-by-professional-id';
+import { FetchAppointmentsByClinicIdUseCase } from '@/domain/application/use-cases/appointment/fetch-appointments-by-clinic-id';
+import { FetchAppointmentsByClinicIdWeekUseCase } from '@/domain/application/use-cases/appointment/fetch-appointments-by-clinic-id-week';
 
 @Module({
   imports: [
@@ -101,6 +123,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     AuthenticateUserController,
     RegisterUserController,
     LogoutController,
+    MeController,
     SetupMfaController,
     EnableMfaController,
     MfaVerifyLoginController,
@@ -111,6 +134,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     InactivateClinicController,
     GetClinicByIdController,
     FetchClinicController,
+    GetUsersByClinicIdController,
     RegisterFranchiseController,
     EditFranchiseController,
     ActivateFranchiseController,
@@ -120,27 +144,37 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     EditPatientController,
     GetPatientByIdController,
     FetchPatientsController,
+    FetchPatientsByClinicIdController,
     CreateProfessionalController,
     EditProfessionalController,
     GetProfessionalController,
     GetProfessionalsByFranchiseIdController,
+    GetProfessionalsByClinicIdController,
     CreateProcedureController,
     EditProcedureController,
     GetProcedureByIdController,
     FetchProceduresByFranchiseIdController,
+    FetchProceduresByClinicIdController,
+    DeleteProcedureController,
     InactivateProcedureController,
     CreateAnamnesisController,
     GetAnamnesisByPatientIdController,
     CancelAppointmentController,
     ConfirmAppointmentController,
     CreateAppointmentController,
+    EditAppointmentController,
+    GetAppointmentByIdController,
     FetchAppointmentsByPatientIdController,
+    FetchAppointmentsByProfessionalIdController,
+    FetchAppointmentsByClinicIdController,
+    FetchAppointmentsByClinicIdWeekController,
   ],
   providers: [
     { provide: APP_GUARD, useClass: RateLimitGuard },
     AuthenticateUserUseCase,
     RegisterUserUseCase,
     LogoutUseCase,
+    GetCurrentUserUseCase,
     SetupMfaUseCase,
     EnableMfaUseCase,
     MfaVerifyLoginUseCase,
@@ -151,6 +185,7 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     InactivateClinicUseCase,
     GetClinicByIdUseCase,
     FetchClinicUseCase,
+    GetUsersByClinicIdUseCase,
     RegisterFranchiseUseCase,
     EditFranchiseUseCase,
     ActivateFranchiseUseCase,
@@ -160,21 +195,30 @@ import { FetchAppointmentsByPatientIdUseCase } from '@/domain/application/use-ca
     EditPatientUseCase,
     GetPatientByIdUseCase,
     FetchPatientsUseCase,
+    FetchPatientsByClinicIdUseCase,
     CreateProfessionalUseCase,
     EditProfessionalUseCase,
     GetProfessionalUseCase,
     GetProfessionalsByFranchiseIdUseCase,
+    GetProfessionalsByClinicIdUseCase,
     CreateProcedureUseCase,
     EditProcedureUseCase,
     GetProcedureByIdUseCase,
     FetchProceduresByFranchiseIdUseCase,
+    FetchProceduresByClinicIdUseCase,
+    DeleteProcedureUseCase,
     InactivateProcedureUseCase,
     CreateAnamnesisUseCase,
     GetAnamnesisByPatientIdUseCase,
     CancelAppointmentUseCase,
     ConfirmAppointmentUseCase,
     CreateAppointmentUseCase,
+    EditAppointmentUseCase,
+    GetAppointmentByIdUseCase,
     FetchAppointmentsByPatientIdUseCase,
+    FetchAppointmentsByProfessionalIdUseCase,
+    FetchAppointmentsByClinicIdUseCase,
+    FetchAppointmentsByClinicIdWeekUseCase,
   ],
 })
 export class HttpModule {}

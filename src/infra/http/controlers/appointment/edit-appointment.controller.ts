@@ -3,14 +3,16 @@ import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
+import { AppointmentNotFoundError } from "@/shared/errors/appointment-not-found-error";
 import { AppointmentConflictError } from "@/shared/errors/appointment-conflict-error";
-import { CreateAppointmentUseCase } from "@/domain/application/use-cases/appointment/create-appointment";
+import { EditAppointmentUseCase } from "@/domain/application/use-cases/appointment/edit-appointment";
 import {
 	BadRequestException,
 	Body,
 	Controller,
 	NotFoundException,
-	Post,
+	Param,
+	Put,
 } from "@nestjs/common";
 import {
 	ApiBadRequestResponse,
@@ -18,6 +20,7 @@ import {
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiTags,
 } from "@nestjs/swagger";
 import z from "zod";
@@ -26,7 +29,15 @@ import { AppointmentPresenter } from "../../presenters/appointment-presenter";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { AppointmentItem } from "@/domain/enterprise/entities/appointment-item";
 
-const createAppointmentBodySchema = z.object({
+const editAppointmentParamsSchema = z.object({
+	id: z.string(),
+});
+
+type EditAppointmentParamsSchema = z.infer<typeof editAppointmentParamsSchema>;
+
+const editAppointmentParamsValidationPipe = new ZodValidationPipe(editAppointmentParamsSchema);
+
+const editAppointmentBodySchema = z.object({
 	professionalId: z.string(),
 	franchiseId: z.string(),
 	patientId: z.string(),
@@ -42,22 +53,27 @@ const createAppointmentBodySchema = z.object({
 	durationInMinutes: z.number(),
 });
 
-type CreateAppointmentBodySchema = z.infer<typeof createAppointmentBodySchema>;
+type EditAppointmentBodySchema = z.infer<typeof editAppointmentBodySchema>;
 
-const createAppointmentBodyValidationPipe = new ZodValidationPipe(createAppointmentBodySchema);
+const editAppointmentBodyValidationPipe = new ZodValidationPipe(editAppointmentBodySchema);
 
 @ApiTags("Appointments")
 @Controller("/appointments")
-export class CreateAppointmentController {
+export class EditAppointmentController {
 	constructor(
-		@Inject(CreateAppointmentUseCase)
-		private readonly createAppointmentUseCase: CreateAppointmentUseCase
+		@Inject(EditAppointmentUseCase)
+		private readonly editAppointmentUseCase: EditAppointmentUseCase
 	) {}
 
-	@Post()
+	@Put("/:id")
 	@ApiOperation({
-		summary: "Create appointment",
-		description: "Creates a new appointment for a patient with a professional.",
+		summary: "Edit appointment",
+		description: "Updates an existing appointment.",
+	})
+	@ApiParam({
+		name: "id",
+		type: String,
+		description: "Appointment identifier",
 	})
 	@ApiBody({
 		schema: {
@@ -86,15 +102,19 @@ export class CreateAppointmentController {
 		},
 	})
 	@ApiOkResponse({
-		description: "Appointment created successfully",
+		description: "Appointment updated successfully",
 	})
 	@ApiNotFoundResponse({
-		description: "Professional, franchise or patient not found",
+		description: "Appointment, professional, franchise or patient not found",
 	})
 	@ApiBadRequestResponse({
 		description: "Invalid request data or appointment conflict",
 	})
-	async handle(@Body(createAppointmentBodyValidationPipe) body: CreateAppointmentBodySchema) {
+	async handle(
+		@Param(editAppointmentParamsValidationPipe) params: EditAppointmentParamsSchema,
+		@Body(editAppointmentBodyValidationPipe) body: EditAppointmentBodySchema
+	) {
+		const { id } = params;
 		const { professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes } = body;
 
 		const appointmentItemsEntities = appointmentItems.map(
@@ -106,7 +126,8 @@ export class CreateAppointmentController {
 				})
 		);
 
-		const result = await this.createAppointmentUseCase.execute({
+		const result = await this.editAppointmentUseCase.execute({
+			appointmentId: id,
 			professionalId,
 			franchiseId,
 			patientId,
@@ -120,6 +141,7 @@ export class CreateAppointmentController {
 			const error = unwrapEither(result);
 
 			switch (error.constructor) {
+				case AppointmentNotFoundError:
 				case ProfessionalNotFoundError:
 				case FranchiseNotFoundError:
 				case PatientNotFoundError:
@@ -136,3 +158,4 @@ export class CreateAppointmentController {
 		return AppointmentPresenter.toHTTP(appointment);
 	}
 }
+

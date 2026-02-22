@@ -3,6 +3,7 @@ import { FetchAppointmentsByPatientIdUseCase } from "@/domain/application/use-ca
 import {
 	Controller,
 	Get,
+	Inject,
 	Param,
 } from "@nestjs/common";
 import {
@@ -26,7 +27,10 @@ const fetchAppointmentsByPatientIdParamsValidationPipe = new ZodValidationPipe(f
 @ApiTags("Appointments")
 @Controller("/patients")
 export class FetchAppointmentsByPatientIdController {
-	constructor(private readonly fetchAppointmentsByPatientIdUseCase: FetchAppointmentsByPatientIdUseCase) {}
+	constructor(
+		@Inject(FetchAppointmentsByPatientIdUseCase)
+		private readonly fetchAppointmentsByPatientIdUseCase: FetchAppointmentsByPatientIdUseCase
+	) {}
 
 	@Get("/:patientId/appointments")
 	@ApiOperation({
