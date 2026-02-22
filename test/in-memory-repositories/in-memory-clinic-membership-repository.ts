@@ -15,7 +15,13 @@ export class InMemoryClinicMembershipRepository implements ClinicMembershipRepos
     return membership;
   }
 
-  async create(membership: ClinicMembership): Promise<ClinicMembership> {
+  async findByClinicId(clinicId: string): Promise<ClinicMembership[]> {
+    return this.items.filter(
+      (item) => item.clinicId.toString() === clinicId
+    );
+  }
+
+  async create(membership: ClinicMembership, _tx?: unknown): Promise<ClinicMembership> {
     this.items.push(membership);
     return membership;
   }

@@ -38,6 +38,16 @@ export class InMemoryAppointmentsRepository implements AppointmentsRepository {
     return appointment || null;
   }
 
+  async findByProfessionalIdAndHourRangeExcludingId(professionalId: string, startAt: Date, endAt: Date, excludeId: string): Promise<Appointment | null> {
+    const appointment = this.items.find((item) => {
+      const sameProfessional = item.professionalId.toString() === professionalId;
+      const isNotExcluded = item.id.toString() !== excludeId;
+      const overlaps = (item.startAt < endAt && item.endAt > startAt);
+      return sameProfessional && isNotExcluded && overlaps;
+    });
+    return appointment || null;
+  }
+
   async findPendingByClinicId(clinicId: string): Promise<Appointment[]> {
     const franchiseIds = this.clinicFranchisesMap.get(clinicId) || [];
 
@@ -57,6 +67,25 @@ export class InMemoryAppointmentsRepository implements AppointmentsRepository {
       const belongsToFranchise = appointment.franchiseId.toString() === franchiseId;
 
       return isPending && belongsToFranchise;
+    });
+  }
+
+  async findByClinicId(clinicId: string): Promise<Appointment[]> {
+    const franchiseIds = this.clinicFranchisesMap.get(clinicId) || [];
+
+    return this.items.filter((appointment) => {
+      return franchiseIds.includes(appointment.franchiseId.toString());
+    });
+  }
+
+  async findByClinicIdAndWeek(clinicId: string, weekStart: Date, weekEnd: Date): Promise<Appointment[]> {
+    const franchiseIds = this.clinicFranchisesMap.get(clinicId) || [];
+
+    return this.items.filter((appointment) => {
+      const belongsToClinic = franchiseIds.includes(appointment.franchiseId.toString());
+      const isInWeek = appointment.startAt >= weekStart && appointment.startAt <= weekEnd;
+      
+      return belongsToClinic && isInWeek;
     });
   }
 
