@@ -18,6 +18,7 @@ import { RegisterUserController } from './controlers/users/register-user.control
 import { LogoutController } from './controlers/users/logout.controller';
 import { MeController } from './controlers/users/me.controller';
 import { GetPatientByUserIdController } from './controlers/users/get-patient-by-user-id.controller';
+import { EditUserController } from './controlers/users/edit-user.controller';
 import { SetupMfaController } from './controlers/mfa/setup-mfa.controller';
 import { EnableMfaController } from './controlers/mfa/enable-mfa.controller';
 import { MfaVerifyLoginController } from './controlers/mfa/mfa-verify-login.controller';
@@ -111,6 +112,7 @@ import { FetchAppointmentsByProfessionalIdUseCase } from '@/domain/application/u
 import { GetAppointmentByIdUseCase } from '@/domain/application/use-cases/appointment/get-appointment-by-id';
 import { EditAppointmentUseCase } from '@/domain/application/use-cases/appointment/edit-appointment';
 import { CreateServiceOrderUseCase } from '@/domain/application/use-cases/service-order/create-service-order';
+import { EditUserUseCase } from '@/domain/application/use-cases/users/edit-user';
 import { GetDashboardStatsUseCase } from '@/domain/application/use-cases/clinic/get-dashboard-stats';
 import { CreateStaffMemberUseCase } from '@/domain/application/use-cases/clinic/create-staff-member';
 import { OnboardClinicUseCase } from '@/domain/application/use-cases/admin/onboard-clinic';
@@ -134,6 +136,7 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     LogoutController,
     MeController,
     GetPatientByUserIdController,
+    EditUserController,
     SetupMfaController,
     EnableMfaController,
     MfaVerifyLoginController,
@@ -187,6 +190,7 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     RegisterUserUseCase,
     LogoutUseCase,
     GetCurrentUserUseCase,
+    EditUserUseCase,
     SetupMfaUseCase,
     EnableMfaUseCase,
     MfaVerifyLoginUseCase,
