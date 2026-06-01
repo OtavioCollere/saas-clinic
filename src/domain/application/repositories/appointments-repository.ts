@@ -24,5 +24,6 @@ export abstract class AppointmentsRepository {
   abstract update(appointment: Appointment): Promise<Appointment>;
   abstract countByClinicIdAndDateRange(clinicId: string, start: Date, end: Date): Promise<number>;
   abstract sumItemsPriceByClinicIdAndDateRange(clinicId: string, start: Date, end: Date): Promise<number>;
+  abstract markAsDone(appointmentId: string): Promise<void>;
   abstract findActiveForDate(date: Date): Promise<Appointment[]>;
 }

@@ -357,10 +357,18 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
         appointment: {
           franchise: { clinicId },
           startAt: { gte: start, lt: end },
+          status: 'DONE',
         },
       },
     });
     return result._sum.price?.toNumber() ?? 0;
+  }
+
+  async markAsDone(appointmentId: string): Promise<void> {
+    await this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'DONE' },
+    });
   }
 
   async findActiveForDate(date: Date): Promise<Appointment[]> {
