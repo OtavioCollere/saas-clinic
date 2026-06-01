@@ -59,25 +59,9 @@ import { FetchAppointmentsByProfessionalIdController } from './controlers/appoin
 import { GetAppointmentByIdController } from './controlers/appointment/get-appointment-by-id.controller';
 import { EditAppointmentController } from './controlers/appointment/edit-appointment.controller';
 import { CreateServiceOrderController } from './controlers/service-order/create-service-order.controller';
-import { CreateProductController } from './controlers/product/create-product.controller';
-import { GetProductByIdController } from './controlers/product/get-product-by-id.controller';
-import { FetchProductsByFranchiseIdController } from './controlers/product/fetch-products-by-franchise-id.controller';
-import { FetchProductsByClinicIdController } from './controlers/product/fetch-products-by-clinic-id.controller';
-import { EditProductController } from './controlers/product/edit-product.controller';
-import { InactivateProductController } from './controlers/product/inactivate-product.controller';
-import { DeleteProductController } from './controlers/product/delete-product.controller';
 import { GetDashboardStatsController } from './controlers/clinic/get-dashboard-stats.controller';
 import { CreateStaffMemberController } from './controlers/clinic/create-staff-member.controller';
 import { PublicBookingController } from './controlers/booking/public-booking.controller';
-import { CreateInventoryItemController } from './controlers/inventory/create-inventory-item.controller';
-import { UpdateInventoryItemController } from './controlers/inventory/update-inventory-item.controller';
-import { ListInventoryItemsController } from './controlers/inventory/list-inventory-items.controller';
-import { CreateInventoryEntryController } from './controlers/inventory/create-inventory-entry.controller';
-import { UpsertProcedureSupplyTemplateController } from './controlers/inventory/upsert-procedure-supply-template.controller';
-import { ListProcedureSupplyTemplatesController } from './controlers/inventory/list-procedure-supply-templates.controller';
-import { DeleteProcedureSupplyTemplateController } from './controlers/inventory/delete-procedure-supply-template.controller';
-import { GetConsumptionSuggestionController } from './controlers/inventory/get-consumption-suggestion.controller';
-import { ConfirmConsumptionController } from './controlers/inventory/confirm-consumption.controller';
 import { OnboardClinicController } from './controlers/admin/onboard-clinic.controller';
 
 // Use Cases
@@ -127,24 +111,8 @@ import { FetchAppointmentsByProfessionalIdUseCase } from '@/domain/application/u
 import { GetAppointmentByIdUseCase } from '@/domain/application/use-cases/appointment/get-appointment-by-id';
 import { EditAppointmentUseCase } from '@/domain/application/use-cases/appointment/edit-appointment';
 import { CreateServiceOrderUseCase } from '@/domain/application/use-cases/service-order/create-service-order';
-import { CreateProductUseCase } from '@/domain/application/use-cases/product/create-product';
-import { GetProductByIdUseCase } from '@/domain/application/use-cases/product/get-product-by-id';
-import { FetchProductsByFranchiseIdUseCase } from '@/domain/application/use-cases/product/fetch-products-by-franchise-id';
-import { FetchProductsByClinicIdUseCase } from '@/domain/application/use-cases/product/fetch-products-by-clinic-id';
-import { EditProductUseCase } from '@/domain/application/use-cases/product/edit-product';
-import { InactivateProductUseCase } from '@/domain/application/use-cases/product/inactivate-product';
-import { DeleteProductUseCase } from '@/domain/application/use-cases/product/delete-product';
 import { GetDashboardStatsUseCase } from '@/domain/application/use-cases/clinic/get-dashboard-stats';
 import { CreateStaffMemberUseCase } from '@/domain/application/use-cases/clinic/create-staff-member';
-import { CreateInventoryItemUseCase } from '@/domain/application/use-cases/inventory/create-inventory-item';
-import { UpdateInventoryItemUseCase } from '@/domain/application/use-cases/inventory/update-inventory-item';
-import { ListInventoryItemsByClinicUseCase } from '@/domain/application/use-cases/inventory/list-inventory-items-by-clinic';
-import { CreateInventoryEntryUseCase } from '@/domain/application/use-cases/inventory/create-inventory-entry';
-import { UpsertProcedureSupplyTemplateUseCase } from '@/domain/application/use-cases/inventory/upsert-procedure-supply-template';
-import { ListProcedureSupplyTemplatesUseCase } from '@/domain/application/use-cases/inventory/list-procedure-supply-templates';
-import { DeleteProcedureSupplyTemplateUseCase } from '@/domain/application/use-cases/inventory/delete-procedure-supply-template';
-import { GetConsumptionSuggestionUseCase } from '@/domain/application/use-cases/inventory/get-consumption-suggestion';
-import { ConfirmConsumptionUseCase } from '@/domain/application/use-cases/inventory/confirm-consumption';
 import { OnboardClinicUseCase } from '@/domain/application/use-cases/admin/onboard-clinic';
 import { OnAppointmentConfirmed } from '../events/on-appointment-confirmed';
 import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/whatsapp/handle-whatsapp-message';
@@ -207,26 +175,10 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetAppointmentByIdController,
     EditAppointmentController,
     CreateServiceOrderController,
-    CreateProductController,
-    GetProductByIdController,
-    FetchProductsByFranchiseIdController,
-    FetchProductsByClinicIdController,
-    EditProductController,
-    InactivateProductController,
-    DeleteProductController,
     GetDashboardStatsController,
     CreateStaffMemberController,
     PublicBookingController,
     WhatsappWebhookController,
-    CreateInventoryItemController,
-    UpdateInventoryItemController,
-    ListInventoryItemsController,
-    CreateInventoryEntryController,
-    UpsertProcedureSupplyTemplateController,
-    ListProcedureSupplyTemplatesController,
-    DeleteProcedureSupplyTemplateController,
-    GetConsumptionSuggestionController,
-    ConfirmConsumptionController,
     OnboardClinicController,
   ],
   providers: [
@@ -277,24 +229,8 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetAppointmentByIdUseCase,
     EditAppointmentUseCase,
     CreateServiceOrderUseCase,
-    CreateProductUseCase,
-    GetProductByIdUseCase,
-    FetchProductsByFranchiseIdUseCase,
-    FetchProductsByClinicIdUseCase,
-    EditProductUseCase,
-    InactivateProductUseCase,
-    DeleteProductUseCase,
     GetDashboardStatsUseCase,
     CreateStaffMemberUseCase,
-    CreateInventoryItemUseCase,
-    UpdateInventoryItemUseCase,
-    ListInventoryItemsByClinicUseCase,
-    CreateInventoryEntryUseCase,
-    UpsertProcedureSupplyTemplateUseCase,
-    ListProcedureSupplyTemplatesUseCase,
-    DeleteProcedureSupplyTemplateUseCase,
-    GetConsumptionSuggestionUseCase,
-    ConfirmConsumptionUseCase,
     OnboardClinicUseCase,
     OnAppointmentConfirmed,
     HandleWhatsAppMessageUseCase,

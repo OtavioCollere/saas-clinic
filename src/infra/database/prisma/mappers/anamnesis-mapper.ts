@@ -17,7 +17,7 @@ export class AnamnesisMapper {
         healthConditions: raw.healthConditions as unknown as HealthConditions,
         medicalHistory: raw.medicalHistory as unknown as MedicalHistory,
         physicalAssessment: raw.physicalAssessment as unknown as PhysicalAssessment,
-        patientSignature: raw.patientSignature ?? undefined,
+        patientSignature: raw.patientSignature ?? '',
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt,
       },
@@ -33,7 +33,8 @@ export class AnamnesisMapper {
       healthConditions: anamnesis.healthConditions,
       medicalHistory: anamnesis.medicalHistory,
       physicalAssessment: anamnesis.physicalAssessment,
-      patientSignature: anamnesis.patientSignature ?? null,
+      patientSignature: anamnesis.patientSignature,
+      signedAt: anamnesis.patientSignature ? new Date() : null,
     }
   }
 }

@@ -17,7 +17,7 @@ interface CreateAnamnesisUseCaseRequest {
   healthConditions: HealthConditions;
   medicalHistory: MedicalHistory;
   physicalAssessment: PhysicalAssessment;
-  patientSignature?: string;
+  patientSignature: string;
 }
 
 type CreateAnamnesisUseCaseResponse = Either<

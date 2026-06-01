@@ -32,14 +32,10 @@ const createServiceOrderBodySchema = z.object({
   items: z.array(
     z.object({
       appointmentItemId: z.string().optional(),
-      procedureId: z.string().optional(),
-      productId: z.string().optional(),
+      procedureId: z.string().min(1),
       price: z.number().min(0),
       notes: z.string().optional(),
-    }).refine(
-      (item) => !!item.procedureId || !!item.productId,
-      { message: 'Each item must have either procedureId or productId' }
-    )
+    })
   ).min(1, "Pelo menos um item é obrigatório"),
   status: z.enum(["PENDING", "WAITING_PAYMENT", "PAID", "CANCELED", "FAILED"]).optional(),
   paymentMethod: z.enum(["credit_card", "debit_card", "pix", "bank_transfer", "cash", "other"]).optional(),

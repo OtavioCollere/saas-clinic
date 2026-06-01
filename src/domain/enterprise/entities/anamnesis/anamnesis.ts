@@ -12,7 +12,7 @@ export interface AnamnesisProps {
   healthConditions: HealthConditions;
   medicalHistory: MedicalHistory;
   physicalAssessment: PhysicalAssessment;
-  patientSignature?: string;
+  patientSignature: string;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -50,7 +50,7 @@ export class Anamnesis extends Entity<AnamnesisProps> {
     return this.props.physicalAssessment;
   }
 
-  get patientSignature(): string | undefined {
+  get patientSignature(): string {
     return this.props.patientSignature;
   }
 

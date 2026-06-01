@@ -4,7 +4,6 @@ import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 export interface ServiceOrderItemProps {
     appointmentItemId?: UniqueEntityId
     procedureId?: UniqueEntityId
-    productId?: UniqueEntityId
     price: number
     notes?: string
     createdAt: Date
@@ -33,10 +32,6 @@ export class ServiceOrderItem extends Entity<ServiceOrderItemProps> {
 
     get procedureId() {
         return this.props.procedureId;
-    }
-
-    get productId() {
-        return this.props.productId;
     }
 
     get price() {

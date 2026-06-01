@@ -14,7 +14,6 @@ export type PaymentMethodType = keyof typeof PaymentMethod | (typeof PaymentMeth
 export interface ServiceOrderItemInput {
   appointmentItemId?: string;
   procedureId?: string;
-  productId?: string;
   price: number;
   notes?: string;
 }
@@ -51,7 +50,6 @@ export class CreateServiceOrderUseCase {
       ServiceOrderItem.create({
         appointmentItemId: input.appointmentItemId ? new UniqueEntityId(input.appointmentItemId) : undefined,
         procedureId: input.procedureId ? new UniqueEntityId(input.procedureId) : undefined,
-        productId: input.productId ? new UniqueEntityId(input.productId) : undefined,
         price: input.price,
         notes: input.notes,
       })

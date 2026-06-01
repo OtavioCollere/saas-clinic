@@ -15,11 +15,6 @@ import { AppointmentsRepository } from '@/domain/application/repositories/appoin
 import { ServiceOrderRepository } from '@/domain/application/repositories/service-order-repository';
 import { PasswordVerificationRepository } from '@/domain/application/repositories/password-verification-repository';
 import { WhatsAppConversationRepository } from '@/domain/application/repositories/whatsapp-conversation-repository';
-import { ProductRepository } from '@/domain/application/repositories/product-repository';
-import { InventoryItemRepository } from '@/domain/application/repositories/inventory-item-repository';
-import { InventoryEntryRepository } from '@/domain/application/repositories/inventory-entry-repository';
-import { InventoryMovementRepository } from '@/domain/application/repositories/inventory-movement-repository';
-import { ProcedureSupplyTemplateRepository } from '@/domain/application/repositories/procedure-supply-template-repository';
 import { PrismaUsersRepository } from './prisma/repositories/prisma-users-repository';
 import { PrismaMfaSettingsRepository } from './prisma/repositories/prisma-mfa-settings-repository';
 import { PrismaSessionsRepository } from './prisma/repositories/prisma-sessions-repository';
@@ -35,11 +30,6 @@ import { PrismaProcedureRepository } from './prisma/repositories/prisma-procedur
 import { PrismaAppointmentsRepository } from './prisma/repositories/prisma-appointments-repository';
 import { PrismaServiceOrderRepository } from './prisma/repositories/prisma-service-order-repository';
 import { PrismaWhatsAppConversationRepository } from './prisma/repositories/prisma-whatsapp-conversation-repository';
-import { PrismaProductRepository } from './prisma/repositories/prisma-product-repository';
-import { PrismaInventoryItemRepository } from './prisma/repositories/prisma-inventory-item-repository';
-import { PrismaInventoryEntryRepository } from './prisma/repositories/prisma-inventory-entry-repository';
-import { PrismaInventoryMovementRepository } from './prisma/repositories/prisma-inventory-movement-repository';
-import { PrismaProcedureSupplyTemplateRepository } from './prisma/repositories/prisma-procedure-supply-template-repository';
 import { TransactionManager } from '@/domain/application/transactions/transaction-manager';
 import { PrismaTransactionManager } from './prisma-transaction-manager';
 
@@ -62,11 +52,6 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     {provide : ServiceOrderRepository, useClass : PrismaServiceOrderRepository},
     {provide : PasswordVerificationRepository, useClass : PrismaPasswordVerificationRepository},
     {provide : WhatsAppConversationRepository, useClass : PrismaWhatsAppConversationRepository},
-    {provide : ProductRepository, useClass : PrismaProductRepository},
-    {provide : InventoryItemRepository, useClass : PrismaInventoryItemRepository},
-    {provide : InventoryEntryRepository, useClass : PrismaInventoryEntryRepository},
-    {provide : InventoryMovementRepository, useClass : PrismaInventoryMovementRepository},
-    {provide : ProcedureSupplyTemplateRepository, useClass : PrismaProcedureSupplyTemplateRepository},
   ],
   exports: [
     PrismaService,
@@ -86,11 +71,6 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     AppointmentsRepository,
     ServiceOrderRepository,
     WhatsAppConversationRepository,
-    ProductRepository,
-    InventoryItemRepository,
-    InventoryEntryRepository,
-    InventoryMovementRepository,
-    ProcedureSupplyTemplateRepository,
   ],
 })
 export class DatabaseModule {}

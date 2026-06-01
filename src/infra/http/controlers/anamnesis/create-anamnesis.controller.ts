@@ -57,7 +57,7 @@ const createAnamnesisBodySchema = z.object({
 		initialWeight: z.number().positive(),
 		finalWeight: z.number().positive().optional(),
 	}),
-	patientSignature: z.string().optional(),
+	patientSignature: z.string().min(1),
 });
 
 type CreateAnamnesisParamsSchema = z.infer<typeof createAnamnesisParamsSchema>;
