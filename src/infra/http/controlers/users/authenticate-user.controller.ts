@@ -1,7 +1,5 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { WrongCredentialsError } from "@/shared/errors/wrong-credentials-error";
-import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
-import { ClinicMembershipNotFoundError } from "@/shared/errors/clinic-membership-not-found-error";
 import { AuthenticateUserUseCase } from "@/domain/application/use-cases/users/authenticate-user";
 import {
 	BadRequestException,
@@ -89,14 +87,8 @@ export class AuthenticateUserController {
 
     if (isLeft(result)) {
       const error = unwrapEither(result);
-
       switch (error.constructor) {
         case WrongCredentialsError:
-          throw new BadRequestException(error.message);
-        case ClinicNotFoundError:
-          throw new BadRequestException(error.message);
-        case ClinicMembershipNotFoundError:
-          throw new BadRequestException(error.message);
         default:
           throw new BadRequestException(error.message);
       }

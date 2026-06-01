@@ -42,7 +42,7 @@ export class LogoutController {
 	@ApiBadRequestResponse({
 		description: "Invalid request",
 	})
-	async handle(@Req() request: FastifyRequest & { user?: UserPayload }, @Res() reply) {
+	async handle(@Req() request: FastifyRequest & { user?: UserPayload }, @Res({ passthrough: true }) reply) {
 		const user = request.user;
 		
 		if (!user || !user.sub) {

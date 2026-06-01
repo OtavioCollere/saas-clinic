@@ -17,6 +17,7 @@ interface CreateAnamnesisUseCaseRequest {
   healthConditions: HealthConditions;
   medicalHistory: MedicalHistory;
   physicalAssessment: PhysicalAssessment;
+  patientSignature?: string;
 }
 
 type CreateAnamnesisUseCaseResponse = Either<
@@ -41,6 +42,7 @@ export class CreateAnamnesisUseCase {
     healthConditions,
     medicalHistory,
     physicalAssessment,
+    patientSignature,
   }: CreateAnamnesisUseCaseRequest): Promise<CreateAnamnesisUseCaseResponse> {
     const patient = await this.patientRepository.findById(patientId);
 
@@ -54,6 +56,7 @@ export class CreateAnamnesisUseCase {
       healthConditions,
       medicalHistory,
       physicalAssessment,
+      patientSignature,
     });
 
     await this.anamnesisRepository.create(anamnesis);

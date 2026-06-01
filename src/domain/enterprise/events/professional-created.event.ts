@@ -5,5 +5,7 @@ export class ProfessionalCreatedEvent {
     public readonly franchiseId: string,
     public readonly clinicSlug: string,
     public readonly userEmail: string,
+    public readonly password: string,
+    public readonly expiresAt: Date,
   ) {}
 }

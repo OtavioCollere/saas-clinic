@@ -16,9 +16,10 @@ export class PrismaClinicRepository extends ClinicRepository {
     super();
   }
 
-  async create(clinic: Clinic): Promise<Clinic> {
+  async create(clinic: Clinic, tx?: unknown): Promise<Clinic> {
     const data = ClinicMapper.toPrisma(clinic);
-    const raw = await this.prisma.clinic.create({ data });
+    const client = (tx as typeof this.prisma) ?? this.prisma;
+    const raw = await client.clinic.create({ data });
     return ClinicMapper.toDomain(raw);
   }
 

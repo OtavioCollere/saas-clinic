@@ -2,10 +2,9 @@ import { Module } from '@nestjs/common'
 import { BullModule } from '@nestjs/bull'
 import { EmailSender } from '@/shared/services/email/email-sender'
 import { EmailQueue } from '@/shared/services/email/email-queue'
-import { NodemailerEmailSender } from './nodemailer-email-sender'
+import { ResendEmailSender } from './resend-email-sender'
 import { BullEmailQueue } from './bull-email-queue'
 import { SendEmailConsumer } from './consumers/send-email.consumer'
-import { createNodemailerTransporter } from './nodemailer.provider'
 
 @Module({
   imports: [
@@ -13,12 +12,8 @@ import { createNodemailerTransporter } from './nodemailer.provider'
   ],
   providers: [
     {
-      provide: 'NODEMAILER_TRANSPORTER',
-      useFactory: createNodemailerTransporter,
-    },
-    {
       provide: EmailSender,
-      useClass: NodemailerEmailSender,
+      useClass: ResendEmailSender,
     },
     {
       provide: EmailQueue,

@@ -13,7 +13,8 @@ async function bootstrap() {
 		AppModule,
 		new FastifyAdapter(),
 	);
-	await app.register(cookie);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	await app.register(cookie as any);
 
 	const configService = app.get(ConfigService);
 	const port = configService.get("PORT") || 3000;

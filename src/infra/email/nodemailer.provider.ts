@@ -1,9 +1,16 @@
+import { Logger } from '@nestjs/common'
 import * as nodemailer from 'nodemailer'
+
+const logger = new Logger('NodemailerProvider')
 
 export const createNodemailerTransporter = async () => {
   // Cria uma conta de teste do Ethereal Email dinamicamente
   // Isso garante que as credenciais sempre estejam válidas
-  const testAccount = await nodemailer.createTestAccount();
+  const testAccount = await nodemailer.createTestAccount()
+
+  logger.log(
+    `📧 Ethereal Email: Conta criada. Web: ${testAccount.web} | User: ${testAccount.user}`,
+  )
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
@@ -16,7 +23,8 @@ export const createNodemailerTransporter = async () => {
   });
 
   // Verifica a conexão
-  await transporter.verify();
+  await transporter.verify()
+  logger.log('✅ Nodemailer: Conexão SMTP verificada com sucesso')
 
   return transporter;
 }

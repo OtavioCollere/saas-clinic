@@ -1,83 +1,39 @@
-import { Anamnesis } from "@/domain/enterprise/entities/anamnesis/anamnesis";
-import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
-import type { Prisma } from "@prisma/client";
+import { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis'
+import { UniqueEntityId } from '@/shared/entities/unique-entity-id'
+import type { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history'
+import type { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions'
+import type { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history'
+import type { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment'
+import type { Anamnesis as PrismaAnamnesis } from '@prisma/client'
 
-type AnamnesisRaw = {
-  id: string;
-  patientId: string;
-  aestheticHistory: Prisma.JsonValue;
-  healthConditions: Prisma.JsonValue;
-  medicalHistory: Prisma.JsonValue;
-  physicalAssessment: Prisma.JsonValue;
-  createdAt: Date;
-  updatedAt: Date | null;
-};
-
-type AnamnesisPrismaCreateInput = {
-  id: string;
-  patient: {
-    connect: {
-      id: string;
-    };
-  };
-  aestheticHistory: Prisma.JsonValue;
-  healthConditions: Prisma.JsonValue;
-  medicalHistory: Prisma.JsonValue;
-  physicalAssessment: Prisma.JsonValue;
-  createdAt: Date;
-  // updatedAt não é incluído na criação - Prisma gerencia automaticamente com @updatedAt
-};
-
-type AnamnesisPrismaUpdateInput = {
-  aestheticHistory?: Prisma.JsonValue;
-  healthConditions?: Prisma.JsonValue;
-  medicalHistory?: Prisma.JsonValue;
-  physicalAssessment?: Prisma.JsonValue;
-  // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
-};
+type AnamnesisRaw = PrismaAnamnesis
 
 export class AnamnesisMapper {
   static toDomain(raw: AnamnesisRaw): Anamnesis {
     return Anamnesis.create(
       {
         patientId: new UniqueEntityId(raw.patientId),
-        aestheticHistory: raw.aestheticHistory as any,
-        healthConditions: raw.healthConditions as any,
-        medicalHistory: raw.medicalHistory as any,
-        physicalAssessment: raw.physicalAssessment as any,
+        aestheticHistory: raw.aestheticHistory as unknown as AestheticHistory,
+        healthConditions: raw.healthConditions as unknown as HealthConditions,
+        medicalHistory: raw.medicalHistory as unknown as MedicalHistory,
+        physicalAssessment: raw.physicalAssessment as unknown as PhysicalAssessment,
+        patientSignature: raw.patientSignature ?? undefined,
         createdAt: raw.createdAt,
-        updatedAt: raw.updatedAt ?? undefined,
+        updatedAt: raw.updatedAt,
       },
-      new UniqueEntityId(raw.id)
-    );
+      new UniqueEntityId(raw.id),
+    )
   }
 
-  static toPrisma(anamnesis: Anamnesis): AnamnesisPrismaCreateInput {
+  static toPrisma(anamnesis: Anamnesis) {
     return {
       id: anamnesis.id.toString(),
-      patient: {
-        connect: {
-          id: anamnesis.patientId.toString(),
-        },
-      },
-      aestheticHistory: anamnesis.aestheticHistory as Prisma.JsonValue,
-      healthConditions: anamnesis.healthConditions as Prisma.JsonValue,
-      medicalHistory: anamnesis.medicalHistory as Prisma.JsonValue,
-      physicalAssessment: anamnesis.physicalAssessment as Prisma.JsonValue,
-      createdAt: anamnesis.createdAt,
-      // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
-    };
-  }
-
-  static toPrismaUpdate(anamnesis: Anamnesis): AnamnesisPrismaUpdateInput {
-    return {
-      aestheticHistory: anamnesis.aestheticHistory as Prisma.JsonValue,
-      healthConditions: anamnesis.healthConditions as Prisma.JsonValue,
-      medicalHistory: anamnesis.medicalHistory as Prisma.JsonValue,
-      physicalAssessment: anamnesis.physicalAssessment as Prisma.JsonValue,
-      // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
-    };
+      patientId: anamnesis.patientId.toString(),
+      aestheticHistory: anamnesis.aestheticHistory,
+      healthConditions: anamnesis.healthConditions,
+      medicalHistory: anamnesis.medicalHistory,
+      physicalAssessment: anamnesis.physicalAssessment,
+      patientSignature: anamnesis.patientSignature ?? null,
+    }
   }
 }
-
-

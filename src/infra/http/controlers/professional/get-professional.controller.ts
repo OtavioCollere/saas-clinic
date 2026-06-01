@@ -67,8 +67,8 @@ export class GetProfessionalController {
 			}
 		}
 
-		const { professional } = unwrapEither(result);
+		const { professional, user } = unwrapEither(result);
 
-		return ProfessionalPresenter.toHTTP(professional, null);
+		return ProfessionalPresenter.toHTTP(professional, user ?? undefined);
 	}
 }

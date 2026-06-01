@@ -2,6 +2,7 @@ import { Appointment } from "@/domain/enterprise/entities/appointment";
 import { AppointmentItem } from "@/domain/enterprise/entities/appointment-item";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { AppointmentStatus } from "@/domain/enterprise/value-objects/appointment-status";
+import type { Decimal } from "@prisma/client/runtime/library";
 
 type AppointmentRaw = {
   id: string;
@@ -18,7 +19,7 @@ type AppointmentRaw = {
   appointmentItems: Array<{
     id: string;
     procedureId: string;
-    price: number | string;
+    price: number | string | Decimal;
     notes: string | null;
   }>;
 };

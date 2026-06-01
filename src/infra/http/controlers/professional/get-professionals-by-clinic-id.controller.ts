@@ -69,9 +69,13 @@ export class GetProfessionalsByClinicIdController {
 
 		const { professionals, users } = unwrapEither(result);
 
-		return professionals.map((professional) => 
-			ProfessionalPresenter.toHTTP(professional, users.get(professional.userId.toString()))
-		);
+		return professionals.map((professional) => {
+			const user = users.get(professional.userId.toString());
+			return {
+				...ProfessionalPresenter.toHTTP(professional),
+				name: user?.name ?? null,
+			};
+		});
 	}
 }
 

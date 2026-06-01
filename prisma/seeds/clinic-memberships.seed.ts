@@ -2,28 +2,47 @@ import { PrismaClient } from '@prisma/client';
 
 export async function seedClinicMemberships(
   prisma: PrismaClient,
-  userId: string,
-  clinicId: string
+  ownerId: string,
+  clinicId: string,
+  professionalUserIds: string[] = []
 ) {
   console.log('👥 Seeding clinic memberships...');
 
-  const membership = await prisma.clinicMembership.upsert({
+  const owner = await prisma.clinicMembership.upsert({
     where: {
       userId_clinicId: {
-        userId: userId,
-        clinicId: clinicId,
+        userId: ownerId,
+        clinicId,
       },
     },
     update: {},
     create: {
-      userId: userId,
-      clinicId: clinicId,
+      userId: ownerId,
+      clinicId,
       role: 'OWNER',
     },
   });
 
-  console.log(`✅ Created/updated 1 clinic membership`);
-  return membership;
+  for (const userId of professionalUserIds) {
+    await prisma.clinicMembership.upsert({
+      where: {
+        userId_clinicId: {
+          userId,
+          clinicId,
+        },
+      },
+      update: {},
+      create: {
+        userId,
+        clinicId,
+        role: 'PROFESSIONAL',
+      },
+    });
+  }
+
+  const total = 1 + professionalUserIds.length;
+  console.log(`✅ Created/updated ${total} clinic memberships`);
+  return owner;
 }
 
 

@@ -119,6 +119,53 @@ export const CLINIC_ROLE_PERMISSIONS = {
         ClinicPermissions.GET_ANAMNESIS_BY_PATIENT,
     ],
 
+    COLLABORATOR : [
+        // Clinic
+        ClinicPermissions.VIEW_CLINIC,
+        ClinicPermissions.GET_CLINIC_BY_ID,
+        ClinicPermissions.GET_CLINIC_USERS,
+
+        // Patients
+        ClinicPermissions.CREATE_PATIENT,
+        ClinicPermissions.UPDATE_PATIENT,
+        ClinicPermissions.VIEW_PATIENT,
+        ClinicPermissions.VIEW_PATIENTS,
+        ClinicPermissions.GET_PATIENT_BY_ID,
+        ClinicPermissions.FETCH_PATIENTS,
+        ClinicPermissions.FETCH_PATIENTS_BY_CLINIC,
+
+        // Appointments
+        ClinicPermissions.CREATE_APPOINTMENT,
+        ClinicPermissions.UPDATE_APPOINTMENT,
+        ClinicPermissions.CANCEL_APPOINTMENT,
+        ClinicPermissions.CONFIRM_APPOINTMENT,
+        ClinicPermissions.VIEW_APPOINTMENT,
+        ClinicPermissions.VIEW_APPOINTMENTS,
+        ClinicPermissions.GET_APPOINTMENT_BY_ID,
+        ClinicPermissions.FETCH_APPOINTMENTS_BY_CLINIC,
+        ClinicPermissions.FETCH_APPOINTMENTS_BY_CLINIC_WEEK,
+        ClinicPermissions.VIEW_APPOINTMENTS_BY_PROFESSIONAL,
+        ClinicPermissions.VIEW_APPOINTMENTS_BY_PATIENT,
+
+        // Procedures (read-only)
+        ClinicPermissions.VIEW_PROCEDURE,
+        ClinicPermissions.GET_PROCEDURE_BY_ID,
+        ClinicPermissions.FETCH_PROCEDURES,
+        ClinicPermissions.FETCH_PROCEDURES_BY_CLINIC,
+        ClinicPermissions.FETCH_PROCEDURES_BY_FRANCHISE,
+
+        // Professionals (read-only — para criar consulta)
+        ClinicPermissions.VIEW_PROFESSIONAL,
+        ClinicPermissions.GET_PROFESSIONAL_BY_ID,
+        ClinicPermissions.FETCH_PROFESSIONALS,
+        ClinicPermissions.FETCH_PROFESSIONALS_BY_CLINIC,
+        ClinicPermissions.FETCH_PROFESSIONALS_BY_FRANCHISE,
+
+        // Anamnesis
+        ClinicPermissions.VIEW_ANAMNESIS,
+        ClinicPermissions.GET_ANAMNESIS_BY_PATIENT,
+    ],
+
     PATIENT : [
         // Patient - can view own profile
         ClinicPermissions.VIEW_PATIENT,

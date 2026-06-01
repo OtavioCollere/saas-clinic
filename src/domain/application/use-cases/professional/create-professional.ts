@@ -26,6 +26,8 @@ import { User } from '@/domain/enterprise/entities/user';
 import { UserRole } from '@/domain/enterprise/value-objects/user-role';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ProfessionalCreatedEvent } from '@/domain/enterprise/events/professional-created.event';
+import { HashGenerator } from '../../cryptography/hash-generator';
+import crypto from 'crypto';
 
 interface CreateProfessionalUseCaseRequest {
   name: string;
@@ -61,6 +63,8 @@ export class CreateProfessionalUseCase {
     private clinicMembershipRepository: ClinicMembershipRepository,
     @Inject(TransactionManager)
     private transactionManager: TransactionManager,
+    @Inject(HashGenerator)
+    private hashGenerator: HashGenerator,
     @Inject(EventEmitter2)
     private eventEmitter: EventEmitter2,
   ) {}
@@ -121,6 +125,11 @@ export class CreateProfessionalUseCase {
 		const cpfVO = Cpf.create(cpf);
 		const emailVO = Email.create(email);
 
+    // Gera senha aleatória para enviar por email (expira em 72 h)
+    const randomPassword = crypto.randomBytes(16).toString('hex');
+    const passwordHash = await this.hashGenerator.hash(randomPassword);
+    const passwordExpiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+
     // Execução dentro da transação
     const result = await this.transactionManager.run(
       async (tx) => {
@@ -128,7 +137,7 @@ export class CreateProfessionalUseCase {
           name,
           cpf: cpfVO,
           email: emailVO,
-          password: "TEMPORARY_PASSWORD_PLACEHOLDER", // Placeholder, will be set via email link
+          password: passwordHash,
           role: UserRole.member(),
         });
 
@@ -161,13 +170,13 @@ export class CreateProfessionalUseCase {
         });
         await this.clinicMembershipRepository.create(clinicMembership, tx);
 
-        return makeRight({ professional, user, email: emailVO.getValue() });
+        return makeRight({ professional, user, email: emailVO.getValue(), password: randomPassword });
       }
     );
 
     // Emite o evento apenas se a transação foi bem-sucedida
     if (isRight(result)) {
-      const { professional, user, email } = unwrapEither(result);
+      const { professional, user, email, password } = unwrapEither(result);
 
       this.eventEmitter.emit(
         'professional.created',
@@ -177,6 +186,8 @@ export class CreateProfessionalUseCase {
           franchiseId,
           clinic.slug.getValue(),
           email,
+          password,
+          passwordExpiresAt,
         )
       );
 

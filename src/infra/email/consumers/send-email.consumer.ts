@@ -20,8 +20,38 @@ export class SendEmailConsumer {
 
   @Process('send-email')
   async handleSendEmail(job: Job<SendEmailJobData>) {
-    const { to, subject, text, html } = job.data;
-    await this.emailSender.send({ to, subject, text, html });
+    console.log('🔄 SendEmailConsumer: Job recebido para processamento', {
+      jobId: job.id,
+      jobName: job.name,
+      attempt: job.attemptsMade + 1,
+      data: {
+        to: job.data.to,
+        subject: job.data.subject,
+        hasText: !!job.data.text,
+        hasHtml: !!job.data.html,
+      },
+    });
+
+    try {
+      const { to, subject, text, html } = job.data;
+      
+      console.log('📤 SendEmailConsumer: Enviando email via EmailSender...');
+      
+      await this.emailSender.send({ to, subject, text, html });
+      
+      console.log('✅ SendEmailConsumer: Email enviado com sucesso', {
+        to,
+        subject,
+        jobId: job.id,
+      });
+    } catch (error) {
+      console.error('❌ SendEmailConsumer: Erro ao enviar email', {
+        jobId: job.id,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
   }
 }
 

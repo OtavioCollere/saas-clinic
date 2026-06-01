@@ -1,68 +1,38 @@
-############################
-# Base
-############################
-FROM node:20.18-alpine AS base
+FROM node:20-bookworm-slim AS builder
+WORKDIR /app
 
-ENV NODE_ENV=production
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates openssl \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm
-
-############################
-# Dependencies
-############################
-FROM base AS dependencies
-
-WORKDIR /usr/src/app
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 COPY package.json pnpm-lock.yaml ./
-
-# instala TODAS deps (newrelic incluso)
 RUN pnpm install --frozen-lockfile
 
-############################
-# Build
-############################
-FROM base AS build
-
-WORKDIR /usr/src/app
-
 COPY . .
-COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+RUN pnpm exec prisma generate
+RUN pnpm run build
 
-# Prisma client
-RUN pnpm prisma generate
 
-# Build Nest
-RUN pnpm build
+FROM node:20-bookworm-slim AS runner
+WORKDIR /app
 
-# Remove dev deps (mantém newrelic)
-RUN pnpm prune --prod
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates openssl \
+  && rm -rf /var/lib/apt/lists/*
 
-############################
-# Runtime (Deploy)
-############################
-FROM node:20.18-alpine AS deploy
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 ENV NODE_ENV=production
+ENV PORT=8080
+EXPOSE 8080
 
-WORKDIR /usr/src/app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
 
-# usuário não-root (ECS best practice)
-# A imagem node:20.18-alpine já vem com o usuário 'node', vamos usar ele
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+RUN pnpm exec prisma generate
 
-# Copia apenas o necessário
-COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/package.json ./package.json
-COPY --from=build /usr/src/app/prisma ./prisma
-
-# Copia newrelic.js se existir no build stage (opcional)
-RUN --mount=type=bind,from=build,source=/usr/src/app,target=/mnt/build \
-    test -f /mnt/build/newrelic.js && cp /mnt/build/newrelic.js ./newrelic.js || true
-
-USER node
-
-EXPOSE 3000
-
-# New Relic SEMPRE no preload
-CMD ["/usr/local/bin/node", "-r", "newrelic", "dist/src/main.js"]
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/src/main.js"]

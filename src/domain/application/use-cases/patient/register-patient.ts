@@ -3,12 +3,11 @@ import { type Either, makeLeft, makeRight, isRight, unwrapEither } from '@/share
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
 import { Patient } from '@/domain/enterprise/entities/patient';
-import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
-import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
-import { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import { ClinicRepository } from '../../repositories/clinic-repository';
+import { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import { PatientRepository } from '../../repositories/patient-repository';
 import { UsersRepository } from '../../repositories/users-repository';
+import { HashGenerator } from '../../cryptography/hash-generator';
 import { CpfAlreadyExistsError } from '@/shared/errors/cpf-already-exists-error';
 import { Cpf } from '@/domain/enterprise/value-objects/cpf';
 import { InvalidCpfError } from '@/shared/errors/invalid-cpf-error';
@@ -16,16 +15,20 @@ import { Email } from '@/domain/enterprise/value-objects/email';
 import { InvalidEmailError } from '@/shared/errors/invalid-email-error';
 import { EmailAlreadyExistsError } from '@/shared/errors/email-already-exists-error';
 import { TransactionManager } from '../../transactions/transaction-manager';
+import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
+import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
 import { User } from '@/domain/enterprise/entities/user';
 import { UserRole } from '@/domain/enterprise/value-objects/user-role';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PatientCreatedEvent } from '@/domain/enterprise/events/patient-created.event';
+import crypto from 'crypto';
 
 interface RegisterPatientUseCaseRequest {
   clinicId: string;
   name: string;
   cpf: string;
   email: string;
+  phone?: string;
   birthDay: Date;
   address: string;
   zipCode: string;
@@ -41,6 +44,8 @@ type RegisterPatientUseCaseResponse = Either<
 @Injectable()
 export class RegisterPatientUseCase {
   constructor(
+    @Inject(HashGenerator)
+    private hashGenerator: HashGenerator,
     @Inject(PatientRepository)
     private patientRepository: PatientRepository,
     @Inject(ClinicRepository)
@@ -60,6 +65,7 @@ export class RegisterPatientUseCase {
     name,
     cpf,
     email,
+    phone,
     birthDay,
     address,
     zipCode,
@@ -91,7 +97,15 @@ export class RegisterPatientUseCase {
       return makeLeft(new ClinicNotFoundError());
     }
 
+    // Gera senha aleatória (expira em 72 h)
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    const randomPassword = Array.from(crypto.randomBytes(8))
+      .map(b => chars[b % chars.length])
+      .join('');
+    const passwordExpiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+
     // Preparação de dados
+    const passwordHash = await this.hashGenerator.hash(randomPassword);
     const cpfVO = Cpf.create(cpf);
     const emailVO = Email.create(email);
 
@@ -102,7 +116,8 @@ export class RegisterPatientUseCase {
           name,
           cpf: cpfVO,
           email: emailVO,
-          password: "TEMPORARY_PASSWORD_PLACEHOLDER", // Placeholder, will be set via email link
+          phone,
+          password: passwordHash,
           role: UserRole.member(),
         });
 
@@ -117,35 +132,32 @@ export class RegisterPatientUseCase {
           zipCode,
         });
 
-        await this.patientRepository.create(patient, tx);
+        await this.patientRepository.create(patient);
 
-        const clinicMembership = ClinicMembership.create({
+        const membership = ClinicMembership.create({
           userId: user.id,
-          clinicId: new UniqueEntityId(clinicId),
+          clinicId: clinic.id,
           role: ClinicRole.patient(),
         });
-        await this.clinicMembershipRepository.create(clinicMembership, tx);
+        await this.clinicMembershipRepository.create(membership, tx);
 
-        return makeRight({ patient, user, email: emailVO.getValue() });
+        return makeRight({ patient, user, email: emailVO.getValue(), password: randomPassword });
       }
     );
 
-    // Emite o evento apenas se a transação foi bem-sucedida
     if (isRight(result)) {
-      const { patient, user, email } = unwrapEither(result);
-
+      const { patient, user, email, password } = unwrapEither(result);
       this.eventEmitter.emit(
         'patient.created',
         new PatientCreatedEvent(
           patient.id.toString(),
           user.id.toString(),
           clinicId,
-          clinic.slug.getValue(),
           email,
-        )
+          password,
+          passwordExpiresAt,
+        ),
       );
-
-      // Retorna apenas o patient (sem os dados temporários)
       return makeRight({ patient });
     }
 

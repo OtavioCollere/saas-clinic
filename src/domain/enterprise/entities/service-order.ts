@@ -2,10 +2,13 @@ import { Entity } from "@/shared/entities/entity";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { ServiceOrderItem } from "./service-order-item";
 import { ServiceOrderStatus } from "../value-objects/service-order-status";
+import { PaymentMethod } from "@/domain/enterprise/value-objects/payment-method";
 
 export interface ServiceOrderProps {
     items: ServiceOrderItem[]
     status: ServiceOrderStatus
+    paymentMethod: PaymentMethod
+    totalAmount?: number
     createdAt: Date
     updatedAt?: Date
 }
@@ -30,12 +33,23 @@ export class ServiceOrder extends Entity<ServiceOrderProps> {
             {
                 items: props.items ?? [],
                 status: props.status ?? ServiceOrderStatus.pending(),
+                paymentMethod: props.paymentMethod ?? PaymentMethod.CASH,
+                totalAmount: props.totalAmount,
                 createdAt: props.createdAt ?? new Date(),
+                updatedAt: props.updatedAt,
             },
             id,
         );
 
         return serviceOrder;
+    }
+
+    get paymentMethod() {
+        return this.props.paymentMethod;
+    }
+
+    calculateTotalAmount() {
+        return this.props.items.reduce((total, item) => total + item.price, 0);
     }
 
     get items() {

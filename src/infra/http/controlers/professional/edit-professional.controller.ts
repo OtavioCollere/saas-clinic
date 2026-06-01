@@ -104,6 +104,6 @@ export class EditProfessionalController {
 
 		const { professional } = unwrapEither(result);
 
-		return ProfessionalPresenter.toHTTP(professional, null);
+		return ProfessionalPresenter.toHTTP(professional, undefined);
 	}
 }

@@ -1,4 +1,4 @@
-export type ClinicRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT'; 
+export type ClinicRoleType = 'ADMIN' | 'OWNER' | 'PROFESSIONAL' | 'PATIENT' | 'COLLABORATOR';
 
 export class ClinicRole{
   constructor(
@@ -21,6 +21,10 @@ export class ClinicRole{
     return new ClinicRole('PATIENT')
   }
 
+  static collaborator() {
+    return new ClinicRole('COLLABORATOR')
+  }
+
   isOwner(){
     return this.value === 'OWNER';
   }
@@ -35,6 +39,10 @@ export class ClinicRole{
 
   isPatient(){
     return this.value === 'PATIENT';
+  }
+
+  isCollaborator(){
+    return this.value === 'COLLABORATOR';
   }
 
   getValue(): ClinicRoleType {

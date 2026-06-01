@@ -40,7 +40,7 @@ type ProfessionalPrismaUpdateInput = {
   councilNumber?: string | null;
   councilState?: string | null;
   profession?: string;
-  updatedAt?: Date | null;
+  updatedAt?: Date;
 };
 
 export class ProfessionalMapper {
@@ -96,7 +96,7 @@ export class ProfessionalMapper {
       councilNumber: professional.councilNumber ?? null,
       councilState: professional.councilState ?? null,
       profession: professional.profession.getValue(),
-      updatedAt: professional.updatedAt ?? null,
+      updatedAt: professional.updatedAt ?? undefined,
     };
   }
 }

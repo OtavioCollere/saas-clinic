@@ -1,8 +1,9 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import type { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
-import type { AnamnesisRepository } from '../../repositories/anamnesis-repository';
-import type { PatientRepository } from '../../repositories/patient-repository';
+import { AnamnesisRepository } from '../../repositories/anamnesis-repository';
+import { PatientRepository } from '../../repositories/patient-repository';
 
 interface GetAnamnesisByPatientIdUseCaseRequest {
   patientId: string;
@@ -13,10 +14,13 @@ type GetAnamnesisByPatientIdUseCaseResponse = Either<
   { anamnesis: Anamnesis | null }
 >;
 
+@Injectable()
 export class GetAnamnesisByPatientIdUseCase {
   constructor(
+    @Inject(AnamnesisRepository)
     private anamnesisRepository: AnamnesisRepository,
-    private patientRepository: PatientRepository
+    @Inject(PatientRepository)
+    private patientRepository: PatientRepository,
   ) {}
 
   async execute({

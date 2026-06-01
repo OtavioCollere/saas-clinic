@@ -3,6 +3,7 @@ import { FranchiseRepository } from "@/domain/application/repositories/franchise
 import { Franchise } from "@/domain/enterprise/entities/franchise";
 import { PrismaService } from "../../prisma.service";
 import { FranchiseMapper } from "../mappers/franchise-mapper";
+import type { Prisma } from "@prisma/client";
 
 @Injectable()
 export class PrismaFranchiseRepository extends FranchiseRepository {
@@ -13,9 +14,10 @@ export class PrismaFranchiseRepository extends FranchiseRepository {
     super();
   }
 
-  async create(franchise: Franchise): Promise<Franchise> {
+  async create(franchise: Franchise, tx?: unknown): Promise<Franchise> {
     const data = FranchiseMapper.toPrisma(franchise);
-    const raw = await this.prisma.franchise.create({ data });
+    const client = (tx as Prisma.TransactionClient) ?? this.prisma;
+    const raw = await client.franchise.create({ data });
     return FranchiseMapper.toDomain(raw);
   }
 

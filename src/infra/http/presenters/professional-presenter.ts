@@ -7,7 +7,7 @@ export class ProfessionalPresenter {
 			id: professional.id.toString(),
 			franchiseId: professional.franchiseId.toString(),
 			userId: professional.userId.toString(),
-			name: user?.name,
+			name: user?.name ?? null,
 			council: professional.council?.getValue(),
 			councilNumber: professional.councilNumber,
 			councilState: professional.councilState,

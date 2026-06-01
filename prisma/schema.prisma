@@ -12,6 +12,7 @@ model User {
   name           String
   cpf            String   @unique
   email          String   @unique
+  phone          String?
   password       String
   isEmailVerified Boolean @default(false)
   role           String   // ADMIN, MEMBER
@@ -111,6 +112,7 @@ model Clinic {
   memberships      ClinicMembership[]
   franchises       Franchise[]
   patients         Patient[]
+  inventoryItems   InventoryItem[]
 
   @@map("clinics")
   @@index([ownerId])
@@ -150,7 +152,10 @@ model Franchise {
   clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   professionals Professional[]
   procedures    Procedure[]
+  products      Product[]
   appointments  Appointment[]
+  whatsAppConversations WhatsAppConversation[]
+  inventoryItems InventoryItem[]
 
   @@map("franchises")
   @@index([clinicId])
@@ -202,16 +207,38 @@ model Patient {
 model Anamnesis {
   id                String   @id @default(uuid())
   patientId         String   @unique
-  aestheticHistory  Json     // AestheticHistory
-  healthConditions  Json     // HealthConditions
-  medicalHistory    Json     // MedicalHistory
-  physicalAssessment Json    // PhysicalAssessment
+  aestheticHistory  Json
+  healthConditions  Json
+  medicalHistory    Json
+  physicalAssessment Json
+  patientSignature  String?
+  signedAt          DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patient  Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  history  AnamnesisHistory[]
 
   @@map("anamnesis")
+  @@index([patientId])
+}
+
+model AnamnesisHistory {
+  id                String   @id @default(uuid())
+  anamnesisId       String
+  patientId         String
+  aestheticHistory  Json
+  healthConditions  Json
+  medicalHistory    Json
+  physicalAssessment Json
+  patientSignature  String?
+  signedAt          DateTime?
+  savedAt           DateTime @default(now())
+
+  anamnesis Anamnesis @relation(fields: [anamnesisId], references: [id], onDelete: Cascade)
+
+  @@map("anamnesis_history")
+  @@index([anamnesisId])
   @@index([patientId])
 }
 
@@ -225,8 +252,10 @@ model Procedure {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  franchise       Franchise       @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
-  appointmentItems AppointmentItem[]
+  franchise         Franchise         @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  appointmentItems  AppointmentItem[]
+  serviceOrderItems ServiceOrderItem[]
+  supplyTemplates   ProcedureSupplyTemplate[]
 
   @@map("procedures")
   @@index([franchiseId])
@@ -266,10 +295,185 @@ model AppointmentItem {
   price         Decimal  @db.Decimal(10, 2)
   notes         String?
 
-  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  procedure   Procedure   @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  appointment     Appointment       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  procedure       Procedure         @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  serviceOrderItems ServiceOrderItem[]
 
   @@map("appointment_items")
   @@index([appointmentId])
   @@index([procedureId])
+}
+
+model ServiceOrder {
+  id                String   @id @default(uuid())
+  status            String   // PENDING, WAITING_PAYMENT, PAID, CANCELED, FAILED
+  paymentMethod     String   @default("cash") // credit_card, debit_card, pix, bank_transfer, cash, other
+  consumptionStatus String?  // CONFIRMED, SKIPPED (null = pending)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  items ServiceOrderItem[]
+
+  @@map("service_orders")
+  @@index([status])
+}
+
+model WhatsAppConversation {
+  id             String    @id @default(uuid())
+  phoneNumber    String
+  franchiseId    String
+  step           String
+  patientId      String?
+  professionalId String?
+  selectedDate   DateTime?
+  expiresAt      DateTime
+  updatedAt      DateTime  @updatedAt
+
+  franchise Franchise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+
+  @@unique([phoneNumber, franchiseId])
+  @@map("whatsapp_conversations")
+  @@index([phoneNumber])
+  @@index([franchiseId])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  franchiseId String
+  name        String
+  price       Decimal  @db.Decimal(10, 2)
+  costPrice   Decimal? @db.Decimal(10, 2)
+  notes       String?
+  status      String   // ACTIVE, INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  franchise         Franchise          @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  serviceOrderItems ServiceOrderItem[]
+
+  @@map("products")
+  @@index([franchiseId])
+  @@index([status])
+}
+
+model ServiceOrderItem {
+  id                String   @id @default(uuid())
+  serviceOrderId    String
+  appointmentItemId String?
+  procedureId       String?
+  productId         String?
+  price             Decimal  @db.Decimal(10, 2)
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  serviceOrder    ServiceOrder     @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  appointmentItem AppointmentItem? @relation(fields: [appointmentItemId], references: [id], onDelete: SetNull)
+  procedure       Procedure?       @relation(fields: [procedureId], references: [id], onDelete: SetNull)
+  product         Product?         @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@map("service_order_items")
+  @@index([serviceOrderId])
+  @@index([appointmentItemId])
+  @@index([procedureId])
+  @@index([productId])
+}
+
+// ── Inventory Module ─────────────────────────────────────────────────────────
+
+model InventoryItem {
+  id              String   @id @default(uuid())
+  clinicId        String
+  franchiseId     String?
+  name            String
+  category        String
+  unitType        String   // UNIDADE, ML, FRASCO, SERINGA, AMPOLA, CAIXA, OUTRO
+  currentQuantity Decimal  @default(0) @db.Decimal(15, 4)
+  minimumQuantity Decimal  @default(0) @db.Decimal(15, 4)
+  averageCost     Decimal  @default(0) @db.Decimal(15, 4)
+  supplier        String?
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic        Clinic         @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  franchise     Franchise?     @relation(fields: [franchiseId], references: [id], onDelete: SetNull)
+  entries       InventoryEntry[]
+  movements     InventoryMovement[]
+  templates     ProcedureSupplyTemplate[]
+
+  @@map("inventory_items")
+  @@index([clinicId])
+  @@index([franchiseId])
+  @@index([active])
+}
+
+model InventoryEntry {
+  id              String    @id @default(uuid())
+  clinicId        String
+  inventoryItemId String
+  quantity        Decimal   @db.Decimal(15, 4)
+  unitCost        Decimal   @db.Decimal(15, 4)
+  totalCost       Decimal   @db.Decimal(15, 4)
+  supplier        String?
+  batchNumber     String?
+  expirationDate  DateTime?
+  notes           String?
+  createdBy       String
+  createdAt       DateTime  @default(now())
+
+  inventoryItem InventoryItem      @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  movements     InventoryMovement[]
+
+  @@map("inventory_entries")
+  @@index([clinicId])
+  @@index([inventoryItemId])
+}
+
+model ProcedureSupplyTemplate {
+  id              String  @id @default(uuid())
+  clinicId        String
+  procedureId     String
+  inventoryItemId String
+  defaultQuantity Decimal @db.Decimal(15, 4)
+  isRequired      Boolean @default(true)
+  active          Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  procedure     Procedure     @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  @@map("procedure_supply_templates")
+  @@unique([procedureId, inventoryItemId])
+  @@index([clinicId])
+  @@index([procedureId])
+  @@index([inventoryItemId])
+}
+
+model InventoryMovement {
+  id              String   @id @default(uuid())
+  clinicId        String
+  inventoryItemId String
+  type            String   // ENTRADA, SAIDA, AJUSTE_POSITIVO, AJUSTE_NEGATIVO, CANCELAMENTO
+  quantity        Decimal  @db.Decimal(15, 4)
+  unitCost        Decimal? @db.Decimal(15, 4)
+  reason          String?
+  appointmentId   String?
+  serviceOrderId  String?
+  inventoryEntryId String?
+  professionalId  String?
+  franchiseId     String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+
+  inventoryItem  InventoryItem   @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  inventoryEntry InventoryEntry? @relation(fields: [inventoryEntryId], references: [id], onDelete: SetNull)
+
+  @@map("inventory_movements")
+  @@index([clinicId])
+  @@index([inventoryItemId])
+  @@index([serviceOrderId])
+  @@index([type])
+  @@index([createdAt])
 }

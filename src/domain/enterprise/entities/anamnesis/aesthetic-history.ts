@@ -1,21 +1,23 @@
+import { type AestheticRegionType } from '../../value-objects/aesthetic-region';
+
 export interface AestheticHistory {
   hadPreviousAestheticTreatment: boolean;
   botulinumToxin: boolean;
-  botulinumRegion?: string;
+  botulinumRegion?: AestheticRegionType;
   filler: boolean;
-  fillerRegion?: string;
+  fillerRegion?: AestheticRegionType;
   fillerProduct?: string;
   suspensionThreads: boolean;
-  suspensionThreadsRegion?: string;
+  suspensionThreadsRegion?: AestheticRegionType;
   suspensionThreadsProduct?: string;
   surgicalLift: boolean;
-  surgicalLiftRegion?: string;
+  surgicalLiftRegion?: AestheticRegionType;
   surgicalLiftProduct?: string;
   chemicalPeeling: boolean;
-  chemicalPeelingRegion?: string;
+  chemicalPeelingRegion?: AestheticRegionType;
   chemicalPeelingProduct?: string;
   laser: boolean;
-  laserRegion?: string;
+  laserRegion?: AestheticRegionType;
   laserProduct?: string;
   exposedToHeatOrColdWork: boolean;
 }

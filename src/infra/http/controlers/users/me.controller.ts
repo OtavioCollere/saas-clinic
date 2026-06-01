@@ -82,14 +82,18 @@ export class MeController {
 			}
 		}
 
-		const { user: currentUser, clinicMembershipId, clinicId, clinicRole, permissions } = unwrapEither(result);
+		const { user: currentUser, clinicMembershipId, clinicId, clinicRole, permissions, hasFranchise, patientId, professionalId, isAnamneseDone } = unwrapEither(result);
 
 		return {
 			user: UserPresenter.toHTTP(currentUser),
 			clinicMembershipId,
 			clinicId,
-			clinicRole,
+			clinicRole: clinicRole.getValue(),
 			permissions,
+			hasFranchise,
+			...(patientId !== undefined && { patientId }),
+			...(professionalId !== undefined && { professionalId }),
+			...(isAnamneseDone !== undefined && { isAnamneseDone }),
 		};
 	}
 }

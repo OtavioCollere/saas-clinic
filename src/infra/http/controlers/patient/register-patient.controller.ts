@@ -30,6 +30,7 @@ const registerPatientBodySchema = z.object({
 	name: z.string(),
 	cpf: z.string(),
 	email: z.string().email(),
+	phone: z.string().optional(),
 	birthDay: z.coerce.date(),
 	address: z.string(),
 	zipCode: z.string(),
@@ -79,16 +80,10 @@ export class RegisterPatientController {
 		@Body(registerPatientBodyValidationPipe) body: RegisterPatientBodySchema,
 	) {
 		const { clinicId } = params;
-		const { name, cpf, email, birthDay, address, zipCode } = body;
+		const { name, cpf, email, phone, birthDay, address, zipCode } = body;
 
 		console.log('📝 [RegisterPatientController] Recebendo requisição:', {
-			clinicId,
-			name,
-			cpf,
-			email,
-			birthDay,
-			address,
-			zipCode,
+			clinicId, name, cpf, email, birthDay, address, zipCode,
 		});
 
 		const result = await this.registerPatientUseCase.execute({
@@ -96,6 +91,7 @@ export class RegisterPatientController {
 			name,
 			cpf,
 			email,
+			phone,
 			birthDay,
 			address,
 			zipCode,

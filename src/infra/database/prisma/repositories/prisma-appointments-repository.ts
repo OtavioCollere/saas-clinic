@@ -1,9 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { AppointmentsRepository } from "@/domain/application/repositories/appointments-repository";
 import { Appointment } from "@/domain/enterprise/entities/appointment";
+import { AppointmentItem } from "@/domain/enterprise/entities/appointment-item";
+import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { PrismaService } from "../../prisma.service";
 import { AppointmentMapper } from "../mappers/appointment-mapper";
-import type { Prisma } from "@prisma/client";
 
 @Injectable()
 export class PrismaAppointmentsRepository extends AppointmentsRepository {
@@ -25,6 +26,26 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     return AppointmentMapper.toDomain(raw);
   }
 
+  async findByAppointmentItemIds(ids: string[]): Promise<AppointmentItem[]> {
+    if (ids.length === 0) return [];
+
+    const raw = await this.prisma.appointmentItem.findMany({
+      where: { id: { in: ids } },
+    });
+
+    return raw.map((item) => {
+      const price = Number(item.price);
+      return AppointmentItem.create(
+        {
+          procedureId: new UniqueEntityId(item.procedureId),
+          price,
+          notes: item.notes ?? undefined,
+        },
+        new UniqueEntityId(item.id)
+      );
+    });
+  }
+
   async findById(id: string): Promise<Appointment | null> {
     const raw = await this.prisma.appointment.findUnique({
       where: { id },
@@ -36,9 +57,16 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     return AppointmentMapper.toDomain(raw);
   }
 
-  async findByProfessionalId(professionalId: string): Promise<Appointment[]> {
+  async findByProfessionalId(professionalId: string, options?: { period?: 'active' | 'history' }): Promise<Appointment[]> {
+    const now = new Date();
+    const where: Record<string, unknown> = { professionalId };
+    if (options?.period === 'active') {
+      where.endAt = { gte: now };
+    } else if (options?.period === 'history') {
+      where.endAt = { lt: now };
+    }
     const raw = await this.prisma.appointment.findMany({
-      where: { professionalId },
+      where,
       include: {
         appointmentItems: true,
       },
@@ -47,9 +75,16 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     return raw.map(AppointmentMapper.toDomain);
   }
 
-  async findByPatientId(patientId: string): Promise<Appointment[]> {
+  async findByPatientId(patientId: string, options?: { period?: 'active' | 'history' }): Promise<Appointment[]> {
+    const now = new Date();
+    const where: Record<string, unknown> = { patientId };
+    if (options?.period === 'active') {
+      where.endAt = { gte: now };
+    } else if (options?.period === 'history') {
+      where.endAt = { lt: now };
+    }
     const raw = await this.prisma.appointment.findMany({
-      where: { patientId },
+      where,
       include: {
         appointmentItems: true,
       },
@@ -63,18 +98,20 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     startAt: Date,
     endAt: Date
   ): Promise<Appointment | null> {
+    // Overlap: existing.startAt < new.endAt AND existing.endAt > new.startAt
+    // Permite agendamentos encostados (ex.: 15:30-16:00 e 16:00-17:00)
     const raw = await this.prisma.appointment.findFirst({
       where: {
         professionalId,
         AND: [
           {
             startAt: {
-              lte: endAt,
+              lt: endAt,
             },
           },
           {
             endAt: {
-              gte: startAt,
+              gt: startAt,
             },
           },
         ],
@@ -102,12 +139,12 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
         AND: [
           {
             startAt: {
-              lte: endAt,
+              lt: endAt,
             },
           },
           {
             endAt: {
-              gte: startAt,
+              gt: startAt,
             },
           },
         ],
@@ -191,6 +228,63 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     return raw.map(AppointmentMapper.toDomain);
   }
 
+  async findFutureByClinicId(clinicId: string): Promise<Appointment[]> {
+    const franchises = await this.prisma.franchise.findMany({
+      where: { clinicId },
+      select: { id: true },
+    });
+
+    const franchiseIds = franchises.map(f => f.id);
+    if (franchiseIds.length === 0) return [];
+
+    const now = new Date();
+    const raw = await this.prisma.appointment.findMany({
+      where: {
+        franchiseId: { in: franchiseIds },
+        endAt: { gte: now },
+      },
+      include: { appointmentItems: true },
+      orderBy: { startAt: 'asc' },
+    });
+    return raw.map(AppointmentMapper.toDomain);
+  }
+
+  async findHistoryByClinicIdPaginated(
+    clinicId: string,
+    page: number,
+    perPage: number
+  ): Promise<{ appointments: Appointment[]; total: number }> {
+    const franchises = await this.prisma.franchise.findMany({
+      where: { clinicId },
+      select: { id: true },
+    });
+
+    const franchiseIds = franchises.map(f => f.id);
+    if (franchiseIds.length === 0) return { appointments: [], total: 0 };
+
+    const now = new Date();
+    const where = {
+      franchiseId: { in: franchiseIds },
+      endAt: { lt: now },
+    };
+
+    const [raw, total] = await Promise.all([
+      this.prisma.appointment.findMany({
+        where,
+        include: { appointmentItems: true },
+        orderBy: { startAt: 'desc' },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+      this.prisma.appointment.count({ where }),
+    ]);
+
+    return {
+      appointments: raw.map(AppointmentMapper.toDomain),
+      total,
+    };
+  }
+
   async findByClinicIdAndWeek(clinicId: string, weekStart: Date, weekEnd: Date): Promise<Appointment[]> {
     // Busca todas as franquias da clínica
     const franchises = await this.prisma.franchise.findMany({
@@ -245,6 +339,46 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     }
 
     return AppointmentMapper.toDomain(raw);
+  }
+
+  async countByClinicIdAndDateRange(clinicId: string, start: Date, end: Date): Promise<number> {
+    return this.prisma.appointment.count({
+      where: {
+        franchise: { clinicId },
+        startAt: { gte: start, lt: end },
+      },
+    });
+  }
+
+  async sumItemsPriceByClinicIdAndDateRange(clinicId: string, start: Date, end: Date): Promise<number> {
+    const result = await this.prisma.appointmentItem.aggregate({
+      _sum: { price: true },
+      where: {
+        appointment: {
+          franchise: { clinicId },
+          startAt: { gte: start, lt: end },
+        },
+      },
+    });
+    return result._sum.price?.toNumber() ?? 0;
+  }
+
+  async findActiveForDate(date: Date): Promise<Appointment[]> {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const raw = await this.prisma.appointment.findMany({
+      where: {
+        startAt: { gte: start, lte: end },
+        status: { in: ['WAITING', 'CONFIRMED'] },
+      },
+      include: { appointmentItems: true },
+      orderBy: { startAt: 'asc' },
+    });
+
+    return raw.map(AppointmentMapper.toDomain);
   }
 }
 

@@ -1,5 +1,7 @@
 import { Patient } from "@/domain/enterprise/entities/patient";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
+import { AnamnesisMapper } from "./anamnesis-mapper";
+import type { Anamnesis as PrismaAnamnesis } from "@prisma/client";
 
 type PatientRaw = {
   id: string;
@@ -13,36 +15,16 @@ type PatientRaw = {
   updatedAt: Date | null;
 };
 
-type PatientPrismaCreateInput = {
-  id: string;
-  clinic: {
-    connect: {
-      id: string;
-    };
-  };
-  user: {
-    connect: {
-      id: string;
-    };
-  };
-  name: string;
-  birthDay: Date;
-  address: string;
-  zipCode: string;
-  createdAt: Date;
-  // updatedAt não é incluído na criação - Prisma gerencia automaticamente com @updatedAt
-};
-
-type PatientPrismaUpdateInput = {
-  name?: string;
-  birthDay?: Date;
-  address?: string;
-  zipCode?: string;
-  // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
+type PatientRawWithAnamnesis = PatientRaw & {
+  anamnesis?: PrismaAnamnesis | null;
 };
 
 export class PatientMapper {
-  static toDomain(raw: PatientRaw): Patient {
+  static toDomain(raw: PatientRaw | PatientRawWithAnamnesis): Patient {
+    const anamnesisRaw = "anamnesis" in raw ? raw.anamnesis : undefined;
+    const anamnesis =
+      anamnesisRaw != null ? AnamnesisMapper.toDomain(anamnesisRaw) : undefined;
+
     return Patient.create(
       {
         clinicId: new UniqueEntityId(raw.clinicId),
@@ -53,42 +35,21 @@ export class PatientMapper {
         zipCode: raw.zipCode,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt ?? undefined,
+        ...(anamnesis != null && { anamnesis }),
       },
       new UniqueEntityId(raw.id)
     );
   }
 
-  static toPrisma(patient: Patient): PatientPrismaCreateInput {
+  static toPrisma(patient: Patient) {
     return {
       id: patient.id.toString(),
-      clinic: {
-        connect: {
-          id: patient.clinicId.toString(),
-        },
-      },
-      user: {
-        connect: {
-          id: patient.userId.toString(),
-        },
-      },
+      clinicId: patient.clinicId.toString(),
+      userId: patient.userId.toString(),
       name: patient.name,
       birthDay: patient.birthDay,
       address: patient.address,
       zipCode: patient.zipCode,
-      createdAt: patient.createdAt,
-      // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
-    };
-  }
-
-  static toPrismaUpdate(patient: Patient): PatientPrismaUpdateInput {
-    return {
-      name: patient.name,
-      birthDay: patient.birthDay,
-      address: patient.address,
-      zipCode: patient.zipCode,
-      // updatedAt não é incluído - Prisma gerencia automaticamente com @updatedAt
     };
   }
 }
-
-

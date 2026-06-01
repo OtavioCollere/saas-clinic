@@ -96,6 +96,14 @@ export class CreateProfessionalController {
 
 		const ownerId = user.sub;
 
+		console.log('📝 Criando profissional:', {
+			franchiseId,
+			name,
+			email,
+			cpf: cpf.substring(0, 3) + '***', // Log parcial do CPF por segurança
+			ownerId,
+		});
+
 		const result = await this.createProfessionalUseCase.execute({
 			franchiseId,
 			name,
@@ -110,6 +118,13 @@ export class CreateProfessionalController {
 
 		if (isLeft(result)) {
 			const error = unwrapEither(result);
+
+			console.error('❌ Erro ao criar profissional:', {
+				errorType: error.constructor.name,
+				errorMessage: error.message,
+				franchiseId,
+				email,
+			});
 
 			switch (error.constructor) {
 				case UserNotFoundError:
@@ -126,6 +141,11 @@ export class CreateProfessionalController {
 		}
 
 		const { professional } = unwrapEither(result);
+
+		console.log('✅ Profissional criado com sucesso:', {
+			professionalId: professional.id.toString(),
+			userId: professional.userId.toString(),
+		});
 
 		return ProfessionalPresenter.toHTTP(professional);
 	}

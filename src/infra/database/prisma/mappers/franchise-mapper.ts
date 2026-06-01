@@ -23,7 +23,7 @@ type FranchisePrismaInput = {
   status: string;
   description?: string | null;
   createdAt: Date;
-  updatedAt?: Date | null;
+  updatedAt?: Date;
 };
 
 export class FranchiseMapper {
@@ -57,7 +57,7 @@ export class FranchiseMapper {
       status: franchise.status.getValue(),
       description: franchise.description ?? null,
       createdAt: franchise.createdAt,
-      updatedAt: franchise.updatedAt ?? null,
+      updatedAt: franchise.updatedAt ?? undefined,
     };
   }
 }

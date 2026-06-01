@@ -10,4 +10,5 @@ export abstract class ProfessionalRepository {
   abstract findByFranchiseId(franchiseId: string): Promise<Professional[]>;
   abstract findByClinicId(clinicId: string): Promise<Professional[]>;
   abstract update(professional: Professional): Promise<Professional>;
+  abstract countByClinicId(clinicId: string): Promise<number>;
 }

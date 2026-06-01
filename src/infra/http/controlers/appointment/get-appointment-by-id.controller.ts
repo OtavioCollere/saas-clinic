@@ -69,7 +69,7 @@ export class GetAppointmentByIdController {
 
 		const { appointment, patient, user } = unwrapEither(result);
 
-		return AppointmentPresenter.toHTTP(appointment, patient, user);
+		return AppointmentPresenter.toHTTP(appointment, patient ?? undefined, user);
 	}
 }
 

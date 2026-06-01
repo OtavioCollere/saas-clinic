@@ -9,6 +9,7 @@ export class AnamnesisPresenter {
 			healthConditions: anamnesis.healthConditions,
 			medicalHistory: anamnesis.medicalHistory,
 			physicalAssessment: anamnesis.physicalAssessment,
+			patientSignature: anamnesis.patientSignature ?? null,
 			createdAt: anamnesis.createdAt.toISOString(),
 			updatedAt: anamnesis.updatedAt?.toISOString(),
 		};

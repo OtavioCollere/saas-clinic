@@ -68,6 +68,12 @@ export class PrismaProfessionalRepository extends ProfessionalRepository {
     return raw.map(ProfessionalMapper.toDomain);
   }
 
+  async countByClinicId(clinicId: string): Promise<number> {
+    return this.prisma.professional.count({
+      where: { franchise: { clinicId } },
+    });
+  }
+
   async update(professional: Professional): Promise<Professional> {
     const data = ProfessionalMapper.toPrismaUpdate(professional);
     const raw = await this.prisma.professional.update({

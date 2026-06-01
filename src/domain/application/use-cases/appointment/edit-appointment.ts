@@ -10,6 +10,7 @@ import { FranchiseNotFoundError } from '@/shared/errors/franchise-not-found-erro
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-error';
 import { AppointmentConflictError } from '@/shared/errors/appointment-conflict-error';
+import { AppointmentInPastError } from '@/shared/errors/appointment-in-past-error';
 import { AppointmentsRepository } from '../../repositories/appointments-repository';
 import { Appointment } from '@/domain/enterprise/entities/appointment';
 import { AppointmentStatus } from '@/domain/enterprise/value-objects/appointment-status';
@@ -26,7 +27,7 @@ interface EditAppointmentUseCaseRequest {
 }
 
 type EditAppointmentUseCaseResponse = Either<
-  AppointmentNotFoundError | ProfessionalNotFoundError | FranchiseNotFoundError | PatientNotFoundError | AppointmentConflictError,
+  AppointmentNotFoundError | ProfessionalNotFoundError | FranchiseNotFoundError | PatientNotFoundError | AppointmentConflictError | AppointmentInPastError,
   {
     appointment: Appointment;
   }
@@ -46,6 +47,10 @@ export class EditAppointmentUseCase {
   ) {}
 
   async execute({ appointmentId, professionalId, franchiseId, patientId, name, appointmentItems, startAt, durationInMinutes }: EditAppointmentUseCaseRequest) {
+    if (startAt.getTime() <= Date.now()) {
+      return makeLeft(new AppointmentInPastError());
+    }
+
    
     const appointment = await this.appointmentsRepository.findById(appointmentId);
 
@@ -76,7 +81,7 @@ export class EditAppointmentUseCase {
     const appointmentConflict = await this.appointmentsRepository.findByProfessionalIdAndHourRangeExcludingId(professionalId, startAt, endAt, appointmentId);
 
     if(appointmentConflict) {
-      return makeLeft(new AppointmentConflictError(appointmentConflict.startAt));
+      return makeLeft(new AppointmentConflictError(appointmentConflict.startAt, appointmentConflict.endAt));
     }
     
     appointment.professionalId = new UniqueEntityId(professionalId);

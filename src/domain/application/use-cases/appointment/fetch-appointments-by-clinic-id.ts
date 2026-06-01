@@ -11,6 +11,8 @@ import { UsersRepository } from '../../repositories/users-repository';
 
 interface FetchAppointmentsByClinicIdUseCaseRequest {
   clinicId: string;
+  /** 'future' = só agendamentos futuros (endAt >= now), ordenado do próximo ao mais distante. Padrão: 'future' para query leve. */
+  period?: 'future' | 'all';
 }
 
 type FetchAppointmentsByClinicIdUseCaseResponse = Either<
@@ -38,8 +40,12 @@ export class FetchAppointmentsByClinicIdUseCase {
 
   async execute({
     clinicId,
+    period = 'future',
   }: FetchAppointmentsByClinicIdUseCaseRequest): Promise<FetchAppointmentsByClinicIdUseCaseResponse> {
-    const appointments = await this.appointmentsRepository.findByClinicId(clinicId);
+    const appointments =
+      period === 'future'
+        ? await this.appointmentsRepository.findFutureByClinicId(clinicId)
+        : await this.appointmentsRepository.findByClinicId(clinicId);
 
     // Busca pacientes e profissionais únicos
     const patientIds = [...new Set(appointments.map(a => a.patientId.toString()))];

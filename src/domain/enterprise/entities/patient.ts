@@ -16,7 +16,7 @@ export interface PatientProps {
 }
 
 export class Patient extends Entity<PatientProps> {
-  static create(props: Optional<PatientProps, 'createdAt' | 'updatedAt'>, id?: UniqueEntityId) {
+  static create(props: Optional<PatientProps, 'createdAt' | 'updatedAt' | 'anamnesis'>, id?: UniqueEntityId) {
     const patient = new Patient(
       {
         ...props,
@@ -35,7 +35,7 @@ export class Patient extends Entity<PatientProps> {
     return this.props.userId;
   }
 
-  get anamnesis() {
+  get anamnesis(): Anamnesis | undefined {
     return this.props.anamnesis;
   }
 

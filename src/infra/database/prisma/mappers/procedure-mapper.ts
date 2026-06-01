@@ -1,12 +1,13 @@
 import { Procedure } from "@/domain/enterprise/entities/procedure";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { ProcedureStatus } from "@/domain/enterprise/value-objects/procedure-status";
+import type { Decimal } from "@prisma/client/runtime/library";
 
 type ProcedureRaw = {
   id: string;
   franchiseId: string;
   name: string;
-  price: number | string;
+  price: number | string | Decimal;
   notes: string | null;
   status: string;
   createdAt: Date;

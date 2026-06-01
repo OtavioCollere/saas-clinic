@@ -2,10 +2,9 @@ import { Entity } from "@/shared/entities/entity";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 
 export interface ServiceOrderItemProps {
-    // pode vir de um appointment item
-    // ou pode ser um item adicionado manualmente na service order
     appointmentItemId?: UniqueEntityId
-    name: string
+    procedureId?: UniqueEntityId
+    productId?: UniqueEntityId
     price: number
     notes?: string
     createdAt: Date
@@ -32,8 +31,12 @@ export class ServiceOrderItem extends Entity<ServiceOrderItemProps> {
         return this.props.appointmentItemId;
     }
 
-    get name() {
-        return this.props.name;
+    get procedureId() {
+        return this.props.procedureId;
+    }
+
+    get productId() {
+        return this.props.productId;
     }
 
     get price() {

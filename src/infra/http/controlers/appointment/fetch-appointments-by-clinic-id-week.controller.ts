@@ -55,7 +55,7 @@ export class FetchAppointmentsByClinicIdWeekController {
 		return appointments.map((appointment) => {
 			const patient = patients.get(appointment.patientId.toString());
 			const professional = professionals.get(appointment.professionalId.toString());
-			const user = professional ? users.get(professional.userId.toString()) : null;
+			const user = professional ? users.get(professional.userId.toString()) : undefined;
 			
 			return AppointmentPresenter.toHTTP(appointment, patient, user);
 		});

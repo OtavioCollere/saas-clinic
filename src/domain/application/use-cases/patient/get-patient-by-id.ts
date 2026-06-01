@@ -1,7 +1,8 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import type { Patient } from '@/domain/enterprise/entities/patient';
-import type { PatientRepository } from '../../repositories/patient-repository';
+import { PatientRepository } from '../../repositories/patient-repository';
 
 interface GetPatientByIdUseCaseRequest {
   patientId: string;
@@ -12,8 +13,12 @@ type GetPatientByIdUseCaseResponse = Either<
   { patient: Patient }
 >;
 
+@Injectable()
 export class GetPatientByIdUseCase {
-  constructor(private patientRepository: PatientRepository) {}
+  constructor(
+    @Inject(PatientRepository)
+    private patientRepository: PatientRepository,
+  ) {}
 
   async execute({
     patientId,

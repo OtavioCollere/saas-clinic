@@ -5,6 +5,7 @@ import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-erro
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
 import { AppointmentNotFoundError } from "@/shared/errors/appointment-not-found-error";
 import { AppointmentConflictError } from "@/shared/errors/appointment-conflict-error";
+import { AppointmentInPastError } from "@/shared/errors/appointment-in-past-error";
 import { EditAppointmentUseCase } from "@/domain/application/use-cases/appointment/edit-appointment";
 import {
 	BadRequestException,
@@ -147,6 +148,7 @@ export class EditAppointmentController {
 				case PatientNotFoundError:
 					throw new NotFoundException(error.message);
 				case AppointmentConflictError:
+				case AppointmentInPastError:
 					throw new BadRequestException(error.message);
 				default:
 					throw new BadRequestException(error.message);

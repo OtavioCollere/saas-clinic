@@ -2,11 +2,14 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './infra/auth/auth.module';
 import { HttpModule } from './infra/http/http.module';
 import { EnvModule } from './infra/env/env.module';
 import { EmailModule } from './infra/email/email.module';
 import { EventsModule } from './infra/events/events.module';
+import { SchedulerModule } from './infra/scheduler/scheduler.module';
+import { WhatsAppModule } from './infra/whatsapp/whatsapp.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './infra/env/env';
 import { DomainErrorFilter } from './shared/filters/domain-error.filter';
@@ -19,6 +22,7 @@ import { LoggerModule } from 'nestjs-pino';
       isGlobal: true,
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
@@ -43,6 +47,8 @@ import { LoggerModule } from 'nestjs-pino';
     EnvModule,
     EmailModule,
     EventsModule,
+    SchedulerModule,
+    WhatsAppModule,
   ],
   providers: [
     {
