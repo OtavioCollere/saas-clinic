@@ -4,10 +4,10 @@ interface ProfessionalUser {
   id: string;
 }
 
-const PROFESSIONAL_CONFIG = [
-  { councilNumber: '123456', councilState: 'SP' },
-  { councilNumber: '234567', councilState: 'SP' },
-  { councilNumber: '345678', councilState: 'SP' },
+const CONFIGS = [
+  { profession: 'MEDICO',    council: 'CRM',  councilNumber: '42871', councilState: 'PR' },
+  { profession: 'BIOMEDICO', council: 'CRBM', councilNumber: '3890',  councilState: 'PR' },
+  { profession: 'MEDICO',    council: 'CRM',  councilNumber: '57364', councilState: 'PR' },
 ];
 
 export async function seedProfessionals(
@@ -15,33 +15,24 @@ export async function seedProfessionals(
   professionalUsers: ProfessionalUser[],
   franchiseId: string
 ) {
-  console.log('👨‍⚕️ Seeding professionals...');
+  console.log('👨‍⚕️ Criando profissionais...');
 
   const professionals = [];
   for (let i = 0; i < professionalUsers.length; i++) {
-    const user = professionalUsers[i];
-    const config = PROFESSIONAL_CONFIG[i] ?? PROFESSIONAL_CONFIG[0];
-    const professional = await prisma.professional.upsert({
-      where: {
-        userId_franchiseId: {
-          userId: user.id,
-          franchiseId,
-        },
-      },
-      update: {},
-      create: {
-        userId: user.id,
+    const cfg = CONFIGS[i] ?? CONFIGS[0];
+    const professional = await prisma.professional.create({
+      data: {
+        userId: professionalUsers[i].id,
         franchiseId,
-        profession: 'MEDICO',
-        council: 'CRM',
-        councilNumber: config.councilNumber,
-        councilState: config.councilState,
+        profession: cfg.profession,
+        council: cfg.council,
+        councilNumber: cfg.councilNumber,
+        councilState: cfg.councilState,
       },
     });
     professionals.push(professional);
   }
 
-  console.log(`✅ Created/updated ${professionals.length} professionals`);
+  console.log(`✅ ${professionals.length} profissionais criados`);
   return professionals;
 }
-

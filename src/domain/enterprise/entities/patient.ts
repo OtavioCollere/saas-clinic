@@ -8,6 +8,7 @@ export interface PatientProps {
   userId: UniqueEntityId;
   anamnesis?: Anamnesis;
   name: string;
+  phone?: string;
   birthDay: Date;
   address: string;
   zipCode: string;
@@ -41,6 +42,10 @@ export class Patient extends Entity<PatientProps> {
 
   get name() {
     return this.props.name;
+  }
+
+  get phone(): string | undefined {
+    return this.props.phone;
   }
 
   get birthDay() {

@@ -13,6 +13,9 @@ type ClinicRaw = {
   description: string | null;
   avatarUrl: string | null;
   status: string;
+  zapInstanceId: string | null;
+  zapToken: string | null;
+  zapClientToken: string | null;
   createdAt: Date;
   updatedAt: Date | null;
 };
@@ -26,6 +29,9 @@ type ClinicPrismaInput = {
   description?: string | null;
   avatarUrl?: string | null;
   status: string;
+  zapInstanceId?: string | null;
+  zapToken?: string | null;
+  zapClientToken?: string | null;
   createdAt: Date;
 };
 
@@ -44,6 +50,9 @@ export class ClinicMapper {
         description: raw.description ?? undefined,
         avatarUrl: raw.avatarUrl ?? undefined,
         status,
+        zapInstanceId: raw.zapInstanceId ?? undefined,
+        zapToken: raw.zapToken ?? undefined,
+        zapClientToken: raw.zapClientToken ?? undefined,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt ?? undefined,
       },
@@ -61,6 +70,9 @@ export class ClinicMapper {
       description: clinic.description ?? null,
       avatarUrl: clinic.avatarUrl ?? null,
       status: clinic.status.getValue(),
+      zapInstanceId: clinic.zapInstanceId ?? null,
+      zapToken: clinic.zapToken ?? null,
+      zapClientToken: clinic.zapClientToken ?? null,
       createdAt: clinic.createdAt,
     };
   }

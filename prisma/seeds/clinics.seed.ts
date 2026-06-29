@@ -1,25 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 
 export async function seedClinics(prisma: PrismaClient, ownerId: string) {
-  console.log('🏥 Seeding clinics...');
+  console.log('🏥 Criando clínica...');
 
-  const clinic = await prisma.clinic.upsert({
-    where: { slug: 'clinica-principal' },
-    update: {},
-    create: {
-      ownerId: ownerId,
-      name: 'Clínica Principal',
-      slug: 'clinica-principal',
-      cnpj: '12345678000190',
-      description: 'Clínica de estética principal',
+  const clinic = await prisma.clinic.create({
+    data: {
+      ownerId,
+      name: 'Cliniker Estética Médica',
+      slug: 'bianca-collere',
+      cnpj: '45678901000123',
+      description: 'Clínica especializada em estética médica avançada',
       status: 'ACTIVE',
     },
   });
 
-  console.log(`✅ Created/updated 1 clinic`);
+  console.log(`✅ Clínica criada (slug: ${clinic.slug})`);
   return clinic;
 }
-
-
-
-

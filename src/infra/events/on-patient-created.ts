@@ -3,6 +3,8 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
 import { PatientCreatedEvent } from '@/domain/enterprise/events/patient-created.event';
 
+const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
+
 function formatExpiry(date: Date): string {
   return date.toLocaleString('pt-BR', {
     day: '2-digit',
@@ -78,7 +80,7 @@ function buildPatientEmail(email: string, password: string, expiresAt: Date): st
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="https://cliniker.com.br"
+                    <a href="${APP_URL}"
                        style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
                       Acessar o Cliniker
                     </a>
@@ -130,7 +132,7 @@ export class OnPatientCreated {
         to: event.userEmail,
         subject: 'Bem-vindo ao Cliniker â€” suas credenciais de acesso',
         html: buildPatientEmail(event.userEmail, event.password, event.expiresAt),
-        text: `Bem-vindo ao Cliniker!\n\nSeu cadastro como paciente foi realizado.\n\nEmail: ${event.userEmail}\nSenha temporÃ¡ria: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: https://cliniker.com.br`,
+        text: `Bem-vindo ao Cliniker!\n\nSeu cadastro como paciente foi realizado.\n\nEmail: ${event.userEmail}\nSenha temporÃ¡ria: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}`,
       });
 
       console.log('âœ… Email de paciente adicionado Ã  fila com sucesso');

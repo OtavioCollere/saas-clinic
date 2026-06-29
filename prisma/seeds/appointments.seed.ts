@@ -1,22 +1,67 @@
 import { PrismaClient } from '@prisma/client';
 
-function dateAt(base: Date, offsetDays: number, hour: number, minute = 0): Date {
-  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offsetDays, hour, minute, 0, 0);
-  return d;
+// Slots disponíveis ao longo do dia
+const SLOTS = [
+  { h: 8, m: 0 },  { h: 9, m: 0 },  { h: 10, m: 0 }, { h: 11, m: 0 },
+  { h: 13, m: 0 }, { h: 14, m: 0 }, { h: 15, m: 0 }, { h: 16, m: 0 }, { h: 17, m: 0 },
+];
+
+// Duração de cada procedimento em minutos (índice corresponde ao array de procedures)
+const DURATIONS = [60, 60, 60, 90, 90, 60, 45, 75, 90, 60];
+
+function dateAt(base: Date, offsetDays: number, h: number, m: number): Date {
+  return new Date(
+    base.getFullYear(),
+    base.getMonth(),
+    base.getDate() + offsetDays,
+    h, m, 0, 0,
+  );
 }
+
+type ApptDef = {
+  id: string;
+  dayOffset: number;
+  slotIdx: number;
+  procIdx: number;
+  profIdx: number;
+  patIdx: number;
+  status: string;
+};
+
+function batch(
+  prefix: string,
+  count: number,
+  dayStart: number,
+  dayEnd: number,
+  statusFn: (i: number) => string,
+  patOffset: number,
+): ApptDef[] {
+  const range = Math.max(1, dayEnd - dayStart);
+  return Array.from({ length: count }, (_, i) => ({
+    id: `appt-${prefix}-${i + 1}`,
+    dayOffset: dayStart + Math.round((i / count) * range),
+    slotIdx: i % SLOTS.length,
+    procIdx: i % 10,
+    profIdx: i % 3,
+    patIdx: (patOffset + i) % 50,
+    status: statusFn(i),
+  }));
+}
+
+const DONE = () => 'DONE';
+const WAITING = () => 'WAITING';
 
 export async function seedAppointments(
   prisma: PrismaClient,
   professionals: Array<{ id: string }>,
   franchiseId: string,
-  patients: Array<{ id: string }>,
-  procedures: Array<{ id: string; price: unknown }>
+  patients: Array<{ id: string; name: string }>,
+  procedures: Array<{ id: string; price: unknown; name: string }>
 ) {
-  console.log('📅 Seeding appointments...');
+  console.log('📅 Criando agendamentos...');
 
-  const profIds = professionals.map((p) => p.id);
-  const patIds = patients.map((p) => p.id);
-  const procIds = procedures.map((p) => p.id);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const priceOf: Record<string, number> = {};
   for (const p of procedures) {
@@ -24,90 +69,75 @@ export async function seedAppointments(
     priceOf[p.id] = typeof v === 'object' && v?.toNumber ? v.toNumber() : Number(p.price);
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const defs: ApptDef[] = [
+    // Há ~4 meses (22 consultas — todas concluídas) — pacientes 0..21
+    ...batch('q1', 22, -120, -91, DONE, 0),
 
-  type AppointmentDef = {
-    id: string;
-    startAt: Date;
-    durationInMinutes: number;
-    status: string;
-    patientIdx: number;
-    professionalIdx: number;
-    procedureIdx: number;
-  };
+    // Há ~3 meses (20 consultas — todas concluídas) — pacientes 22..41
+    ...batch('q2', 20, -90, -62, DONE, 22),
 
-  const defs: AppointmentDef[] = [
-    // ── Hoje (5 consultas) ──────────────────────────────────────────────
-    { id: 'appt-today-1', startAt: dateAt(today, 0, 8, 0),  durationInMinutes: 30, status: 'CONFIRMED', patientIdx: 0,  professionalIdx: 0, procedureIdx: 0 },
-    { id: 'appt-today-2', startAt: dateAt(today, 0, 9, 0),  durationInMinutes: 30, status: 'CONFIRMED', patientIdx: 1,  professionalIdx: 1, procedureIdx: 1 },
-    { id: 'appt-today-3', startAt: dateAt(today, 0, 10, 0), durationInMinutes: 30, status: 'WAITING',   patientIdx: 2,  professionalIdx: 2, procedureIdx: 2 },
-    { id: 'appt-today-4', startAt: dateAt(today, 0, 11, 0), durationInMinutes: 30, status: 'WAITING',   patientIdx: 3,  professionalIdx: 0, procedureIdx: 3 },
-    { id: 'appt-today-5', startAt: dateAt(today, 0, 14, 0), durationInMinutes: 30, status: 'CONFIRMED', patientIdx: 4,  professionalIdx: 1, procedureIdx: 4 },
+    // Cobertura extra: garante que pacientes 42..49 também tenham histórico
+    ...batch('cover', 16, -85, -40, DONE, 42),
 
-    // ── Mesma semana passada (3 consultas — base de comparação) ─────────
-    { id: 'appt-lastweek-1', startAt: dateAt(today, -7, 8, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 5,  professionalIdx: 0, procedureIdx: 0 },
-    { id: 'appt-lastweek-2', startAt: dateAt(today, -7, 9, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 6,  professionalIdx: 1, procedureIdx: 1 },
-    { id: 'appt-lastweek-3', startAt: dateAt(today, -7, 10, 0), durationInMinutes: 30, status: 'DONE', patientIdx: 7,  professionalIdx: 2, procedureIdx: 2 },
+    // Mês anterior (28 consultas — 25 concluídas + 3 canceladas)
+    ...batch('prev', 28, -61, -32,
+      (i) => (i === 4 || i === 11 || i === 19) ? 'CANCELED' : 'DONE', 10),
 
-    // ── Este mês — dias anteriores ao de hoje (10 consultas) ────────────
-    { id: 'appt-month-1',  startAt: dateAt(today, -1,  8, 0),  durationInMinutes: 30, status: 'DONE',      patientIdx: 8,  professionalIdx: 0, procedureIdx: 0 },
-    { id: 'appt-month-2',  startAt: dateAt(today, -2,  9, 0),  durationInMinutes: 30, status: 'DONE',      patientIdx: 9,  professionalIdx: 1, procedureIdx: 1 },
-    { id: 'appt-month-3',  startAt: dateAt(today, -3,  10, 0), durationInMinutes: 30, status: 'DONE',      patientIdx: 10, professionalIdx: 2, procedureIdx: 2 },
-    { id: 'appt-month-4',  startAt: dateAt(today, -4,  11, 0), durationInMinutes: 30, status: 'DONE',      patientIdx: 11, professionalIdx: 0, procedureIdx: 3 },
-    { id: 'appt-month-5',  startAt: dateAt(today, -5,  8, 0),  durationInMinutes: 30, status: 'DONE',      patientIdx: 12, professionalIdx: 1, procedureIdx: 4 },
-    { id: 'appt-month-6',  startAt: dateAt(today, -6,  9, 0),  durationInMinutes: 30, status: 'CANCELED',  patientIdx: 13, professionalIdx: 2, procedureIdx: 0 },
-    { id: 'appt-month-7',  startAt: dateAt(today, -8,  10, 0), durationInMinutes: 30, status: 'DONE',      patientIdx: 14, professionalIdx: 0, procedureIdx: 1 },
-    { id: 'appt-month-8',  startAt: dateAt(today, -9,  11, 0), durationInMinutes: 30, status: 'DONE',      patientIdx: 15, professionalIdx: 1, procedureIdx: 2 },
-    { id: 'appt-month-9',  startAt: dateAt(today, -10, 8, 0),  durationInMinutes: 30, status: 'DONE',      patientIdx: 16, professionalIdx: 2, procedureIdx: 3 },
-    { id: 'appt-month-10', startAt: dateAt(today, -11, 9, 0),  durationInMinutes: 30, status: 'DONE',      patientIdx: 17, professionalIdx: 0, procedureIdx: 4 },
+    // Mês atual — dias passados (20 consultas — 18 concluídas + 2 canceladas)
+    ...batch('cur', 20, -31, -1,
+      (i) => (i === 6 || i === 14) ? 'CANCELED' : 'DONE', 5),
 
-    // ── Mês passado (8 consultas — base de comparação de receita) ───────
-    { id: 'appt-lastmonth-1', startAt: dateAt(today, -32, 8, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 18, professionalIdx: 0, procedureIdx: 0 },
-    { id: 'appt-lastmonth-2', startAt: dateAt(today, -33, 9, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 19, professionalIdx: 1, procedureIdx: 1 },
-    { id: 'appt-lastmonth-3', startAt: dateAt(today, -34, 10, 0), durationInMinutes: 30, status: 'DONE', patientIdx: 20, professionalIdx: 2, procedureIdx: 2 },
-    { id: 'appt-lastmonth-4', startAt: dateAt(today, -35, 11, 0), durationInMinutes: 30, status: 'DONE', patientIdx: 21, professionalIdx: 0, procedureIdx: 3 },
-    { id: 'appt-lastmonth-5', startAt: dateAt(today, -36, 8, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 22, professionalIdx: 1, procedureIdx: 4 },
-    { id: 'appt-lastmonth-6', startAt: dateAt(today, -37, 9, 0),  durationInMinutes: 30, status: 'DONE', patientIdx: 23, professionalIdx: 2, procedureIdx: 0 },
-    { id: 'appt-lastmonth-7', startAt: dateAt(today, -38, 10, 0), durationInMinutes: 30, status: 'DONE', patientIdx: 24, professionalIdx: 0, procedureIdx: 1 },
-    { id: 'appt-lastmonth-8', startAt: dateAt(today, -39, 11, 0), durationInMinutes: 30, status: 'DONE', patientIdx: 25, professionalIdx: 1, procedureIdx: 2 },
+    // Semana passada — para comparação do dashboard (8 consultas)
+    ...batch('lw', 8, -7, -1, DONE, 15),
+
+    // Hoje (8 consultas — mix de status)
+    ...batch('today', 8, 0, 0,
+      (i) => i < 2 ? 'DONE' : i < 5 ? 'CONFIRMED' : 'WAITING', 30),
+
+    // Próxima semana (12 consultas — aguardando)
+    ...batch('nw', 12, 1, 7, WAITING, 38),
+
+    // Duas semanas à frente (8 consultas — aguardando)
+    ...batch('future', 8, 8, 21, WAITING, 45),
   ];
 
+  let created = 0;
   for (const def of defs) {
-    const endAt = new Date(def.startAt.getTime() + def.durationInMinutes * 60_000);
-    const professionalId = profIds[def.professionalIdx % profIds.length];
-    const patientId = patIds[def.patientIdx % patIds.length];
-    const procedureId = procIds[def.procedureIdx % procIds.length];
-    const price = priceOf[procedureId] ?? 350;
+    const slot = SLOTS[def.slotIdx];
+    const startAt = dateAt(today, def.dayOffset, slot.h, slot.m);
+    const duration = DURATIONS[def.procIdx];
+    const endAt = new Date(startAt.getTime() + duration * 60_000);
 
-    const appointment = await prisma.appointment.upsert({
-      where: { id: def.id },
-      update: { startAt: def.startAt, endAt, status: def.status },
-      create: {
+    const professionalId = professionals[def.profIdx % professionals.length].id;
+    const patientId = patients[def.patIdx % patients.length].id;
+    const procedure = procedures[def.procIdx % procedures.length];
+    const price = priceOf[procedure.id] ?? 500;
+
+    const appointment = await prisma.appointment.create({
+      data: {
         id: def.id,
         professionalId,
         franchiseId,
         patientId,
-        name: `Consulta ${def.id}`,
-        durationInMinutes: def.durationInMinutes,
-        startAt: def.startAt,
+        name: procedure.name,
+        durationInMinutes: duration,
+        startAt,
         endAt,
         status: def.status,
       },
     });
 
-    await prisma.appointmentItem.upsert({
-      where: { id: `item-${def.id}` },
-      update: { price },
-      create: {
+    await prisma.appointmentItem.create({
+      data: {
         id: `item-${def.id}`,
         appointmentId: appointment.id,
-        procedureId,
+        procedureId: procedure.id,
         price,
-        notes: null,
       },
     });
+
+    created++;
   }
 
-  console.log(`✅ Created/updated ${defs.length} appointments with items`);
+  console.log(`✅ ${created} agendamentos criados`);
 }

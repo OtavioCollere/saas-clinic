@@ -49,7 +49,7 @@ export class PrismaPatientRepository extends PatientRepository {
     const raw = await this.prisma.patient.findMany({
       where: { clinicId },
       orderBy: { createdAt: "desc" },
-      include: { anamnesis: true },
+      include: { anamnesis: true, user: { select: { phone: true } } },
     });
     return raw.map(PatientMapper.toDomain);
   }

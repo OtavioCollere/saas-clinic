@@ -1,12 +1,15 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+﻿import { Inject, Injectable, Logger } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { AppointmentsRepository } from '@/domain/application/repositories/appointments-repository'
 import { PatientRepository } from '@/domain/application/repositories/patient-repository'
 import { UsersRepository } from '@/domain/application/repositories/users-repository'
 import { ProfessionalRepository } from '@/domain/application/repositories/professional-repository'
 import { FranchiseRepository } from '@/domain/application/repositories/franchise-repository'
+import { ClinicRepository } from '@/domain/application/repositories/clinic-repository'
 import { EmailQueue } from '@/shared/services/email/email-queue'
 import { WhatsAppSender } from '@/shared/services/whatsapp/whatsapp-sender'
+
+const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
 
 function buildReminderEmail(patientName: string, appointmentName: string, date: string, time: string): string {
   return `<!DOCTYPE html>
@@ -77,7 +80,7 @@ function buildReminderEmail(patientName: string, appointmentName: string, date: 
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="https://cliniker.com.br"
+                    <a href="${APP_URL}"
                        style="display:inline-block;background:#1D4ED8;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
                       Acessar o Cliniker
                     </a>
@@ -121,6 +124,8 @@ export class AppointmentReminderScheduler {
     private readonly professionalRepository: ProfessionalRepository,
     @Inject(FranchiseRepository)
     private readonly franchiseRepository: FranchiseRepository,
+    @Inject(ClinicRepository)
+    private readonly clinicRepository: ClinicRepository,
     @Inject(EmailQueue)
     private readonly emailQueue: EmailQueue,
     @Inject(WhatsAppSender)
@@ -150,6 +155,14 @@ export class AppointmentReminderScheduler {
           this.professionalRepository.findById(appointment.professionalId.toString()),
           this.franchiseRepository.findById(appointment.franchiseId.toString()),
         ])
+
+        const clinic = franchise
+          ? await this.clinicRepository.findById(franchise.clinicId.toString())
+          : null
+        const credentials =
+          clinic?.zapInstanceId && clinic?.zapToken
+            ? { instanceId: clinic.zapInstanceId, token: clinic.zapToken, clientToken: clinic.zapClientToken }
+            : undefined
         const professionalUser = professional
           ? await this.usersRepository.findById(professional.userId.toString())
           : null
@@ -182,6 +195,7 @@ export class AppointmentReminderScheduler {
             await this.whatsAppSender.send({
               to: user.phone,
               message: reminderLines.join('\n'),
+              credentials,
             })
             this.logger.log(`WhatsApp lembrete enviado para ${user.phone} (consulta ${appointment.id})`)
             continue

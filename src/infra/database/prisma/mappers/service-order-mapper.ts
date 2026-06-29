@@ -9,7 +9,7 @@ type ServiceOrderItemRaw = {
   serviceOrderId: string;
   appointmentItemId: string | null;
   procedureId: string | null;
-  price: number | string;
+  price: number | string | { toNumber(): number };
   notes: string | null;
   createdAt: Date;
   updatedAt: Date | null;
@@ -19,6 +19,9 @@ type ServiceOrderRaw = {
   id: string;
   status: string;
   paymentMethod?: string;
+  paidAt: Date | null;
+  franchiseId: string | null;
+  appointmentId: string | null;
   createdAt: Date;
   updatedAt: Date | null;
   items: ServiceOrderItemRaw[];
@@ -28,7 +31,9 @@ export class ServiceOrderMapper {
   static toDomain(raw: ServiceOrderRaw): ServiceOrder {
     const status = this.statusFromString(raw.status);
     const items = raw.items.map((item) => {
-      const price = typeof item.price === "string" ? parseFloat(item.price) : Number(item.price);
+      const price = typeof item.price === "object" && item.price !== null && "toNumber" in item.price
+        ? (item.price as { toNumber(): number }).toNumber()
+        : typeof item.price === "string" ? parseFloat(item.price) : Number(item.price);
       return ServiceOrderItem.create(
         {
           appointmentItemId: item.appointmentItemId ? new UniqueEntityId(item.appointmentItemId) : undefined,

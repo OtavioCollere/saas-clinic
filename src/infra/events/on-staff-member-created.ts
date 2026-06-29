@@ -1,7 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+﻿import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
 import { StaffMemberCreatedEvent } from '@/domain/enterprise/events/staff-member-created.event';
+
+const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
 
 function formatExpiry(date: Date): string {
   return date.toLocaleString('pt-BR', {
@@ -67,7 +69,7 @@ function buildStaffEmail(email: string, password: string, expiresAt: Date): stri
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="https://cliniker.com.br" style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
+                    <a href="${APP_URL}" style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
                       Acessar o Cliniker
                     </a>
                   </td>
@@ -105,7 +107,7 @@ export class OnStaffMemberCreated {
         to: event.userEmail,
         subject: 'Bem-vindo ao Cliniker — suas credenciais de acesso',
         html: buildStaffEmail(event.userEmail, event.password, event.expiresAt),
-        text: `Bem-vindo ao Cliniker!\n\nSeu acesso foi criado.\n\nEmail: ${event.userEmail}\nSenha temporária: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: https://cliniker.com.br`,
+        text: `Bem-vindo ao Cliniker!\n\nSeu acesso foi criado.\n\nEmail: ${event.userEmail}\nSenha temporária: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}`,
       });
     } catch (error) {
       console.error('Erro ao enviar email de boas-vindas (staff):', error);

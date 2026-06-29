@@ -13,9 +13,11 @@ export class PrismaServiceOrderRepository extends ServiceOrderRepository {
     super();
   }
 
-  async create(serviceOrder: ServiceOrder): Promise<void> {
+  async create(serviceOrder: ServiceOrder, franchiseId?: string, appointmentId?: string): Promise<void> {
     const data = ServiceOrderMapper.toPrisma(serviceOrder);
-    await this.prisma.serviceOrder.create({ data });
+    await this.prisma.serviceOrder.create({
+      data: { ...data, franchiseId: franchiseId ?? null, appointmentId: appointmentId ?? null },
+    });
   }
 
   async findById(id: string): Promise<ServiceOrder | null> {
@@ -27,10 +29,33 @@ export class PrismaServiceOrderRepository extends ServiceOrderRepository {
     return ServiceOrderMapper.toDomain(raw);
   }
 
-  async markConsumptionStatus(id: string, status: "CONFIRMED" | "SKIPPED"): Promise<void> {
+  async findByFranchiseId(franchiseId: string, status?: string): Promise<ServiceOrder[]> {
+    const raws = await this.prisma.serviceOrder.findMany({
+      where: {
+        franchiseId,
+        ...(status ? { status } : {}),
+      },
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return raws.map((r) => ServiceOrderMapper.toDomain(r));
+  }
+
+  async findByPatientId(patientId: string): Promise<ServiceOrder[]> {
+    const raws = await this.prisma.serviceOrder.findMany({
+      where: {
+        appointment: { patientId },
+      },
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return raws.map((r) => ServiceOrderMapper.toDomain(r));
+  }
+
+  async markAsPaid(id: string, paidAt: Date): Promise<void> {
     await this.prisma.serviceOrder.update({
       where: { id },
-      data: { consumptionStatus: status, updatedAt: new Date() },
+      data: { status: "PAID", paidAt, updatedAt: new Date() },
     });
   }
 }

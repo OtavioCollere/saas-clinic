@@ -1,23 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 
 export async function seedFranchises(prisma: PrismaClient, clinicId: string) {
-  console.log('🏢 Seeding franchises...');
+  console.log('🏢 Criando franquia...');
 
-  const franchise = await prisma.franchise.upsert({
-    where: { id: 'franchise-seed-id' },
-    update: {},
-    create: {
-      id: 'franchise-seed-id',
-      name: 'Clínica Principal',
-      clinicId: clinicId,
-      address: 'Rua Principal, 123',
-      zipCode: '12345-678',
+  const franchise = await prisma.franchise.create({
+    data: {
+      clinicId,
+      name: 'Unidade Batel',
+      address: 'Alameda Dom Pedro II, 1285 - Batel',
+      zipCode: '80420-090',
       status: 'ACTIVE',
-      description: 'Franquia principal da clínica',
+      description: 'Unidade principal — Batel, Curitiba',
     },
   });
 
-  console.log(`✅ Created/updated 1 franchise`);
+  console.log(`✅ Franquia criada (${franchise.name})`);
   return franchise;
 }
-

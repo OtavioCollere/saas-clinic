@@ -2,6 +2,7 @@
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
 import { WhatsAppSender } from '@/shared/services/whatsapp/whatsapp-sender';
+import { ClinicRepository } from '@/domain/application/repositories/clinic-repository';
 import { AppointmentCreatedEvent } from '@/domain/enterprise/events/appointment-created.event';
 
 function buildCreatedEmail(patientName: string, appointmentName: string, date: string, time: string): string {
@@ -73,7 +74,7 @@ function buildCreatedEmail(patientName: string, appointmentName: string, date: s
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="https://cliniker.com.br"
+                    <a href="${APP_URL}"
                        style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
                       Acessar o Cliniker
                     </a>
@@ -111,6 +112,8 @@ export class OnAppointmentCreated {
     private readonly emailQueue: EmailQueue,
     @Inject(WhatsAppSender)
     private readonly whatsAppSender: WhatsAppSender,
+    @Inject(ClinicRepository)
+    private readonly clinicRepository: ClinicRepository,
   ) {}
 
   @OnEvent('appointment.created')
@@ -125,6 +128,12 @@ export class OnAppointmentCreated {
       hour: '2-digit',
       minute: '2-digit',
     });
+
+    const clinic = await this.clinicRepository.findById(event.clinicId)
+    const credentials =
+      clinic?.zapInstanceId && clinic?.zapToken
+        ? { instanceId: clinic.zapInstanceId, token: clinic.zapToken, clientToken: clinic.zapClientToken }
+        : undefined
 
     if (event.patientPhone) {
       try {
@@ -144,6 +153,7 @@ export class OnAppointmentCreated {
         await this.whatsAppSender.send({
           to: event.patientPhone,
           message: lines.join('\n'),
+          credentials,
         });
         this.logger.log(`WhatsApp de agendamento enviado para ${event.patientPhone}`);
         return;

@@ -1,50 +1,39 @@
 import { PrismaClient } from '@prisma/client';
 
+interface SeedMembershipsInput {
+  ownerId: string;
+  clinicId: string;
+  collaboratorId: string;
+  professionalUserIds: string[];
+  patientUserIds: string[];
+}
+
 export async function seedClinicMemberships(
   prisma: PrismaClient,
-  ownerId: string,
-  clinicId: string,
-  professionalUserIds: string[] = []
+  input: SeedMembershipsInput
 ) {
-  console.log('👥 Seeding clinic memberships...');
+  console.log('👥 Criando memberships...');
 
-  const owner = await prisma.clinicMembership.upsert({
-    where: {
-      userId_clinicId: {
-        userId: ownerId,
-        clinicId,
-      },
-    },
-    update: {},
-    create: {
-      userId: ownerId,
-      clinicId,
-      role: 'OWNER',
-    },
+  await prisma.clinicMembership.create({
+    data: { userId: input.ownerId, clinicId: input.clinicId, role: 'OWNER' },
   });
 
-  for (const userId of professionalUserIds) {
-    await prisma.clinicMembership.upsert({
-      where: {
-        userId_clinicId: {
-          userId,
-          clinicId,
-        },
-      },
-      update: {},
-      create: {
-        userId,
-        clinicId,
-        role: 'PROFESSIONAL',
-      },
+  await prisma.clinicMembership.create({
+    data: { userId: input.collaboratorId, clinicId: input.clinicId, role: 'COLLABORATOR' },
+  });
+
+  for (const userId of input.professionalUserIds) {
+    await prisma.clinicMembership.create({
+      data: { userId, clinicId: input.clinicId, role: 'PROFESSIONAL' },
     });
   }
 
-  const total = 1 + professionalUserIds.length;
-  console.log(`✅ Created/updated ${total} clinic memberships`);
-  return owner;
+  for (const userId of input.patientUserIds) {
+    await prisma.clinicMembership.create({
+      data: { userId, clinicId: input.clinicId, role: 'PATIENT' },
+    });
+  }
+
+  const total = 2 + input.professionalUserIds.length + input.patientUserIds.length;
+  console.log(`✅ ${total} memberships criados`);
 }
-
-
-
-

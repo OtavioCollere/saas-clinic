@@ -17,6 +17,7 @@ type PatientRaw = {
 
 type PatientRawWithAnamnesis = PatientRaw & {
   anamnesis?: PrismaAnamnesis | null;
+  user?: { phone?: string | null };
 };
 
 export class PatientMapper {
@@ -25,11 +26,14 @@ export class PatientMapper {
     const anamnesis =
       anamnesisRaw != null ? AnamnesisMapper.toDomain(anamnesisRaw) : undefined;
 
+    const phone = "user" in raw ? raw.user?.phone ?? undefined : undefined;
+
     return Patient.create(
       {
         clinicId: new UniqueEntityId(raw.clinicId),
         userId: new UniqueEntityId(raw.userId),
         name: raw.name,
+        phone,
         birthDay: raw.birthDay,
         address: raw.address,
         zipCode: raw.zipCode,

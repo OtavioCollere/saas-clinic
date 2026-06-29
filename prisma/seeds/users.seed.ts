@@ -1,86 +1,101 @@
 import { PrismaClient } from '@prisma/client';
 import { hashPassword } from '../helpers/hash-password';
 
+const PATIENT_NAMES = [
+  'Ana Paula Santos',     'Beatriz Oliveira',      'Camila Ferreira',
+  'Daniela Costa',        'Elena Rodrigues',        'Fernanda Lima',
+  'Gabriela Souza',       'Helena Alves',           'Isabela Pereira',
+  'Joana Ribeiro',        'Karina Martins',         'Laura Gomes',
+  'Mariana Torres',       'Natalia Campos',          'Olivia Barbosa',
+  'Patricia Dias',        'Rafaela Nunes',           'Sandra Freitas',
+  'Tatiana Moreira',      'Valentina Pinto',         'Viviane Castro',
+  'Yasmin Araújo',        'Amanda Vieira',           'Bianca Azevedo',
+  'Claudia Cavalcanti',   'Denise Monteiro',         'Elisa Carvalho',
+  'Flavia Borges',        'Giovanna Teixeira',       'Heloisa Fonseca',
+  'André Silva',          'Bruno Santos',            'Carlos Ferreira',
+  'Diego Pereira',        'Eduardo Lima',            'Felipe Costa',
+  'Gustavo Alves',        'Henrique Ribeiro',        'Igor Martins',
+  'João Pedro Gomes',     'Lucas Rocha',             'Miguel Torres',
+  'Nicolas Campos',       'Otávio Barbosa',          'Pedro Henrique Dias',
+  'Rafael Nunes',         'Sérgio Cardoso',          'Thiago Freitas',
+  'Vitor Moreira',        'Wagner Teixeira',
+];
+
 export async function seedUsers(prisma: PrismaClient) {
-  console.log('👤 Seeding users...');
+  console.log('👤 Criando usuários...');
 
-  const defaultPassword = await hashPassword('123456');
+  const pwd = await hashPassword('123456');
 
-  const owner = await prisma.user.upsert({
-    where: { cpf: '12345678900' },
-    update: { email: 'owner@clinic.com', name: 'Clinic Owner', password: defaultPassword },
-    create: {
-      name: 'Clinic Owner',
-      email: 'owner@clinic.com',
-      cpf: '12345678900',
-      password: defaultPassword,
+  const owner = await prisma.user.create({
+    data: {
+      name: 'Dra. Bianca Collere',
+      email: 'owner@cliniker.com.br',
+      cpf: '99900000001',
+      phone: '41988390220',
+      password: pwd,
       role: 'ADMIN',
       isEmailVerified: true,
     },
   });
 
-  const member = await prisma.user.upsert({
-    where: { cpf: '12345678901' },
-    update: { email: 'member@clinic.com', name: 'Clinic Member', password: defaultPassword },
-    create: {
-      name: 'Clinic Member',
-      email: 'member@clinic.com',
-      cpf: '12345678901',
-      password: defaultPassword,
+  const collaborator = await prisma.user.create({
+    data: {
+      name: 'Fernanda Lima',
+      email: 'admin@cliniker.com.br',
+      cpf: '99900000002',
+      phone: '41991110001',
+      password: pwd,
       role: 'MEMBER',
       isEmailVerified: true,
     },
   });
 
-  const professional2 = await prisma.user.upsert({
-    where: { cpf: '12345678902' },
-    update: { email: 'professional2@clinic.com', name: 'Dra. Maria Silva', password: defaultPassword },
-    create: {
-      name: 'Dra. Maria Silva',
-      email: 'professional2@clinic.com',
-      cpf: '12345678902',
-      password: defaultPassword,
+  const prof1 = await prisma.user.create({
+    data: {
+      name: 'Dra. Ana Carolina Ferreira',
+      email: 'anacarolina@cliniker.com.br',
+      cpf: '99900000003',
+      phone: '41991110002',
+      password: pwd,
       role: 'MEMBER',
       isEmailVerified: true,
     },
   });
 
-  const professional3 = await prisma.user.upsert({
-    where: { cpf: '12345678903' },
-    update: { email: 'professional3@clinic.com', name: 'Dr. Carlos Oliveira', password: defaultPassword },
-    create: {
-      name: 'Dr. Carlos Oliveira',
-      email: 'professional3@clinic.com',
-      cpf: '12345678903',
-      password: defaultPassword,
+  const prof2 = await prisma.user.create({
+    data: {
+      name: 'Dra. Juliana Mendes Rocha',
+      email: 'juliana@cliniker.com.br',
+      cpf: '99900000004',
+      phone: '41991110003',
+      password: pwd,
       role: 'MEMBER',
       isEmailVerified: true,
     },
   });
 
-  const patientNames = [
-    'Ana Paula Santos', 'Bruno Ferreira', 'Carla Mendes', 'Daniel Costa',
-    'Elena Rodrigues', 'Felipe Lima', 'Gabriela Souza', 'Henrique Alves',
-    'Isabela Pereira', 'João Pedro Ribeiro', 'Karina Martins', 'Lucas Gomes',
-    'Mariana Torres', 'Nathan Campos', 'Olivia Barbosa', 'Pedro Henrique Dias',
-    'Quintino Rocha', 'Rafaela Nunes', 'Sérgio Cardoso', 'Tatiana Freitas',
-    'Ulisses Moreira', 'Vanessa Pinto', 'Wagner Teixeira', 'Ximena Castro',
-    'Yuri Araújo', 'Zélia Lopes', 'Amanda Vieira', 'Bernardo Azevedo',
-    'Camila Cavalcanti', 'Diego Monteiro',
-  ];
+  const prof3 = await prisma.user.create({
+    data: {
+      name: 'Dr. Ricardo Santos Lima',
+      email: 'ricardo@cliniker.com.br',
+      cpf: '99900000005',
+      phone: '41991110004',
+      password: pwd,
+      role: 'MEMBER',
+      isEmailVerified: true,
+    },
+  });
 
   const patientUsers: Array<{ id: string; name: string }> = [];
-  for (let i = 0; i < patientNames.length; i++) {
-    const email = `patient${i + 1}@clinic.com`;
-    const cpf = `123456789${String(i + 10).padStart(2, '0')}`;
-    const user = await prisma.user.upsert({
-      where: { cpf },
-      update: { email, name: patientNames[i], password: defaultPassword },
-      create: {
-        name: patientNames[i],
-        email,
-        cpf,
-        password: defaultPassword,
+  for (let i = 0; i < PATIENT_NAMES.length; i++) {
+    const name = PATIENT_NAMES[i];
+    const index = String(i + 1).padStart(2, '0');
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email: `paciente${index}@cliniker.com.br`,
+        cpf: `88800000${String(i).padStart(3, '0')}`,
+        password: pwd,
         role: 'MEMBER',
         isEmailVerified: true,
       },
@@ -88,30 +103,11 @@ export async function seedUsers(prisma: PrismaClient) {
     patientUsers.push({ id: user.id, name: user.name });
   }
 
-  // Força atualização das senhas (hash bcrypt) para garantir login
-  const allEmails = [
-    'owner@clinic.com',
-    'member@clinic.com',
-    'professional2@clinic.com',
-    'professional3@clinic.com',
-    ...patientNames.map((_, i) => `patient${i + 1}@clinic.com`),
-  ];
-  await prisma.user.updateMany({
-    where: { email: { in: allEmails } },
-    data: { password: defaultPassword },
-  });
-
-  console.log(`✅ Created/updated ${4 + patientUsers.length} users (senhas em bcrypt)`);
+  console.log(`✅ ${5 + patientUsers.length} usuários criados`);
   return {
     owner,
-    member,
-    professional2,
-    professional3,
-    professionals: [member, professional2, professional3],
+    collaborator,
+    professionals: [prof1, prof2, prof3],
     patientUsers,
   };
 }
-
-
-
-

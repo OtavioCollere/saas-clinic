@@ -97,16 +97,19 @@ model PasswordVerification {
 }
 
 model Clinic {
-  id          String   @id @default(uuid())
-  ownerId     String
-  name        String
-  slug        String   @unique
-  cnpj        String   @unique
-  description String?
-  avatarUrl   String?
-  status      String   // ACTIVE, INACTIVE
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  ownerId         String
+  name            String
+  slug            String   @unique
+  cnpj            String   @unique
+  description     String?
+  avatarUrl       String?
+  status          String   // ACTIVE, INACTIVE
+  zapInstanceId   String?
+  zapToken        String?
+  zapClientToken  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   owner            User                @relation("ClinicOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   memberships      ClinicMembership[]
@@ -153,6 +156,7 @@ model Franchise {
   procedures    Procedure[]
   appointments  Appointment[]
   whatsAppConversations WhatsAppConversation[]
+  serviceOrders ServiceOrder[]
 
   @@map("franchises")
   @@index([clinicId])
@@ -275,6 +279,7 @@ model Appointment {
   franchise      Franchise      @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
   patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
   appointmentItems AppointmentItem[]
+  serviceOrders    ServiceOrder[]
 
   @@map("appointments")
   @@index([professionalId])
@@ -301,16 +306,23 @@ model AppointmentItem {
 }
 
 model ServiceOrder {
-  id                String   @id @default(uuid())
-  status            String   // PENDING, WAITING_PAYMENT, PAID, CANCELED, FAILED
-  paymentMethod     String   @default("cash") // credit_card, debit_card, pix, bank_transfer, cash, other
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id            String    @id @default(uuid())
+  status        String    // PENDING, WAITING_PAYMENT, PAID, CANCELED, FAILED
+  paymentMethod String    @default("cash") // credit_card, debit_card, pix, bank_transfer, cash, other
+  paidAt        DateTime?
+  franchiseId   String?
+  appointmentId String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  items ServiceOrderItem[]
+  items       ServiceOrderItem[]
+  franchise   Franchise?   @relation(fields: [franchiseId], references: [id], onDelete: SetNull)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@map("service_orders")
   @@index([status])
+  @@index([franchiseId])
+  @@index([appointmentId])
 }
 
 model WhatsAppConversation {

@@ -75,6 +75,7 @@ export class CancelAppointmentUseCase {
           user.email.getValue(),
           appointment.name,
           appointment.startAt,
+          franchise?.clinicId.toString() ?? '',
           user.phone,
           professionalUser?.name,
           franchise?.address,

@@ -1,7 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+﻿import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
 import { ClinicOwnerOnboardedEvent } from '@/domain/enterprise/events/clinic-owner-onboarded.event';
+
+const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
 
 function formatExpiry(date: Date): string {
   return date.toLocaleString('pt-BR', {
@@ -16,7 +18,7 @@ function formatExpiry(date: Date): string {
 
 function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, password: string, expiresAt: Date): string {
   const expiry = formatExpiry(expiresAt);
-  const loginUrl = `https://cliniker.com.br/${clinicSlug}/auth/login`;
+  const loginUrl = `${APP_URL}/${clinicSlug}/auth/login`;
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -106,7 +108,7 @@ export class OnClinicOwnerOnboarded {
         to: event.ownerEmail,
         subject: `Bem-vindo ao Cliniker — acesso à ${event.clinicName}`,
         html: buildOwnerEmail(event.clinicName, event.clinicSlug, event.ownerEmail, event.password, event.expiresAt),
-        text: `Bem-vindo ao Cliniker!\n\nSua clínica "${event.clinicName}" foi criada.\n\nEmail: ${event.ownerEmail}\nSenha temporária: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: https://cliniker.com.br/${event.clinicSlug}/auth/login`,
+        text: `Bem-vindo ao Cliniker!\n\nSua clínica "${event.clinicName}" foi criada.\n\nEmail: ${event.ownerEmail}\nSenha temporária: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}/${event.clinicSlug}/auth/login`,
       });
     } catch (error) {
       console.error('Erro ao enviar email de boas-vindas (owner):', error);

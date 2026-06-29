@@ -1,6 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+﻿import { Inject, Injectable, Logger } from '@nestjs/common'
 import { EmailSender } from '@/shared/services/email/email-sender'
 import * as nodemailer from 'nodemailer'
+
+const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
 
 @Injectable()
 export class NodemailerEmailSender extends EmailSender {
@@ -59,7 +61,7 @@ export class NodemailerEmailSender extends EmailSender {
       html: `
         <h1>Bem vindo ao Cliniker</h1>
         <p>Sua senha de acesso é: ${password}</p>
-        <p>Você pode acessar o sistema em <a href="https://cliniker.com.br">https://cliniker.com.br</a></p>
+        <p>Você pode acessar o sistema em <a href="${APP_URL}">${APP_URL}</a></p>
         <p>Se você não solicitou este acesso, por favor, ignore este email.</p>
       `,
     })

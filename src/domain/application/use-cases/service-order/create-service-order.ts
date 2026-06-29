@@ -20,15 +20,15 @@ export interface ServiceOrderItemInput {
 
 interface CreateServiceOrderUseCaseRequest {
   items: ServiceOrderItemInput[];
+  franchiseId?: string;
+  appointmentId?: string;
   status?: ServiceOrderStatusType;
   paymentMethod?: PaymentMethodType;
 }
 
 type CreateServiceOrderUseCaseResponse = Either<
   AppointmentItemNotFoundError,
-  {
-    serviceOrder: ServiceOrder;
-  }
+  { serviceOrder: ServiceOrder }
 >;
 
 export class CreateServiceOrderUseCase {
@@ -39,6 +39,8 @@ export class CreateServiceOrderUseCase {
 
   async execute({
     items: itemInputs,
+    franchiseId,
+    appointmentId,
     status,
     paymentMethod: paymentMethodInput,
   }: CreateServiceOrderUseCaseRequest): Promise<CreateServiceOrderUseCaseResponse> {
@@ -79,7 +81,7 @@ export class CreateServiceOrderUseCase {
       paymentMethod: paymentMethodValue,
     });
 
-    await this.serviceOrderRepository.create(serviceOrder);
+    await this.serviceOrderRepository.create(serviceOrder, franchiseId, appointmentId);
 
     return makeRight({ serviceOrder });
   }

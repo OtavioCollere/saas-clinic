@@ -17,8 +17,13 @@ export class OnAppointmentConfirmed {
 
   @OnEvent('appointment.confirmed')
   async handle(event: AppointmentConfirmedEvent): Promise<ServiceOrder> {
+    const appointment = await this.appointmentsRepository.findById(event.appointmentId);
+    const franchiseId = appointment?.franchiseId?.toString();
+
     const result = await this.createServiceOrderUseCase.execute({
       items: event.items,
+      franchiseId,
+      appointmentId: event.appointmentId,
       status: event.status,
       paymentMethod: event.paymentMethod,
     });

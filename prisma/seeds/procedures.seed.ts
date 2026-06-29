@@ -1,36 +1,35 @@
 import { PrismaClient } from '@prisma/client';
 
 const PROCEDURES = [
-  { id: 'procedure-seed-botox', name: 'Botox', price: 800 },
-  { id: 'procedure-seed-preenchimento-labial', name: 'Preenchimento labial', price: 1200 },
-  { id: 'procedure-seed-limpeza-de-pele', name: 'Limpeza de pele', price: 350 },
-  { id: 'procedure-seed-microagulhamento', name: 'Microagulhamento', price: 600 },
-  { id: 'procedure-seed-peeling-quimico', name: 'Peeling químico', price: 450 },
+  { name: 'Toxina Botulínica',          price: 1200, notes: 'Aplicação por área (testa, glabela, pés de galinha)' },
+  { name: 'Preenchimento Labial',        price: 1800, notes: 'Ácido hialurônico — volume e definição labial' },
+  { name: 'Preenchimento Malar',         price: 2200, notes: 'Ácido hialurônico — projeção e simetria malar' },
+  { name: 'Bioestimulador de Colágeno',  price: 2800, notes: 'Sculptra ou Radiesse — estímulo natural de colágeno' },
+  { name: 'Fio de PDO',                  price: 1600, notes: 'Fios tensores absorvíveis para lifting não cirúrgico' },
+  { name: 'Skinbooster',                 price: 1400, notes: 'Hidratação profunda com ácido hialurônico não reticulado' },
+  { name: 'Peeling Químico',             price: 480,  notes: 'TCA, salicílico ou glicólico conforme indicação' },
+  { name: 'Microagulhamento com PRP',    price: 850,  notes: 'Microagulhamento associado ao plasma rico em plaquetas' },
+  { name: 'Limpeza de Pele Profunda',    price: 390,  notes: 'Esfoliação, extração e hidratação profissional' },
+  { name: 'Drenagem Linfática Facial',   price: 280,  notes: 'Técnica manual para redução de edema e toxinas' },
 ];
 
-export async function seedProcedures(
-  prisma: PrismaClient,
-  franchiseId: string
-) {
-  console.log('💉 Seeding procedures...');
+export async function seedProcedures(prisma: PrismaClient, franchiseId: string) {
+  console.log('💉 Criando procedimentos...');
 
-  for (const proc of PROCEDURES) {
-    await prisma.procedure.upsert({
-      where: { id: proc.id },
-      update: {},
-      create: {
-        id: proc.id,
+  const procedures = [];
+  for (const p of PROCEDURES) {
+    const proc = await prisma.procedure.create({
+      data: {
         franchiseId,
-        name: proc.name,
-        price: proc.price,
-        notes: null,
+        name: p.name,
+        price: p.price,
+        notes: p.notes,
         status: 'ACTIVE',
       },
     });
+    procedures.push(proc);
   }
 
-  console.log(`✅ Created/updated ${PROCEDURES.length} procedures`);
-  return prisma.procedure.findMany({
-    where: { franchiseId },
-  });
+  console.log(`✅ ${procedures.length} procedimentos criados`);
+  return procedures;
 }

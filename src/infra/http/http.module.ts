@@ -44,6 +44,7 @@ import { EditProfessionalController } from './controlers/professional/edit-profe
 import { GetProfessionalController } from './controlers/professional/get-professional.controller';
 import { GetProfessionalsByFranchiseIdController } from './controlers/professional/get-professionals-by-franchise-id.controller';
 import { GetProfessionalsByClinicIdController } from './controlers/professional/get-professionals-by-clinic-id.controller';
+import { FetchPatientsByProfessionalIdController } from './controlers/professional/fetch-patients-by-professional-id.controller';
 import { CreateProcedureController } from './controlers/procedure/create-procedure.controller';
 import { EditProcedureController } from './controlers/procedure/edit-procedure.controller';
 import { GetProcedureByIdController } from './controlers/procedure/get-procedure-by-id.controller';
@@ -60,6 +61,9 @@ import { FetchAppointmentsByProfessionalIdController } from './controlers/appoin
 import { GetAppointmentByIdController } from './controlers/appointment/get-appointment-by-id.controller';
 import { EditAppointmentController } from './controlers/appointment/edit-appointment.controller';
 import { CreateServiceOrderController } from './controlers/service-order/create-service-order.controller';
+import { FetchServiceOrdersByFranchiseIdController } from './controlers/service-order/fetch-service-orders-by-franchise-id.controller';
+import { FetchServiceOrdersByPatientIdController } from './controlers/service-order/fetch-service-orders-by-patient-id.controller';
+import { MarkServiceOrderAsPaidController } from './controlers/service-order/mark-service-order-as-paid.controller';
 import { GetDashboardStatsController } from './controlers/clinic/get-dashboard-stats.controller';
 import { CreateStaffMemberController } from './controlers/clinic/create-staff-member.controller';
 import { PublicBookingController } from './controlers/booking/public-booking.controller';
@@ -96,6 +100,7 @@ import { EditProfessionalUseCase } from '@/domain/application/use-cases/professi
 import { GetProfessionalUseCase } from '@/domain/application/use-cases/professional/get-professional';
 import { GetProfessionalsByFranchiseIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-franchise-id';
 import { GetProfessionalsByClinicIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-clinic-id';
+import { FetchPatientsByProfessionalIdUseCase } from '@/domain/application/use-cases/professional/fetch-patients-by-professional-id';
 import { CreateProcedureUseCase } from '@/domain/application/use-cases/procedure/create-procedure';
 import { EditProcedureUseCase } from '@/domain/application/use-cases/procedure/edit-procedure';
 import { GetProcedureByIdUseCase } from '@/domain/application/use-cases/procedure/get-procedure-by-id';
@@ -112,6 +117,9 @@ import { FetchAppointmentsByProfessionalIdUseCase } from '@/domain/application/u
 import { GetAppointmentByIdUseCase } from '@/domain/application/use-cases/appointment/get-appointment-by-id';
 import { EditAppointmentUseCase } from '@/domain/application/use-cases/appointment/edit-appointment';
 import { CreateServiceOrderUseCase } from '@/domain/application/use-cases/service-order/create-service-order';
+import { FetchServiceOrdersByFranchiseIdUseCase } from '@/domain/application/use-cases/service-order/fetch-service-orders-by-franchise-id';
+import { FetchServiceOrdersByPatientIdUseCase } from '@/domain/application/use-cases/service-order/fetch-service-orders-by-patient-id';
+import { MarkServiceOrderAsPaidUseCase } from '@/domain/application/use-cases/service-order/mark-service-order-as-paid';
 import { EditUserUseCase } from '@/domain/application/use-cases/users/edit-user';
 import { GetDashboardStatsUseCase } from '@/domain/application/use-cases/clinic/get-dashboard-stats';
 import { CreateStaffMemberUseCase } from '@/domain/application/use-cases/clinic/create-staff-member';
@@ -162,6 +170,7 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetProfessionalController,
     GetProfessionalsByFranchiseIdController,
     GetProfessionalsByClinicIdController,
+    FetchPatientsByProfessionalIdController,
     CreateProcedureController,
     EditProcedureController,
     GetProcedureByIdController,
@@ -178,6 +187,9 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetAppointmentByIdController,
     EditAppointmentController,
     CreateServiceOrderController,
+    FetchServiceOrdersByFranchiseIdController,
+    FetchServiceOrdersByPatientIdController,
+    MarkServiceOrderAsPaidController,
     GetDashboardStatsController,
     CreateStaffMemberController,
     PublicBookingController,
@@ -217,6 +229,7 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetProfessionalUseCase,
     GetProfessionalsByFranchiseIdUseCase,
     GetProfessionalsByClinicIdUseCase,
+    FetchPatientsByProfessionalIdUseCase,
     CreateProcedureUseCase,
     EditProcedureUseCase,
     GetProcedureByIdUseCase,
@@ -233,6 +246,9 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetAppointmentByIdUseCase,
     EditAppointmentUseCase,
     CreateServiceOrderUseCase,
+    FetchServiceOrdersByFranchiseIdUseCase,
+    FetchServiceOrdersByPatientIdUseCase,
+    MarkServiceOrderAsPaidUseCase,
     GetDashboardStatsUseCase,
     CreateStaffMemberUseCase,
     OnboardClinicUseCase,

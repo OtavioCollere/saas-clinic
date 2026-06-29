@@ -7,6 +7,7 @@ export class PatientPresenter {
 			clinicId: patient.clinicId.toString(),
 			userId: patient.userId.toString(),
 			name: patient.name,
+			phone: patient.phone ?? null,
 			birthDay: patient.birthDay.toISOString(),
 			address: patient.address,
 			zipCode: patient.zipCode,

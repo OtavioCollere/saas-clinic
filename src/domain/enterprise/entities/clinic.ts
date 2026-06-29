@@ -13,6 +13,9 @@ export interface ClinicProps {
   description?: string;
   avatarUrl?: string;
   status: ClinicStatus;
+  zapInstanceId?: string;
+  zapToken?: string;
+  zapClientToken?: string;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -56,6 +59,18 @@ export class Clinic extends Entity<ClinicProps> {
     return this.props.avatarUrl;
   }
 
+  get zapInstanceId() {
+    return this.props.zapInstanceId;
+  }
+
+  get zapToken() {
+    return this.props.zapToken;
+  }
+
+  get zapClientToken() {
+    return this.props.zapClientToken;
+  }
+
   get ownerId() {
     return this.props.ownerId;
   }
@@ -90,6 +105,18 @@ export class Clinic extends Entity<ClinicProps> {
 
   set avatarUrl(avatarUrl: string | undefined) {
     this.props.avatarUrl = avatarUrl;
+  }
+
+  set zapInstanceId(v: string | undefined) {
+    this.props.zapInstanceId = v;
+  }
+
+  set zapToken(v: string | undefined) {
+    this.props.zapToken = v;
+  }
+
+  set zapClientToken(v: string | undefined) {
+    this.props.zapClientToken = v;
   }
 
   set ownerId(ownerId: UniqueEntityId) {
