@@ -115,6 +115,8 @@ model Clinic {
   memberships      ClinicMembership[]
   franchises       Franchise[]
   patients         Patient[]
+  notificationLogs NotificationLog[]
+  anamnesisTokens  AnamnesisToken[]
 
   @@map("clinics")
   @@index([ownerId])
@@ -197,8 +199,10 @@ model Patient {
 
   clinic      Clinic      @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  anamnesis   Anamnesis?
-  appointments Appointment[]
+  anamnesis       Anamnesis?
+  appointments    Appointment[]
+  notificationLogs NotificationLog[]
+  anamnesisTokens AnamnesisToken[]
 
   @@map("patients")
   @@index([clinicId])
@@ -280,6 +284,7 @@ model Appointment {
   patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
   appointmentItems AppointmentItem[]
   serviceOrders    ServiceOrder[]
+  notificationLogs NotificationLog[]
 
   @@map("appointments")
   @@index([professionalId])
@@ -365,3 +370,52 @@ model ServiceOrderItem {
   @@index([procedureId])
 }
 
+model NotificationLog {
+  id                String    @id @default(uuid())
+  clinicId          String
+  channel           String    // EMAIL, WHATSAPP
+  type              String    // APPOINTMENT_CREATED, APPOINTMENT_CANCELLED, APPOINTMENT_RESCHEDULED, APPOINTMENT_REMINDER, PATIENT_WELCOME, PROFESSIONAL_WELCOME, STAFF_WELCOME, OWNER_WELCOME
+  status            String    @default("QUEUED") // QUEUED, SENT, FAILED
+  recipientRef      String    // email or phone
+  appointmentId     String?
+  patientId         String?
+  attempts          Int       @default(0)
+  providerMessageId String?
+  errorMessage      String?
+  scheduledFor      DateTime?
+  queuedAt          DateTime  @default(now())
+  sentAt            DateTime?
+  failedAt          DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  clinic      Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  patient     Patient?     @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  @@map("notification_logs")
+  @@index([clinicId])
+  @@index([status])
+  @@index([channel])
+  @@index([appointmentId])
+  @@index([patientId])
+}
+
+model AnamnesisToken {
+  id        String    @id @default(uuid())
+  patientId String
+  clinicId  String
+  token     String    @unique
+  status    String    @default("PENDING")
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinic  Clinic  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([patientId, status])
+  @@map("anamnesis_tokens")
+}

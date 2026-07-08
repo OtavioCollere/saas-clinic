@@ -255,6 +255,7 @@ export class OnboardClinicUseCase {
             profData.professionalId,
             profData.userId,
             profData.franchiseId,
+            clinicId,
             clinicSlug,
             profData.email,
             profData.password,

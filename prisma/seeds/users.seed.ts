@@ -26,6 +26,20 @@ export async function seedUsers(prisma: PrismaClient) {
 
   const pwd = await hashPassword('123456');
 
+  // Superadmin (acesso ao painel /admin)
+  await prisma.user.upsert({
+    where: { email: 'otaviosk59@gmail.com' },
+    update: {},
+    create: {
+      name: 'Otávio (Superadmin)',
+      email: 'otaviosk59@gmail.com',
+      cpf: '00000000001',
+      password: pwd,
+      role: 'ADMIN',
+      isEmailVerified: true,
+    },
+  });
+
   const owner = await prisma.user.create({
     data: {
       name: 'Dra. Bianca Collere',

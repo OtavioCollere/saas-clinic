@@ -184,6 +184,7 @@ export class CreateProfessionalUseCase {
           professional.id.toString(),
           user.id.toString(),
           franchiseId,
+          clinic.id.toString(),
           clinic.slug.getValue(),
           email,
           password,

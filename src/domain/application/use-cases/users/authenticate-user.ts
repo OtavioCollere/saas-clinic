@@ -78,7 +78,7 @@ export class AuthenticateUserUseCase {
       )
 
       if (activeSession.length > 0) {
-        const tokens = await this.issueTokens(user.id.toString());
+        const tokens = await this.issueTokens(user.id.toString(), user.role.getValue());
         return makeRight({
           type: 'authenticated',
           ...tokens
@@ -112,7 +112,7 @@ export class AuthenticateUserUseCase {
       session.activateSession()
       await this.sessionsRepository.create(session)
 
-      const tokens = await this.issueTokens(user.id.toString())
+      const tokens = await this.issueTokens(user.id.toString(), user.role.getValue())
 
       return makeRight({
         type: 'authenticated',
@@ -120,9 +120,9 @@ export class AuthenticateUserUseCase {
       })
     }
 
-    private async issueTokens(userId: string) {
-      const access_token = await this.encrypter.sign({ userId })
-      const refresh_token = await this.encrypter.refresh({ userId })
+    private async issueTokens(userId: string, role: string) {
+      const access_token = await this.encrypter.sign({ userId, role })
+      const refresh_token = await this.encrypter.refresh({ userId, role })
 
       return { access_token, refresh_token }
     }

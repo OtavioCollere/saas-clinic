@@ -21,6 +21,7 @@ import { User } from '@/domain/enterprise/entities/user';
 import { UserRole } from '@/domain/enterprise/value-objects/user-role';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PatientCreatedEvent } from '@/domain/enterprise/events/patient-created.event';
+import { AnamnesisTokenRequestedEvent } from '@/domain/enterprise/events/anamnesis-token-requested.event';
 import crypto from 'crypto';
 
 interface RegisterPatientUseCaseRequest {
@@ -156,6 +157,16 @@ export class RegisterPatientUseCase {
           email,
           password,
           passwordExpiresAt,
+        ),
+      );
+      this.eventEmitter.emit(
+        'anamnesis.token.requested',
+        new AnamnesisTokenRequestedEvent(
+          patient.id.toString(),
+          clinicId,
+          email,
+          phone,
+          name,
         ),
       );
       return makeRight({ patient });

@@ -45,6 +45,8 @@ import { GetProfessionalController } from './controlers/professional/get-profess
 import { GetProfessionalsByFranchiseIdController } from './controlers/professional/get-professionals-by-franchise-id.controller';
 import { GetProfessionalsByClinicIdController } from './controlers/professional/get-professionals-by-clinic-id.controller';
 import { FetchPatientsByProfessionalIdController } from './controlers/professional/fetch-patients-by-professional-id.controller';
+import { ActivateProfessionalController } from './controlers/professional/activate-professional.controller';
+import { InactivateProfessionalController } from './controlers/professional/inactivate-professional.controller';
 import { CreateProcedureController } from './controlers/procedure/create-procedure.controller';
 import { EditProcedureController } from './controlers/procedure/edit-procedure.controller';
 import { GetProcedureByIdController } from './controlers/procedure/get-procedure-by-id.controller';
@@ -53,6 +55,8 @@ import { InactivateProcedureController } from './controlers/procedure/inactivate
 import { DeleteProcedureController } from './controlers/procedure/delete-procedure.controller';
 import { CreateAnamnesisController } from './controlers/anamnesis/create-anamnesis.controller';
 import { GetAnamnesisByPatientIdController } from './controlers/anamnesis/get-anamnesis-by-patient-id.controller';
+import { AnamnesisTokenController } from './controlers/anamnesis/anamnesis-token.controller';
+import { ResendAnamnesisTokenController } from './controlers/anamnesis/resend-anamnesis-token.controller';
 import { CancelAppointmentController } from './controlers/appointment/cancel-appointment.controller';
 import { ConfirmAppointmentController } from './controlers/appointment/confirm-appointment.controller';
 import { CreateAppointmentController } from './controlers/appointment/create-appointment.controller';
@@ -67,7 +71,11 @@ import { MarkServiceOrderAsPaidController } from './controlers/service-order/mar
 import { GetDashboardStatsController } from './controlers/clinic/get-dashboard-stats.controller';
 import { CreateStaffMemberController } from './controlers/clinic/create-staff-member.controller';
 import { PublicBookingController } from './controlers/booking/public-booking.controller';
+import { AdminModule } from './admin.module';
 import { OnboardClinicController } from './controlers/admin/onboard-clinic.controller';
+import { MeAdminController } from './controlers/admin/me-admin.controller';
+import { RefreshTokenController } from './controlers/users/refresh-token.controller';
+import { ListNotificationLogsController } from './controlers/notifications/list-notification-logs.controller';
 
 // Use Cases
 import { AuthenticateUserUseCase } from '@/domain/application/use-cases/users/authenticate-user';
@@ -101,6 +109,8 @@ import { GetProfessionalUseCase } from '@/domain/application/use-cases/professio
 import { GetProfessionalsByFranchiseIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-franchise-id';
 import { GetProfessionalsByClinicIdUseCase } from '@/domain/application/use-cases/professional/get-professionals-by-clinic-id';
 import { FetchPatientsByProfessionalIdUseCase } from '@/domain/application/use-cases/professional/fetch-patients-by-professional-id';
+import { ActivateProfessionalUseCase } from '@/domain/application/use-cases/professional/activate-professional';
+import { InactivateProfessionalUseCase } from '@/domain/application/use-cases/professional/inactivate-professional';
 import { CreateProcedureUseCase } from '@/domain/application/use-cases/procedure/create-procedure';
 import { EditProcedureUseCase } from '@/domain/application/use-cases/procedure/edit-procedure';
 import { GetProcedureByIdUseCase } from '@/domain/application/use-cases/procedure/get-procedure-by-id';
@@ -109,6 +119,9 @@ import { InactivateProcedureUseCase } from '@/domain/application/use-cases/proce
 import { DeleteProcedureUseCase } from '@/domain/application/use-cases/procedure/delete-procedure';
 import { CreateAnamnesisUseCase } from '@/domain/application/use-cases/anamnesis/create-anamnesis';
 import { GetAnamnesisByPatientIdUseCase } from '@/domain/application/use-cases/anamnesis/get-anamnesis-by-patient-id';
+import { ValidateAnamnesisTokenUseCase } from '@/domain/application/use-cases/anamnesis/validate-anamnesis-token';
+import { SubmitAnamnesisViaTokenUseCase } from '@/domain/application/use-cases/anamnesis/submit-anamnesis-via-token';
+import { ResendAnamnesisTokenUseCase } from '@/domain/application/use-cases/anamnesis/resend-anamnesis-token';
 import { CancelAppointmentUseCase } from '@/domain/application/use-cases/appointment/cancel-appointment';
 import { ConfirmAppointmentUseCase } from '@/domain/application/use-cases/appointment/confirm-appointment';
 import { CreateAppointmentUseCase } from '@/domain/application/use-cases/appointment/create-appointment';
@@ -136,12 +149,14 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     RateLimitModule,
     AuthModule,
     ClinicsHttpModule,
+    AdminModule,
   ],
   controllers: [
     HealthCheckController,
     AuthenticateUserController,
     RegisterUserController,
     LogoutController,
+    RefreshTokenController,
     MeController,
     GetPatientByUserIdController,
     EditUserController,
@@ -171,6 +186,8 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetProfessionalsByFranchiseIdController,
     GetProfessionalsByClinicIdController,
     FetchPatientsByProfessionalIdController,
+    ActivateProfessionalController,
+    InactivateProfessionalController,
     CreateProcedureController,
     EditProcedureController,
     GetProcedureByIdController,
@@ -179,6 +196,8 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     DeleteProcedureController,
     CreateAnamnesisController,
     GetAnamnesisByPatientIdController,
+    AnamnesisTokenController,
+    ResendAnamnesisTokenController,
     CancelAppointmentController,
     ConfirmAppointmentController,
     CreateAppointmentController,
@@ -195,6 +214,8 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     PublicBookingController,
     WhatsappWebhookController,
     OnboardClinicController,
+    MeAdminController,
+    ListNotificationLogsController,
   ],
   providers: [
     { provide: APP_GUARD, useClass: RateLimitGuard },
@@ -230,6 +251,8 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     GetProfessionalsByFranchiseIdUseCase,
     GetProfessionalsByClinicIdUseCase,
     FetchPatientsByProfessionalIdUseCase,
+    ActivateProfessionalUseCase,
+    InactivateProfessionalUseCase,
     CreateProcedureUseCase,
     EditProcedureUseCase,
     GetProcedureByIdUseCase,
@@ -238,6 +261,9 @@ import { HandleWhatsAppMessageUseCase } from '@/domain/application/use-cases/wha
     DeleteProcedureUseCase,
     CreateAnamnesisUseCase,
     GetAnamnesisByPatientIdUseCase,
+    ValidateAnamnesisTokenUseCase,
+    SubmitAnamnesisViaTokenUseCase,
+    ResendAnamnesisTokenUseCase,
     CancelAppointmentUseCase,
     ConfirmAppointmentUseCase,
     CreateAppointmentUseCase,

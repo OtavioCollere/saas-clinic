@@ -8,6 +8,7 @@ import { seedProcedures } from './seeds/procedures.seed';
 import { seedPatients } from './seeds/patients.seed';
 import { seedAppointments } from './seeds/appointments.seed';
 import { seedAnamnesis } from './seeds/anamnesis.seed';
+import { seedServiceOrders } from './seeds/service-orders.seed';
 
 const prisma = new PrismaClient();
 
@@ -58,6 +59,7 @@ async function main() {
 
     await seedAppointments(prisma, professionals, franchise.id, patients, procedures);
     await seedAnamnesis(prisma, patients);
+    await seedServiceOrders(prisma, franchise.id);
 
     console.log('\n✅ Seed concluído com sucesso!');
     console.log('\n📋 Resumo:');
@@ -68,6 +70,8 @@ async function main() {
     console.log(`   Procedimentos:  10`);
     console.log(`   Pacientes:      50`);
     console.log(`   Agendamentos:   ~126 (4 meses de histórico + próxima semana)`);
+    console.log(`   Comandas:       ~110 (PAID/PENDING/WAITING_PAYMENT/CANCELED)`);
+    console.log(`   Anamneses:      30 (20 assinadas) + histórico de versões`);
     console.log('\n🔑 Credenciais (senha: 123456):');
     console.log('   Owner:          owner@cliniker.com.br');
     console.log('   Colaborador:    admin@cliniker.com.br');

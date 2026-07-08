@@ -48,7 +48,7 @@ export class SendEmailVerificationUseCase {
       await this.emailVerificationRepository.create(emailVerification, tx);
     });
 
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://cliniker.com.br'}/verify-email?token=${token}`;
+    const verificationUrl = `${process.env.APP_URL ?? 'https://cliniker.com.br'}/verify-email?token=${token}`;
     const expiryFormatted = expiresAt.toLocaleString('pt-BR', {
       day: '2-digit', month: '2-digit', year: 'numeric',
       hour: '2-digit', minute: '2-digit',

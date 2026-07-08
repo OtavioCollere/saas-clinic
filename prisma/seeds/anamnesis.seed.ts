@@ -384,31 +384,85 @@ const TEMPLATES: AnamnesisTemplate[] = [
   },
 ];
 
+function daysAgo(n: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+// Gera variações do template para simular histórico de evolução
+function evolve(base: AnamnesisTemplate, step: number): AnamnesisTemplate {
+  const weightDelta = [-3, -1.5, -0.5][step] ?? 0;
+  const physicalAssessment = {
+    ...(base.physicalAssessment as Record<string, unknown>),
+    initialWeight:
+      ((base.physicalAssessment as Record<string, unknown>).initialWeight as number) + weightDelta,
+  };
+
+  // step 0 (mais antigo): sem medicação, step 1: adiciona, step 2 (atual): mantém
+  const medicalHistory = step === 0
+    ? { ...(base.medicalHistory as Record<string, unknown>), usesMedication: false, medicationDetails: undefined }
+    : base.medicalHistory;
+
+  return { ...base, physicalAssessment, medicalHistory };
+}
+
 export async function seedAnamnesis(
   prisma: PrismaClient,
   patients: Array<{ id: string }>
 ) {
-  console.log('📋 Criando anamneses...');
+  console.log('📋 Criando anamneses e histórico...');
 
-  // Cria anamnese para os primeiros 30 pacientes (20 ficam sem para testar estado vazio)
+  // 30 pacientes com anamnese; 20 ficam sem (para testar estado vazio)
   const toSeed = patients.slice(0, 30);
   let created = 0;
+  let historyCount = 0;
 
   for (let i = 0; i < toSeed.length; i++) {
     const template = TEMPLATES[i % TEMPLATES.length];
-    await prisma.anamnesis.create({
+
+    const anamnesis = await prisma.anamnesis.create({
       data: {
         patientId: toSeed[i].id,
         aestheticHistory: template.aestheticHistory,
         healthConditions: template.healthConditions,
         medicalHistory: template.medicalHistory,
         physicalAssessment: template.physicalAssessment,
-        patientSignature: null,
-        signedAt: null,
+        patientSignature: i < 20 ? `data:image/png;base64,paciente${i + 1}` : null,
+        signedAt: i < 20 ? daysAgo(30 + i * 2) : null,
       },
     });
     created++;
+
+    // Pacientes 0-9: 3 versões de histórico (pacientes antigos, vieram 3 vezes)
+    // Pacientes 10-19: 2 versões
+    // Pacientes 20-29: 1 versão (cadastro recente, só atualizaram 1x)
+    const historySteps = i < 10 ? 3 : i < 20 ? 2 : 1;
+
+    // Snapshots mais antigos primeiro
+    const baseOffsets = [180, 90, 45]; // dias atrás para cada versão
+    for (let step = 0; step < historySteps; step++) {
+      const snapshot = evolve(template, step);
+      const savedAt = daysAgo(baseOffsets[step] ?? 20);
+      await prisma.anamnesisHistory.create({
+        data: {
+          anamnesisId: anamnesis.id,
+          patientId: toSeed[i].id,
+          aestheticHistory: snapshot.aestheticHistory,
+          healthConditions: snapshot.healthConditions,
+          medicalHistory: snapshot.medicalHistory,
+          physicalAssessment: snapshot.physicalAssessment,
+          patientSignature: step === historySteps - 1 && i < 20
+            ? `data:image/png;base64,paciente${i + 1}`
+            : null,
+          signedAt: step === historySteps - 1 && i < 20 ? savedAt : null,
+          savedAt,
+        },
+      });
+      historyCount++;
+    }
   }
 
-  console.log(`✅ ${created} anamneses criadas (${patients.length - created} pacientes sem anamnese)`);
+  console.log(`✅ ${created} anamneses criadas, ${historyCount} entradas de histórico`);
+  console.log(`   (${patients.length - created} pacientes sem anamnese — para testar estado vazio)`);
 }

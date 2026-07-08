@@ -15,6 +15,8 @@ import { AppointmentsRepository } from '@/domain/application/repositories/appoin
 import { ServiceOrderRepository } from '@/domain/application/repositories/service-order-repository';
 import { PasswordVerificationRepository } from '@/domain/application/repositories/password-verification-repository';
 import { WhatsAppConversationRepository } from '@/domain/application/repositories/whatsapp-conversation-repository';
+import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository';
+import { AnamnesisTokenRepository } from '@/domain/application/repositories/anamnesis-token-repository';
 import { PrismaUsersRepository } from './prisma/repositories/prisma-users-repository';
 import { PrismaMfaSettingsRepository } from './prisma/repositories/prisma-mfa-settings-repository';
 import { PrismaSessionsRepository } from './prisma/repositories/prisma-sessions-repository';
@@ -30,6 +32,8 @@ import { PrismaProcedureRepository } from './prisma/repositories/prisma-procedur
 import { PrismaAppointmentsRepository } from './prisma/repositories/prisma-appointments-repository';
 import { PrismaServiceOrderRepository } from './prisma/repositories/prisma-service-order-repository';
 import { PrismaWhatsAppConversationRepository } from './prisma/repositories/prisma-whatsapp-conversation-repository';
+import { PrismaNotificationLogRepository } from './prisma/repositories/prisma-notification-log-repository';
+import { PrismaAnamnesisTokenRepository } from './prisma/repositories/prisma-anamnesis-token-repository';
 import { TransactionManager } from '@/domain/application/transactions/transaction-manager';
 import { PrismaTransactionManager } from './prisma-transaction-manager';
 
@@ -52,6 +56,8 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     {provide : ServiceOrderRepository, useClass : PrismaServiceOrderRepository},
     {provide : PasswordVerificationRepository, useClass : PrismaPasswordVerificationRepository},
     {provide : WhatsAppConversationRepository, useClass : PrismaWhatsAppConversationRepository},
+    {provide : NotificationLogRepository, useClass : PrismaNotificationLogRepository},
+    {provide : AnamnesisTokenRepository, useClass : PrismaAnamnesisTokenRepository},
   ],
   exports: [
     PrismaService,
@@ -71,6 +77,8 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     AppointmentsRepository,
     ServiceOrderRepository,
     WhatsAppConversationRepository,
+    NotificationLogRepository,
+    AnamnesisTokenRepository,
   ],
 })
 export class DatabaseModule {}

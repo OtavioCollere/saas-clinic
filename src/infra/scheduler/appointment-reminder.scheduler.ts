@@ -6,8 +6,9 @@ import { UsersRepository } from '@/domain/application/repositories/users-reposit
 import { ProfessionalRepository } from '@/domain/application/repositories/professional-repository'
 import { FranchiseRepository } from '@/domain/application/repositories/franchise-repository'
 import { ClinicRepository } from '@/domain/application/repositories/clinic-repository'
+import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository'
 import { EmailQueue } from '@/shared/services/email/email-queue'
-import { WhatsAppSender } from '@/shared/services/whatsapp/whatsapp-sender'
+import { WhatsAppQueue } from '@/shared/services/whatsapp/whatsapp-queue'
 
 const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
 
@@ -126,14 +127,17 @@ export class AppointmentReminderScheduler {
     private readonly franchiseRepository: FranchiseRepository,
     @Inject(ClinicRepository)
     private readonly clinicRepository: ClinicRepository,
+    @Inject(NotificationLogRepository)
+    private readonly notificationLogRepository: NotificationLogRepository,
     @Inject(EmailQueue)
     private readonly emailQueue: EmailQueue,
-    @Inject(WhatsAppSender)
-    private readonly whatsAppSender: WhatsAppSender,
+    @Inject(WhatsAppQueue)
+    private readonly whatsAppQueue: WhatsAppQueue,
   ) {}
 
-  @Cron('0 8 * * *')
+  @Cron('0 8 * * *', { timeZone: 'America/Sao_Paulo' })
   async sendDayBeforeReminders() {
+    if (process.env.ENABLE_CRON !== 'true') return;
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -177,41 +181,50 @@ export class AppointmentReminderScheduler {
           minute: '2-digit',
         })
 
-        if (user.phone) {
-          try {
-            const reminderLines = [
-              `Olá, *${patient.name}*! 👋`,
-              '',
-              'Passando para lembrar que você tem uma consulta marcada para *amanhã*.',
-              '',
-              `📋 *${appointment.name}*`,
-              `🗓 ${date}`,
-              `🕐 ${time}`,
-            ]
-            if (professionalUser) reminderLines.push(`👨‍⚕️ ${professionalUser.name}`)
-            if (franchise?.address) reminderLines.push(`📍 ${franchise.address}`)
-            reminderLines.push('', 'Qualquer imprevisto, entre em contato com antecedência.', '', '_Cliniker — Sistema de Gestão Clínica_')
+        const channel = user.phone ? 'WHATSAPP' : 'EMAIL'
+        const recipientRef = user.phone ?? user.email.getValue()
 
-            await this.whatsAppSender.send({
-              to: user.phone,
-              message: reminderLines.join('\n'),
-              credentials,
-            })
-            this.logger.log(`WhatsApp lembrete enviado para ${user.phone} (consulta ${appointment.id})`)
-            continue
-          } catch (err) {
-            this.logger.warn(`Falha no WhatsApp para ${user.phone}, tentando email — ${err}`)
-          }
+        const log = await this.notificationLogRepository.create({
+          clinicId: franchise?.clinicId.toString() ?? '',
+          channel,
+          type: 'APPOINTMENT_REMINDER',
+          recipientRef,
+          appointmentId: appointment.id.toString(),
+        })
+
+        if (user.phone) {
+          const reminderLines = [
+            `Ola, *${patient.name}*!`,
+            '',
+            'Passando para lembrar que voce tem uma consulta marcada para *amanha*.',
+            '',
+            `*${appointment.name}*`,
+            `Data: ${date}`,
+            `Horario: ${time}`,
+          ]
+          if (professionalUser) reminderLines.push(`Profissional: ${professionalUser.name}`)
+          if (franchise?.address) reminderLines.push(`Local: ${franchise.address}`)
+          reminderLines.push('', 'Qualquer imprevisto, entre em contato com antecedencia.', '', '_Cliniker - Sistema de Gestao Clinica_')
+
+          await this.whatsAppQueue.enqueue({
+            to: user.phone,
+            message: reminderLines.join('\n'),
+            credentials,
+            logId: log.id,
+          })
+          this.logger.log(`WhatsApp lembrete enfileirado para ${user.phone} (consulta ${appointment.id})`)
+          continue
         }
 
         await this.emailQueue.enqueue({
           to: user.email.getValue(),
-          subject: 'Lembrete: você tem uma consulta amanhã — Cliniker',
+          subject: 'Lembrete: voce tem uma consulta amanha - Cliniker',
           html: buildReminderEmail(patient.name, appointment.name, date, time),
-          text: `Olá, ${patient.name}! Lembrete: você tem uma consulta "${appointment.name}" amanhã, ${date} às ${time}.`,
+          text: `Ola, ${patient.name}! Lembrete: voce tem uma consulta "${appointment.name}" amanha, ${date} as ${time}.`,
+          logId: log.id,
         })
 
-        this.logger.log(`Email lembrete enviado para ${user.email.getValue()} (consulta ${appointment.id})`)
+        this.logger.log(`Email lembrete enfileirado para ${user.email.getValue()} (consulta ${appointment.id})`)
       } catch (error) {
         this.logger.error(`Erro ao enviar lembrete para consulta ${appointment.id}`, error)
       }
