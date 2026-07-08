@@ -35,4 +35,4 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 RUN pnpm exec prisma generate
 
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/src/main.js"]
+CMD ["node", "dist/src/main.js"]

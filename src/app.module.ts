@@ -26,22 +26,24 @@ import { LoggerModule } from 'nestjs-pino';
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            levelFirst: true,
-            translateTime: 'yyyy-mm-dd HH:MM:ss Z',
-          },
-        },
+        transport: process.env.NODE_ENV === 'production'
+          ? undefined
+          : {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                levelFirst: true,
+                translateTime: 'yyyy-mm-dd HH:MM:ss Z',
+              },
+            },
       },
     }),
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD || undefined,
-        db: process.env.REDIS_DATABASE ? parseInt(process.env.REDIS_DATABASE, 10) : undefined,
+        db: process.env.REDIS_DATABASE ? Number.parseInt(process.env.REDIS_DATABASE, 10) : undefined,
       },
     }),
     AuthModule,
