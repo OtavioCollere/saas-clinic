@@ -173,6 +173,7 @@ model Professional {
   councilNumber String?
   councilState  String?
   profession   String   // MEDICO, BIOMEDICO
+  status       String   @default("ACTIVE") // ACTIVE, INACTIVE
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -184,6 +185,7 @@ model Professional {
   @@unique([userId, franchiseId])
   @@index([franchiseId])
   @@index([userId])
+  @@index([status])
 }
 
 model Patient {
