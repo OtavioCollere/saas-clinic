@@ -65,8 +65,14 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          CLOUDSQL_INSTANCE: ${{ secrets.CLOUDSQL_INSTANCE }}
         run: |
           TAG="${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}"
+          CLOUDSQL_ARGS=()
+
+          if [ -n "$CLOUDSQL_INSTANCE" ]; then
+            CLOUDSQL_ARGS=(--set-cloudsql-instances "$CLOUDSQL_INSTANCE")
+          fi
 
           cat > "$RUNNER_TEMP/run.env" <<EOF
           DATABASE_URL=$DATABASE_URL
@@ -84,5 +90,6 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-cloudsql-instances ${{ secrets.CLOUDSQL_INSTANCE }} \
-            --env-vars-file "$RUNNER_TEMP/run.env"
+            "${CLOUDSQL_ARGS[@]}" \
+            --env-vars-file "$RUNNER_TEMP/run.env" \
+            --quiet
