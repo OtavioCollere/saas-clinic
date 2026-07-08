@@ -84,5 +84,5 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --add-cloudsql-instances ${{ secrets.CLOUDSQL_INSTANCE }} \
+            --set-cloudsql-instances ${{ secrets.CLOUDSQL_INSTANCE }} \
             --env-vars-file "$RUNNER_TEMP/run.env"
