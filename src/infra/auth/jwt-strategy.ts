@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
+  role: z.enum(['ADMIN', 'MEMBER']).optional(),
   clinicId: z.string().uuid().optional(),
   clinicMembershipId: z.string().uuid().optional(),
 })
