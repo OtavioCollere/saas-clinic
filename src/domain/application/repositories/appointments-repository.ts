@@ -11,6 +11,7 @@ export abstract class AppointmentsRepository {
   abstract findByProfessionalIdAndHourRangeExcludingId(professionalId: string, startAt: Date, endAt: Date, excludeId: string): Promise<Appointment | null>;
   abstract findPendingByClinicId(clinicId: string): Promise<Appointment[]>;
   abstract findPendingByFranchiseId(franchiseId: string): Promise<Appointment[]>;
+  abstract findPendingByProfessionalId(professionalId: string): Promise<Appointment[]>;
   abstract findByClinicId(clinicId: string): Promise<Appointment[]>;
   /** Agendamentos futuros (endAt >= now), ordenados do próximo para o mais distante (startAt asc) */
   abstract findFutureByClinicId(clinicId: string): Promise<Appointment[]>;

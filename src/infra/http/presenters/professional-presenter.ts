@@ -12,6 +12,7 @@ export class ProfessionalPresenter {
 			councilNumber: professional.councilNumber,
 			councilState: professional.councilState,
 			profession: professional.profession.getValue(),
+			status: professional.status.getValue(),
 			createdAt: professional.createdAt.toISOString(),
 			updatedAt: professional.updatedAt?.toISOString(),
 		};

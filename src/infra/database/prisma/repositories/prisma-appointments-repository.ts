@@ -200,6 +200,21 @@ export class PrismaAppointmentsRepository extends AppointmentsRepository {
     return raw.map(AppointmentMapper.toDomain);
   }
 
+  async findPendingByProfessionalId(professionalId: string): Promise<Appointment[]> {
+    const raw = await this.prisma.appointment.findMany({
+      where: {
+        professionalId,
+        status: { in: ['WAITING', 'CONFIRMED'] },
+        startAt: { gte: new Date() },
+      },
+      include: {
+        appointmentItems: true,
+      },
+      orderBy: { startAt: 'asc' },
+    });
+    return raw.map(AppointmentMapper.toDomain);
+  }
+
   async findByClinicId(clinicId: string): Promise<Appointment[]> {
     // Busca todas as franquias da clínica
     const franchises = await this.prisma.franchise.findMany({
