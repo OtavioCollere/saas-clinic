@@ -1,56 +1,56 @@
 import { Processor, Process } from '@nestjs/bull'
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { Job } from 'bull'
 import { EmailSender } from '@/shared/services/email/email-sender'
+import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository'
 
 interface SendEmailJobData {
   to: string
   subject: string
   text?: string
   html?: string
+  logId?: string
 }
 
 @Processor('SEND_EMAIL_QUEUE')
 @Injectable()
 export class SendEmailConsumer {
+  private readonly logger = new Logger(SendEmailConsumer.name)
+
   constructor(
     @Inject(EmailSender)
     private readonly emailSender: EmailSender,
+    @Inject(NotificationLogRepository)
+    private readonly notificationLogRepository: NotificationLogRepository,
   ) {}
 
   @Process('send-email')
   async handleSendEmail(job: Job<SendEmailJobData>) {
-    console.log('🔄 SendEmailConsumer: Job recebido para processamento', {
-      jobId: job.id,
-      jobName: job.name,
-      attempt: job.attemptsMade + 1,
-      data: {
-        to: job.data.to,
-        subject: job.data.subject,
-        hasText: !!job.data.text,
-        hasHtml: !!job.data.html,
-      },
-    });
+    const { to, subject, text, html, logId } = job.data
+
+    this.logger.log(`Processando email para ${to} (attempt=${job.attemptsMade + 1})`)
+
+    if (logId) {
+      await this.notificationLogRepository.incrementAttempts(logId)
+    }
 
     try {
-      const { to, subject, text, html } = job.data;
-      
-      console.log('📤 SendEmailConsumer: Enviando email via EmailSender...');
-      
-      await this.emailSender.send({ to, subject, text, html });
-      
-      console.log('✅ SendEmailConsumer: Email enviado com sucesso', {
-        to,
-        subject,
-        jobId: job.id,
-      });
+      await this.emailSender.send({ to, subject, text, html })
+
+      this.logger.log(`Email enviado para ${to} (jobId=${job.id})`)
+
+      if (logId) {
+        await this.notificationLogRepository.markSent(logId)
+      }
     } catch (error) {
-      console.error('❌ SendEmailConsumer: Erro ao enviar email', {
-        jobId: job.id,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-      throw error;
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      this.logger.error(`Erro ao enviar email para ${to}: ${errorMessage}`)
+
+      if (logId) {
+        await this.notificationLogRepository.markFailed(logId, errorMessage)
+      }
+
+      throw error
     }
   }
 }

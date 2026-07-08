@@ -1,9 +1,10 @@
-﻿import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
+import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository';
 import { ClinicOwnerOnboardedEvent } from '@/domain/enterprise/events/clinic-owner-onboarded.event';
 
-const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
+const APP_URL = process.env['APP_URL'] ?? 'https://cliniker.com.br';
 
 function formatExpiry(date: Date): string {
   return date.toLocaleString('pt-BR', {
@@ -34,14 +35,14 @@ function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, 
           <tr>
             <td style="background:#7C3AED;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
               <div style="color:#fff;font-size:26px;font-weight:bold;letter-spacing:-0.5px;">Cliniker</div>
-              <div style="color:#bfdbfe;font-size:13px;margin-top:4px;">Sistema de Gestão Clínica</div>
+              <div style="color:#bfdbfe;font-size:13px;margin-top:4px;">Sistema de Gestao Clinica</div>
             </td>
           </tr>
           <tr>
             <td style="background:#fff;border-radius:0 0 12px 12px;padding:36px 40px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
-              <h2 style="margin:0 0 8px;color:#0f172a;font-size:22px;">Sua clínica está pronta! 🎉</h2>
+              <h2 style="margin:0 0 8px;color:#0f172a;font-size:22px;">Sua clinica esta pronta!</h2>
               <p style="margin:0 0 8px;color:#475569;font-size:15px;line-height:1.6;">
-                A clínica <strong>${clinicName}</strong> foi criada no Cliniker.
+                A clinica <strong>${clinicName}</strong> foi criada no Cliniker.
                 Use as credenciais abaixo para acessar o painel como administrador.
               </p>
               <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:20px;">
@@ -53,7 +54,7 @@ function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, 
                 </tr>
                 <tr>
                   <td style="padding:0 20px;border-top:1px solid #e2e8f0;padding-top:16px;">
-                    <div style="font-size:11px;font-weight:bold;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Senha temporária</div>
+                    <div style="font-size:11px;font-weight:bold;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Senha temporaria</div>
                     <div style="font-size:18px;color:#1e293b;font-weight:700;font-family:monospace;letter-spacing:2px;background:#fff;border:1px dashed #cbd5e1;border-radius:6px;padding:10px 14px;display:inline-block;">${password}</div>
                   </td>
                 </tr>
@@ -62,7 +63,7 @@ function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, 
                 <tr>
                   <td style="padding:0 16px;">
                     <div style="font-size:13px;color:#92400e;line-height:1.5;">
-                      ⚠️ <strong>Atenção:</strong> esta senha expira em <strong>${expiry}</strong> (72 horas). Acesse antes deste prazo e altere sua senha.
+                      <strong>Atencao:</strong> esta senha expira em <strong>${expiry}</strong> (72 horas). Acesse antes deste prazo e altere sua senha.
                     </div>
                   </td>
                 </tr>
@@ -70,20 +71,20 @@ function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, 
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="${loginUrl}" style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
+                    <a href="${loginUrl}" style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;">
                       Acessar o Cliniker
                     </a>
                   </td>
                 </tr>
               </table>
-              <p style="margin:0;font-size:13px;color:#94a3b8;text-align:center;line-height:1.5;">
-                Se você não esperava este email, pode ignorá-lo com segurança.
+              <p style="margin:0;font-size:13px;color:#94a3b8;text-align:center;">
+                Se voce nao esperava este email, pode ignora-lo com seguranca.
               </p>
             </td>
           </tr>
           <tr>
             <td style="text-align:center;padding:20px 0 4px;">
-              <p style="margin:0;font-size:12px;color:#94a3b8;">© ${new Date().getFullYear()} Cliniker · Sistema de Gestão Clínica</p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">© ${new Date().getFullYear()} Cliniker · Sistema de Gestao Clinica</p>
             </td>
           </tr>
         </table>
@@ -96,22 +97,34 @@ function buildOwnerEmail(clinicName: string, clinicSlug: string, email: string, 
 
 @Injectable()
 export class OnClinicOwnerOnboarded {
+  private readonly logger = new Logger(OnClinicOwnerOnboarded.name)
+
   constructor(
     @Inject(EmailQueue)
     private readonly emailQueue: EmailQueue,
+    @Inject(NotificationLogRepository)
+    private readonly notificationLogRepository: NotificationLogRepository,
   ) {}
 
   @OnEvent('clinic-owner.onboarded')
   async handle(event: ClinicOwnerOnboardedEvent) {
     try {
+      const log = await this.notificationLogRepository.create({
+        clinicId: event.clinicId,
+        channel: 'EMAIL',
+        type: 'OWNER_WELCOME',
+        recipientRef: event.ownerEmail,
+      })
+
       await this.emailQueue.enqueue({
         to: event.ownerEmail,
-        subject: `Bem-vindo ao Cliniker — acesso à ${event.clinicName}`,
+        subject: `Bem-vindo ao Cliniker - acesso a ${event.clinicName}`,
         html: buildOwnerEmail(event.clinicName, event.clinicSlug, event.ownerEmail, event.password, event.expiresAt),
-        text: `Bem-vindo ao Cliniker!\n\nSua clínica "${event.clinicName}" foi criada.\n\nEmail: ${event.ownerEmail}\nSenha temporária: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}/${event.clinicSlug}/auth/login`,
-      });
+        text: `Bem-vindo ao Cliniker!\n\nSua clinica "${event.clinicName}" foi criada.\n\nEmail: ${event.ownerEmail}\nSenha temporaria: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}/${event.clinicSlug}/auth/login`,
+        logId: log.id,
+      })
     } catch (error) {
-      console.error('Erro ao enviar email de boas-vindas (owner):', error);
+      this.logger.error('Erro ao enviar email de boas-vindas (owner)', error)
     }
   }
 }

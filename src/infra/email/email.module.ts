@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { BullModule } from '@nestjs/bull'
+import { DatabaseModule } from '../database/database.module'
 import { EmailSender } from '@/shared/services/email/email-sender'
 import { EmailQueue } from '@/shared/services/email/email-queue'
 import { ResendEmailSender } from './resend-email-sender'
@@ -9,6 +10,7 @@ import { SendEmailConsumer } from './consumers/send-email.consumer'
 @Module({
   imports: [
     BullModule.registerQueue({ name: 'SEND_EMAIL_QUEUE' }),
+    DatabaseModule,
   ],
   providers: [
     {

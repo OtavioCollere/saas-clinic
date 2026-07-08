@@ -1,9 +1,10 @@
-﻿import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueue } from '@/shared/services/email/email-queue';
+import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository';
 import { ProfessionalCreatedEvent } from '@/domain/enterprise/events/professional-created.event';
 
-const APP_URL = process.env["APP_URL"] ?? 'https://cliniker.com.br';
+const APP_URL = process.env['APP_URL'] ?? 'https://cliniker.com.br';
 
 function formatExpiry(date: Date): string {
   return date.toLocaleString('pt-BR', {
@@ -30,26 +31,18 @@ function buildProfessionalEmail(email: string, password: string, expiresAt: Date
     <tr>
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-
-          <!-- Header -->
           <tr>
             <td style="background:#7C3AED;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
-              <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:50%;width:52px;height:52px;line-height:52px;font-size:24px;font-weight:bold;color:#fff;margin-bottom:12px;">+</div>
               <div style="color:#fff;font-size:26px;font-weight:bold;letter-spacing:-0.5px;">Cliniker</div>
-              <div style="color:#bfdbfe;font-size:13px;margin-top:4px;">Sistema de GestÃ£o ClÃ­nica</div>
+              <div style="color:#bfdbfe;font-size:13px;margin-top:4px;">Sistema de Gestao Clinica</div>
             </td>
           </tr>
-
-          <!-- Body -->
           <tr>
             <td style="background:#fff;border-radius:0 0 12px 12px;padding:36px 40px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
-
-              <h2 style="margin:0 0 8px;color:#0f172a;font-size:22px;">Bem-vindo Ã  equipe! ðŸ‘‹</h2>
+              <h2 style="margin:0 0 8px;color:#0f172a;font-size:22px;">Bem-vindo a equipe!</h2>
               <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
                 Seu acesso como <strong>profissional</strong> foi criado no Cliniker. Use as credenciais abaixo para entrar no sistema pela primeira vez.
               </p>
-
-              <!-- Credentials box -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:20px;">
                 <tr>
                   <td style="padding:0 20px 16px;">
@@ -59,48 +52,39 @@ function buildProfessionalEmail(email: string, password: string, expiresAt: Date
                 </tr>
                 <tr>
                   <td style="padding:0 20px;border-top:1px solid #e2e8f0;padding-top:16px;">
-                    <div style="font-size:11px;font-weight:bold;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Senha temporÃ¡ria</div>
+                    <div style="font-size:11px;font-weight:bold;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Senha temporaria</div>
                     <div style="font-size:18px;color:#1e293b;font-weight:700;font-family:monospace;letter-spacing:2px;background:#fff;border:1px dashed #cbd5e1;border-radius:6px;padding:10px 14px;display:inline-block;">${password}</div>
                   </td>
                 </tr>
               </table>
-
-              <!-- Expiry warning -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbeb;border:1px solid #fbbf24;border-radius:10px;padding:16px;margin-bottom:28px;">
                 <tr>
                   <td style="padding:0 16px;">
                     <div style="font-size:13px;color:#92400e;line-height:1.5;">
-                      âš ï¸ <strong>AtenÃ§Ã£o:</strong> esta senha expira em <strong>${expiry}</strong> (72 horas). FaÃ§a seu primeiro acesso antes deste prazo e altere sua senha.
+                      <strong>Atencao:</strong> esta senha expira em <strong>${expiry}</strong> (72 horas). Faca seu primeiro acesso antes deste prazo e altere sua senha.
                     </div>
                   </td>
                 </tr>
               </table>
-
-              <!-- CTA -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
-                    <a href="${APP_URL}"
-                       style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;letter-spacing:0.2px;">
+                    <a href="${APP_URL}" style="display:inline-block;background:#7C3AED;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;padding:14px 40px;border-radius:8px;">
                       Acessar o Cliniker
                     </a>
                   </td>
                 </tr>
               </table>
-
-              <p style="margin:0;font-size:13px;color:#94a3b8;text-align:center;line-height:1.5;">
-                Se vocÃª nÃ£o esperava este email, pode ignorÃ¡-lo com seguranÃ§a.
+              <p style="margin:0;font-size:13px;color:#94a3b8;text-align:center;">
+                Se voce nao esperava este email, pode ignora-lo com seguranca.
               </p>
             </td>
           </tr>
-
-          <!-- Footer -->
           <tr>
             <td style="text-align:center;padding:20px 0 4px;">
-              <p style="margin:0;font-size:12px;color:#94a3b8;">Â© ${new Date().getFullYear()} Cliniker Â· Sistema de GestÃ£o ClÃ­nica</p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">© ${new Date().getFullYear()} Cliniker · Sistema de Gestao Clinica</p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
@@ -111,35 +95,39 @@ function buildProfessionalEmail(email: string, password: string, expiresAt: Date
 
 @Injectable()
 export class OnProfessionalCreated {
+  private readonly logger = new Logger(OnProfessionalCreated.name)
+
   constructor(
     @Inject(EmailQueue)
     private readonly emailQueue: EmailQueue,
+    @Inject(NotificationLogRepository)
+    private readonly notificationLogRepository: NotificationLogRepository,
   ) {}
 
   @OnEvent('professional.created')
   async handle(event: ProfessionalCreatedEvent) {
-    console.log('ðŸ“¬ Handler OnProfessionalCreated executado:', {
-      professionalId: event.professionalId,
-      userId: event.userId,
-      userEmail: event.userEmail,
-      franchiseId: event.franchiseId,
-    });
+    this.logger.log(`Handler OnProfessionalCreated: professionalId=${event.professionalId} clinicId=${event.clinicId}`)
 
     try {
-      console.log('ðŸ“§ Adicionando email Ã  fila...');
+      const log = await this.notificationLogRepository.create({
+        clinicId: event.clinicId,
+        channel: 'EMAIL',
+        type: 'PROFESSIONAL_WELCOME',
+        recipientRef: event.userEmail,
+      })
 
       await this.emailQueue.enqueue({
         to: event.userEmail,
-        subject: 'Bem-vindo ao Cliniker â€” suas credenciais de acesso',
+        subject: 'Bem-vindo ao Cliniker - suas credenciais de acesso',
         html: buildProfessionalEmail(event.userEmail, event.password, event.expiresAt),
-        text: `Bem-vindo ao Cliniker!\n\nSeu acesso como profissional foi criado.\n\nEmail: ${event.userEmail}\nSenha temporÃ¡ria: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}`,
-      });
+        text: `Bem-vindo ao Cliniker!\n\nSeu acesso como profissional foi criado.\n\nEmail: ${event.userEmail}\nSenha temporaria: ${event.password}\n\nEsta senha expira em: ${formatExpiry(event.expiresAt)}\n\nAcesse em: ${APP_URL}`,
+        logId: log.id,
+      })
 
-      console.log('âœ… Email adicionado Ã  fila com sucesso');
+      this.logger.log(`Email de boas-vindas enfileirado: professionalId=${event.professionalId}`)
     } catch (error) {
-      console.error('âŒ Erro ao adicionar email Ã  fila:', error);
+      this.logger.error(`Erro ao enfileirar email: professionalId=${event.professionalId}`, error)
       throw error;
     }
   }
 }
-
