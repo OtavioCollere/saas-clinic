@@ -6,6 +6,7 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -43,7 +44,10 @@ const editFranchiseParamsValidationPipe = new ZodValidationPipe(editFranchisePar
 @ApiTags("Franchises")
 @Controller("/franchises")
 export class EditFranchiseController {
-	constructor(private readonly editFranchiseUseCase: EditFranchiseUseCase) {}
+	constructor(
+		@Inject(EditFranchiseUseCase)
+		private readonly editFranchiseUseCase: EditFranchiseUseCase,
+	) {}
 
 	@Patch("/:franchiseId")
 	@ApiOperation({

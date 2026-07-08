@@ -8,6 +8,7 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -45,7 +46,10 @@ const editClinicParamsValidationPipe = new ZodValidationPipe(editClinicParamsSch
 @ApiTags("Clinics")
 @Controller("/clinics")
 export class EditClinicController {
-	constructor(private readonly editClinicUseCase: EditClinicUseCase) {}
+	constructor(
+		@Inject(EditClinicUseCase)
+		private readonly editClinicUseCase: EditClinicUseCase,
+	) {}
 
 	@Patch("/:clinicId")
 	@ApiOperation({

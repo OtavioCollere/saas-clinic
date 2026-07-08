@@ -72,10 +72,6 @@ export class AuthenticateUserController {
     @Tenant() clinicSlug: string,
     @Res({passthrough: true}) reply,
   ) {
-    if (!clinicSlug) {
-      throw new BadRequestException('Tenant (clinic slug) is required. Provide it via X-Tenant-ID header or ?tenant= query parameter.');
-    }
-
     const { email, password } = body;
 
     const result = await this.authenticateUserUseCase.execute({

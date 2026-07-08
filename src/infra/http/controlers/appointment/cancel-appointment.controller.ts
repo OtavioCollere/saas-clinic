@@ -5,6 +5,7 @@ import { CancelAppointmentUseCase } from "@/domain/application/use-cases/appoint
 import {
 	BadRequestException,
 	Controller,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -32,7 +33,10 @@ const cancelAppointmentParamsValidationPipe = new ZodValidationPipe(cancelAppoin
 @ApiTags("Appointments")
 @Controller("/appointments")
 export class CancelAppointmentController {
-	constructor(private readonly cancelAppointmentUseCase: CancelAppointmentUseCase) {}
+	constructor(
+		@Inject(CancelAppointmentUseCase)
+		private readonly cancelAppointmentUseCase: CancelAppointmentUseCase,
+	) {}
 
 	@Patch("/:appointmentId/cancel")
 	@ApiOperation({
