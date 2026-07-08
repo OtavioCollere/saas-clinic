@@ -21,7 +21,8 @@ import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { AnamnesisPresenter } from "../../presenters/anamnesis-presenter";
 
-const regionEnum = z.enum(AESTHETIC_REGIONS as unknown as [string, ...string[]]).optional();
+type AestheticRegion = typeof AESTHETIC_REGIONS[number];
+const regionEnum = z.enum(AESTHETIC_REGIONS as unknown as [AestheticRegion, ...AestheticRegion[]]).optional();
 
 const createAnamnesisParamsSchema = z.object({
 	patientId: z.string(),
