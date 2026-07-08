@@ -15,7 +15,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import z from 'zod'
 import { Public } from '@/infra/auth/public'
 import { isLeft, unwrapEither } from '@/shared/either/either'
-import { AESTHETIC_REGIONS } from '@/domain/enterprise/value-objects/aesthetic-region'
+import { AESTHETIC_REGIONS, AestheticRegionType } from '@/domain/enterprise/value-objects/aesthetic-region'
 import { ZodValidationPipe } from '../../pipes/zod-validation-pipe'
 import { ValidateAnamnesisTokenUseCase } from '@/domain/application/use-cases/anamnesis/validate-anamnesis-token'
 import { SubmitAnamnesisViaTokenUseCase } from '@/domain/application/use-cases/anamnesis/submit-anamnesis-via-token'
@@ -24,7 +24,8 @@ const tokenParamSchema = z.object({ token: z.string().uuid() })
 type TokenParam = z.infer<typeof tokenParamSchema>
 const tokenParamPipe = new ZodValidationPipe(tokenParamSchema)
 
-const regionEnum = z.enum(AESTHETIC_REGIONS as unknown as [string, ...string[]]).optional()
+type AestheticRegion = typeof AESTHETIC_REGIONS[number]
+const regionEnum = z.enum(AESTHETIC_REGIONS as unknown as [AestheticRegion, ...AestheticRegion[]]).optional()
 
 const submitBodySchema = z.object({
   aestheticHistory: z.object({

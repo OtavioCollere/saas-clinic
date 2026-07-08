@@ -33,9 +33,6 @@ export class ResendAnamnesisTokenController {
 
     if (isLeft(result)) {
       const error = unwrapEither(result)
-      if (error instanceof PatientNotFoundError) {
-        throw new NotFoundException(error.message)
-      }
       throw new NotFoundException(error.message)
     }
 
