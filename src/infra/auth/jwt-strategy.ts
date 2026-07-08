@@ -5,6 +5,9 @@ import { z } from 'zod'
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
+  role: z.enum(['ADMIN', 'MEMBER']).optional(),
+  clinicId: z.string().uuid().optional(),
+  clinicMembershipId: z.string().uuid().optional(),
 })
 
 export type UserPayload = z.infer<typeof tokenPayloadSchema>
@@ -12,7 +15,7 @@ export type UserPayload = z.infer<typeof tokenPayloadSchema>
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
-    const publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8CQVGAD3TPyqvC+86DZfGEebvPsMCE/UCxABxjN7RWxg11iTfv+86GMyjMOHfODBUEH83UcZsdv6mIUWILP6reonf3/WIOqqm8xn2OvT+ZDd7x6m7CcO3ZSJciUtp1oU2Fj/WAjMdsSvUYZk6nZnxKWPxIc/+bzZTGeOqcq2Ok3xcihmwKckeYoTKQW8d4q3LbjL3WwC0o66t0SrLhfvDIWnjCvlCUy6Qh5zJy95dQo6+EzF6cVSJc9mWo5AywLt0phZ5KauaegQJs51Fn2oi8lkGt9jqj7U1+9EgQ6jQPSEmKucFfWWJEQ0KkyxVpZNBgVa4GprIdGEn8N9qwgTvQIDAQAB";
+    const publicKey = process.env.JWT_PUBLIC_KEY as string;
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

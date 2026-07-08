@@ -3,6 +3,7 @@ import { FetchPatientsUseCase } from "@/domain/application/use-cases/patient/fet
 import {
 	Controller,
 	Get,
+	Inject,
 	Query,
 } from "@nestjs/common";
 import {
@@ -27,7 +28,10 @@ const fetchPatientsQueryValidationPipe = new ZodValidationPipe(fetchPatientsQuer
 @ApiTags("Patients")
 @Controller("/patients")
 export class FetchPatientsController {
-	constructor(private readonly fetchPatientsUseCase: FetchPatientsUseCase) {}
+	constructor(
+		@Inject(FetchPatientsUseCase)
+		private readonly fetchPatientsUseCase: FetchPatientsUseCase,
+	) {}
 
 	@Get()
 	@ApiOperation({

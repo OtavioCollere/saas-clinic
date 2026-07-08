@@ -11,14 +11,14 @@ export class JwtEncrypter implements Encrypter {
   ){}
 
   async sign(payload: Record<string, unknown>): Promise<string> {
-    return this.jwtService.signAsync(payload, 
-    { expiresIn : '15m' }
-    )
+    const { userId, ...rest } = payload;
+    const jwtPayload = userId ? { sub: userId, ...rest } : payload;
+    return this.jwtService.signAsync(jwtPayload, { expiresIn: '15m' });
   }
 
   async refresh(payload: Record<string, unknown>): Promise<string> {
-    return this.jwtService.signAsync(payload, 
-      { expiresIn : '7d' }
-    )
+    const { userId, ...rest } = payload;
+    const jwtPayload = userId ? { sub: userId, ...rest } : payload;
+    return this.jwtService.signAsync(jwtPayload, { expiresIn: '7d' });
   }
 }

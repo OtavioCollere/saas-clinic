@@ -78,5 +78,9 @@ export class PrismaUsersRepository extends UsersRepository {
 
     return UserMapper.toDomain(raw);
   }
+
+  async save(user: User): Promise<User> {
+    return this.update(user);
+  }
 }
 

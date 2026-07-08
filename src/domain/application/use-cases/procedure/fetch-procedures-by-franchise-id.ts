@@ -1,6 +1,7 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeRight } from '@/shared/either/either';
 import type { Procedure } from '@/domain/enterprise/entities/procedure';
-import type { ProcedureRepository } from '../../repositories/procedure-repository';
+import { ProcedureRepository } from '../../repositories/procedure-repository';
 
 interface FetchProceduresByFranchiseIdUseCaseRequest {
   franchiseId: string;
@@ -13,8 +14,10 @@ type FetchProceduresByFranchiseIdUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class FetchProceduresByFranchiseIdUseCase {
   constructor(
+    @Inject(ProcedureRepository)
     private procedureRepository: ProcedureRepository
   ) {}
 

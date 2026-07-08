@@ -7,6 +7,7 @@ export class ClinicPresenter {
 			ownerId: clinic.ownerId.toString(),
 			name: clinic.name,
 			slug: clinic.slug.getValue(),
+			cnpj: clinic.cnpj.getValue(),
 			description: clinic.description,
 			avatarUrl: clinic.avatarUrl,
 			status: clinic.status.getValue(),

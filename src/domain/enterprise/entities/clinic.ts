@@ -3,14 +3,19 @@ import type { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { Optional } from '@/shared/types/optional';
 import { ClinicStatus } from '../value-objects/clinic-status';
 import { Slug } from '../value-objects/slug';
+import { Cnpj } from '../value-objects/cnpj';
 
 export interface ClinicProps {
   ownerId: UniqueEntityId;
   name: string;
   slug: Slug;
+  cnpj: Cnpj;
   description?: string;
   avatarUrl?: string;
   status: ClinicStatus;
+  zapInstanceId?: string;
+  zapToken?: string;
+  zapClientToken?: string;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -42,12 +47,28 @@ export class Clinic extends Entity<ClinicProps> {
     return this.props.slug;
   }
 
+  get cnpj() {
+    return this.props.cnpj;
+  }
+
   get description() {
     return this.props.description;
   }
 
   get avatarUrl() {
     return this.props.avatarUrl;
+  }
+
+  get zapInstanceId() {
+    return this.props.zapInstanceId;
+  }
+
+  get zapToken() {
+    return this.props.zapToken;
+  }
+
+  get zapClientToken() {
+    return this.props.zapClientToken;
   }
 
   get ownerId() {
@@ -74,12 +95,28 @@ export class Clinic extends Entity<ClinicProps> {
     this.props.slug = slug;
   }
 
+  set cnpj(cnpj: Cnpj) {
+    this.props.cnpj = cnpj;
+  }
+
   set description(description: string | undefined) {
     this.props.description = description;
   }
 
   set avatarUrl(avatarUrl: string | undefined) {
     this.props.avatarUrl = avatarUrl;
+  }
+
+  set zapInstanceId(v: string | undefined) {
+    this.props.zapInstanceId = v;
+  }
+
+  set zapToken(v: string | undefined) {
+    this.props.zapToken = v;
+  }
+
+  set zapClientToken(v: string | undefined) {
+    this.props.zapClientToken = v;
   }
 
   set ownerId(ownerId: UniqueEntityId) {

@@ -1,15 +1,18 @@
 import type { Professional } from "@/domain/enterprise/entities/professional";
+import type { User } from "@/domain/enterprise/entities/user";
 
 export class ProfessionalPresenter {
-	static toHTTP(professional: Professional) {
+	static toHTTP(professional: Professional, user?: User) {
 		return {
 			id: professional.id.toString(),
 			franchiseId: professional.franchiseId.toString(),
 			userId: professional.userId.toString(),
-			council: professional.council.getValue(),
+			name: user?.name ?? null,
+			council: professional.council?.getValue(),
 			councilNumber: professional.councilNumber,
 			councilState: professional.councilState,
 			profession: professional.profession.getValue(),
+			status: professional.status.getValue(),
 			createdAt: professional.createdAt.toISOString(),
 			updatedAt: professional.updatedAt?.toISOString(),
 		};

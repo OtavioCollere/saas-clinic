@@ -2,6 +2,7 @@ import type { ClinicMembership } from '@/domain/enterprise/entities/clinic-membe
 
 export abstract class ClinicMembershipRepository {
   abstract findByUserAndClinic(userId: string, clinicId: string): Promise<ClinicMembership | null>;
-  abstract create(membership: ClinicMembership): Promise<ClinicMembership>;
+  abstract findByClinicId(clinicId: string): Promise<ClinicMembership[]>;
+  abstract create(membership: ClinicMembership, tx?: unknown): Promise<ClinicMembership>;
 }
 

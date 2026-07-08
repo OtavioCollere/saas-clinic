@@ -3,26 +3,29 @@ import type { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import type { Optional } from '@/shared/types/optional';
 import type { Council } from '../value-objects/council';
 import type { Profession } from '../value-objects/profession';
+import { ProfessionalStatus } from '../value-objects/professional-status';
 
 export interface ProfessionalProps {
   franchiseId: UniqueEntityId;
   userId: UniqueEntityId;
-  council: Council;
-  councilNumber: string;
-  councilState: string;
+  council?: Council;
+  councilNumber?: string;
+  councilState?: string;
   profession: Profession;
+  status: ProfessionalStatus;
   createdAt: Date;
   updatedAt?: Date;
 }
 
 export class Professional extends Entity<ProfessionalProps> {
   static create(
-    props: Optional<ProfessionalProps, 'createdAt' | 'updatedAt'>,
+    props: Optional<ProfessionalProps, 'createdAt' | 'updatedAt' | 'council' | 'councilNumber' | 'councilState' | 'status'>,
     id?: UniqueEntityId
   ) {
     const professional = new Professional(
       {
         ...props,
+        status: props.status ?? ProfessionalStatus.active(),
         createdAt: props.createdAt ?? new Date(),
       },
       id
@@ -70,20 +73,28 @@ export class Professional extends Entity<ProfessionalProps> {
     this.props.userId = userId;
   }
 
-  set council(council: Council) {
+  set council(council: Council | undefined) {
     this.props.council = council;
   }
 
-  set councilNumber(councilNumber: string) {
+  set councilNumber(councilNumber: string | undefined) {
     this.props.councilNumber = councilNumber;
   }
 
-  set councilState(councilState: string) {
+  set councilState(councilState: string | undefined) {
     this.props.councilState = councilState;
   }
 
   set profession(profession: Profession) {
     this.props.profession = profession;
+  }
+
+  get status(): ProfessionalStatus {
+    return this.props.status;
+  }
+
+  set status(status: ProfessionalStatus) {
+    this.props.status = status;
   }
 
   set updatedAt(updatedAt: Date) {

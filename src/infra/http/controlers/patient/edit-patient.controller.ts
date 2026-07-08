@@ -5,6 +5,7 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -41,7 +42,10 @@ const editPatientParamsValidationPipe = new ZodValidationPipe(editPatientParamsS
 @ApiTags("Patients")
 @Controller("/patients")
 export class EditPatientController {
-	constructor(private readonly editPatientUseCase: EditPatientUseCase) {}
+	constructor(
+		@Inject(EditPatientUseCase)
+		private readonly editPatientUseCase: EditPatientUseCase,
+	) {}
 
 	@Patch("/:patientId")
 	@ApiOperation({

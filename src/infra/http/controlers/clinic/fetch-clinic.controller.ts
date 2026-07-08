@@ -3,6 +3,7 @@ import { FetchClinicUseCase } from "@/domain/application/use-cases/clinic/fetch-
 import {
 	Controller,
 	Get,
+	Inject,
 	Query,
 } from "@nestjs/common";
 import {
@@ -27,7 +28,10 @@ const fetchClinicQueryValidationPipe = new ZodValidationPipe(fetchClinicQuerySch
 @ApiTags("Clinics")
 @Controller("/clinics")
 export class FetchClinicController {
-	constructor(private readonly fetchClinicUseCase: FetchClinicUseCase) {}
+	constructor(
+		@Inject(FetchClinicUseCase)
+		private readonly fetchClinicUseCase: FetchClinicUseCase,
+	) {}
 
 	@Get()
 	@ApiOperation({

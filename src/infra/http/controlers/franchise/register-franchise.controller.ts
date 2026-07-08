@@ -41,11 +41,11 @@ const registerFranchiseBodyValidationPipe = new ZodValidationPipe(registerFranch
 const registerFranchiseParamsValidationPipe = new ZodValidationPipe(registerFranchiseParamsSchema);
 
 @ApiTags("Franchises")
-@Controller("/clinics")
+@Controller("/clinic")
 export class RegisterFranchiseController {
 	constructor(private readonly registerFranchiseUseCase: RegisterFranchiseUseCase) {}
 
-	@Post("/:clinicId/franchises")
+	@Post("/register-franchise")
 	@ApiOperation({
 		summary: "Register franchise",
 		description: "Creates a new franchise for a clinic if the authenticated user is the clinic owner.",

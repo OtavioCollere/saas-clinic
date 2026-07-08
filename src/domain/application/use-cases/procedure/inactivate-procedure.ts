@@ -1,8 +1,9 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { ProcedureNotFoundError } from '@/shared/errors/procedure-not-found-error';
 import type { Procedure } from '@/domain/enterprise/entities/procedure';
 import { ProcedureStatus } from '@/domain/enterprise/value-objects/procedure-status';
-import type { ProcedureRepository } from '../../repositories/procedure-repository';
+import { ProcedureRepository } from '../../repositories/procedure-repository';
 
 interface InactivateProcedureUseCaseRequest {
   procedureId: string;
@@ -15,8 +16,10 @@ type InactivateProcedureUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class InactivateProcedureUseCase {
   constructor(
+    @Inject(ProcedureRepository)
     private procedureRepository: ProcedureRepository
   ) {}
 

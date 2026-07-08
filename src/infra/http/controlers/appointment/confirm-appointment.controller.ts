@@ -7,6 +7,7 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -40,7 +41,10 @@ const confirmAppointmentBodyValidationPipe = new ZodValidationPipe(confirmAppoin
 @ApiTags("Appointments")
 @Controller("/appointments")
 export class ConfirmAppointmentController {
-	constructor(private readonly confirmAppointmentUseCase: ConfirmAppointmentUseCase) {}
+	constructor(
+		@Inject(ConfirmAppointmentUseCase)
+		private readonly confirmAppointmentUseCase: ConfirmAppointmentUseCase,
+	) {}
 
 	@Patch("/:appointmentId/confirm")
 	@ApiOperation({

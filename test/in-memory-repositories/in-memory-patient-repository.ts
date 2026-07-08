@@ -26,6 +26,17 @@ export class InMemoryPatientRepository implements PatientRepository {
     return patient;
   }
 
+  async findByUserIdAndClinicId(userId: string, clinicId: string): Promise<Patient | null> {
+    const patient = this.items.find(
+      (item) =>
+        item.userId.toString() === userId && item.clinicId.toString() === clinicId,
+    );
+
+    if (!patient) return null;
+
+    return patient;
+  }
+
   async findByClinicId(clinicId: string): Promise<Patient[]> {
     return this.items.filter((item) => item.clinicId.toString() === clinicId);
   }

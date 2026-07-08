@@ -2,16 +2,20 @@ import { Clinic } from "@/domain/enterprise/entities/clinic";
 import { UniqueEntityId } from "@/shared/entities/unique-entity-id";
 import { Slug } from "@/domain/enterprise/value-objects/slug";
 import { ClinicStatus } from "@/domain/enterprise/value-objects/clinic-status";
-// NOTE: As tabelas Clinic ainda não existem no schema.prisma
-// Este mapper será usado quando as tabelas forem criadas
+import { Cnpj } from "@/domain/enterprise/value-objects/cnpj";
+
 type ClinicRaw = {
   id: string;
   ownerId: string;
   name: string;
   slug: string;
+  cnpj: string;
   description: string | null;
   avatarUrl: string | null;
   status: string;
+  zapInstanceId: string | null;
+  zapToken: string | null;
+  zapClientToken: string | null;
   createdAt: Date;
   updatedAt: Date | null;
 };
@@ -21,22 +25,34 @@ type ClinicPrismaInput = {
   ownerId: string;
   name: string;
   slug: string;
+  cnpj: string;
   description?: string | null;
   avatarUrl?: string | null;
   status: string;
+  zapInstanceId?: string | null;
+  zapToken?: string | null;
+  zapClientToken?: string | null;
   createdAt: Date;
 };
 
 export class ClinicMapper {
   static toDomain(raw: ClinicRaw): Clinic {
+    const status = raw.status === 'ACTIVE' 
+      ? ClinicStatus.active() 
+      : ClinicStatus.inactive();
+
     return Clinic.create(
       {
         ownerId: new UniqueEntityId(raw.ownerId),
         name: raw.name,
         slug: Slug.create(raw.slug),
+        cnpj: Cnpj.create(raw.cnpj),
         description: raw.description ?? undefined,
         avatarUrl: raw.avatarUrl ?? undefined,
-        status: ClinicStatus.active(), // TODO: mapear corretamente quando schema estiver pronto
+        status,
+        zapInstanceId: raw.zapInstanceId ?? undefined,
+        zapToken: raw.zapToken ?? undefined,
+        zapClientToken: raw.zapClientToken ?? undefined,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt ?? undefined,
       },
@@ -50,9 +66,13 @@ export class ClinicMapper {
       ownerId: clinic.ownerId.toString(),
       name: clinic.name,
       slug: clinic.slug.getValue(),
+      cnpj: clinic.cnpj.getValue(),
       description: clinic.description ?? null,
       avatarUrl: clinic.avatarUrl ?? null,
       status: clinic.status.getValue(),
+      zapInstanceId: clinic.zapInstanceId ?? null,
+      zapToken: clinic.zapToken ?? null,
+      zapClientToken: clinic.zapClientToken ?? null,
       createdAt: clinic.createdAt,
     };
   }

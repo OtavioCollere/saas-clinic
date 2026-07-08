@@ -15,7 +15,8 @@ interface AuthenticateUserUseCaseRequest{
     fingerprint: {
         ip: string;
         userAgent: string;
-    }
+    },
+    clinicSlug : string
 }
 
 type AuthenticateUserSuccess =
@@ -49,41 +50,41 @@ export class AuthenticateUserUseCase {
       @Inject(MfaSettingsRepository)
       private mfaSettingsRepository: MfaSettingsRepository,
     ) {}
-  
+
     async execute({
       email,
       password,
       fingerprint,
     }: AuthenticateUserUseCaseRequest): Promise<AuthenticateUserUseCaseResponse> {
-  
+
       const user = await this.usersRepository.findByEmail(email)
 
       if (!user) {
         return makeLeft(new WrongCredentialsError())
       }
-  
+
       const passwordMatches = await this.hashComparer.compare(
         password,
         user.password,
       )
-  
+
       if (!passwordMatches) {
         return makeLeft(new WrongCredentialsError())
       }
-  
+
       // 1️⃣ Verifica sessão ativa existente
       const activeSession = await this.sessionsRepository.findActiveByUserId(
         user.id.toString(),
       )
-  
+
       if (activeSession.length > 0) {
-        const tokens = await this.issueTokens(user.id.toString())
+        const tokens = await this.issueTokens(user.id.toString(), user.role.getValue());
         return makeRight({
           type: 'authenticated',
           ...tokens
-        })
+        });
       }
-  
+
       // 2️⃣ Cria nova sessão
       const session = Session.create({
         userId: user.id,
@@ -91,39 +92,38 @@ export class AuthenticateUserUseCase {
         mfaVerified: false,
         status: SessionStatus.PENDING,
       })
-  
+
       const mfaSettings = await this.mfaSettingsRepository.findByUserId(
         user.id.toString(),
       )
-  
+
       // 3️⃣ MFA governa ativação
       if (mfaSettings?.totpEnabled) {
         await this.sessionsRepository.create(session)
-  
+
         return makeRight({
           type: 'mfa_required',
           session_id: session.id.toString(),
           mfa_required: true,
         })
       }
-  
+
       // 4️⃣ Sem MFA → ativa sessão e emite tokens
       session.activateSession()
       await this.sessionsRepository.create(session)
 
-      const tokens = await this.issueTokens(user.id.toString())
+      const tokens = await this.issueTokens(user.id.toString(), user.role.getValue())
 
       return makeRight({
         type: 'authenticated',
         ...tokens
       })
     }
-  
-    private async issueTokens(userId: string) {
-      const access_token = await this.encrypter.sign({ userId })
-      const refresh_token = await this.encrypter.refresh({ userId })
+
+    private async issueTokens(userId: string, role: string) {
+      const access_token = await this.encrypter.sign({ userId, role })
+      const refresh_token = await this.encrypter.refresh({ userId, role })
 
       return { access_token, refresh_token }
     }
   }
-  

@@ -6,8 +6,9 @@ import type { Anamnesis } from './anamnesis/anamnesis';
 export interface PatientProps {
   clinicId: UniqueEntityId;
   userId: UniqueEntityId;
-  anamnesis: Anamnesis;
+  anamnesis?: Anamnesis;
   name: string;
+  phone?: string;
   birthDay: Date;
   address: string;
   zipCode: string;
@@ -16,7 +17,7 @@ export interface PatientProps {
 }
 
 export class Patient extends Entity<PatientProps> {
-  static create(props: Optional<PatientProps, 'createdAt' | 'updatedAt'>, id?: UniqueEntityId) {
+  static create(props: Optional<PatientProps, 'createdAt' | 'updatedAt' | 'anamnesis'>, id?: UniqueEntityId) {
     const patient = new Patient(
       {
         ...props,
@@ -35,12 +36,16 @@ export class Patient extends Entity<PatientProps> {
     return this.props.userId;
   }
 
-  get anamnesis() {
+  get anamnesis(): Anamnesis | undefined {
     return this.props.anamnesis;
   }
 
   get name() {
     return this.props.name;
+  }
+
+  get phone(): string | undefined {
+    return this.props.phone;
   }
 
   get birthDay() {

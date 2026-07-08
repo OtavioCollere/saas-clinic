@@ -1,50 +1,38 @@
-export type Left<T> = {
-  left: T
-  right?: never
+export type Left<L> = {
+  _tag: 'Left';
+  value: L;
+};
+
+export type Right<R> = {
+  _tag: 'Right';
+  value: R;
+};
+
+export type Either<L, R> = Left<L> | Right<R>;
+
+export function makeLeft<L, R = never>(value: L): Either<L, R> {
+  return {
+    _tag: 'Left',
+    value,
+  };
 }
 
-export type Right<U> = {
-  left?: never
-  right: U
+export function makeRight<R, L = never>(value: R): Either<L, R> {
+  return {
+    _tag: 'Right',
+    value,
+  };
 }
 
-export type Either<T, U> = NonNullable<Left<T> | Right<U>>
-
-export const isLeft = <T, U>(e: Either<T, U>): e is Left<T> => {
-  return e.left !== undefined
+export function isLeft<L, R>(either: Either<L, R>): either is Left<L> {
+  return either._tag === 'Left';
 }
 
-export const isRight = <T, U>(e: Either<T, U>): e is Right<U> => {
-  return e.right !== undefined
+export function isRight<L, R>(either: Either<L, R>): either is Right<R> {
+  return either._tag === 'Right';
 }
 
-export type UnwrapEither = <T, U>(e: Either<T, U>) => NonNullable<T | U>
-
-export const unwrapEither: UnwrapEither = <T, U>({
-  left,
-  right,
-}: Either<T, U>) => {
-  if (right !== undefined && left !== undefined) {
-    throw new Error(
-      `Received both left and right values at runtime when opening an Either\nLeft: ${JSON.stringify(
-        left
-      )}\nRight: ${JSON.stringify(right)}`
-    )
-  }
-
-  if (left !== undefined) {
-    return left as NonNullable<T>
-  }
-
-  if (right !== undefined) {
-    return right as NonNullable<U>
-  }
-
-  throw new Error(
-    'Received no left or right values at runtime when opening Either'
-  )
+export function unwrapEither<L, R>(either: Either<L, R>): L | R {
+  return either.value;
 }
 
-export const makeLeft = <T>(value: T): Left<T> => ({ left: value })
-
-export const makeRight = <U>(value: U): Right<U> => ({ right: value })

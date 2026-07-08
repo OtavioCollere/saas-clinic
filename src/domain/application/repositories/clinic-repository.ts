@@ -2,9 +2,11 @@ import type { PaginationParams } from "@/shared/types/pagination-params";
 import type { Clinic } from "@/domain/enterprise/entities/clinic";
 
 export abstract class ClinicRepository{
-  abstract create(clinic: Clinic): Promise<Clinic>;
+  abstract create(clinic: Clinic, tx?: unknown): Promise<Clinic>;
   abstract findById(id: string): Promise<Clinic | null>;
   abstract findBySlug(slug: string): Promise<Clinic | null>;
+  abstract findByName(name: string): Promise<Clinic | null>;
+  abstract findByCnpj(cnpj: string): Promise<Clinic | null>;
   abstract findByOwnerId(ownerId: string): Promise<Clinic | null>;
   abstract update(clinic: Clinic): Promise<Clinic>;
   abstract delete(id: string): Promise<void>;

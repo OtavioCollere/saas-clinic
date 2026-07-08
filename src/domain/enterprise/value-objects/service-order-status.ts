@@ -34,4 +34,8 @@ export class ServiceOrderStatus {
     isPaid(): boolean {
         return this.value === 'PAID';
     }
+
+    getValue(): ServiceOrderStatusType {
+        return this.value;
+    }
 }

@@ -9,6 +9,7 @@ export interface UserProps {
   name: string;
   cpf: Cpf;
   email: Email;
+  phone?: string;
   isEmailVerified?: boolean;
   password: string;
   role: UserRole;
@@ -41,6 +42,10 @@ export class User extends Entity<UserProps> {
     return this.props.email;
   }
 
+  get phone(): string | undefined {
+    return this.props.phone;
+  }
+
   get password() {
     return this.props.password;
   }
@@ -71,6 +76,10 @@ export class User extends Entity<UserProps> {
 
   set email(email: Email) {
     this.props.email = email;
+  }
+
+  set phone(phone: string | undefined) {
+    this.props.phone = phone;
   }
 
   set password(password: string) {

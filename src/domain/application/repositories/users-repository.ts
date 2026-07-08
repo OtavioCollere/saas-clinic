@@ -1,10 +1,11 @@
 import { User } from "@/domain/enterprise/entities/user";
 
 export abstract class UsersRepository{
-    abstract create(user: User): Promise<User>;
+    abstract create(user: User, tx?: unknown): Promise<User>;
     abstract findById(id: string): Promise<User | null>;
     abstract findByEmail(email: string): Promise<User | null>;
     abstract update(user: User): Promise<User>;
     abstract delete(id: string): Promise<void>;
     abstract findByCpf(cpf: string): Promise<User | null>;
+    abstract save(user: User): Promise<User>;
 }

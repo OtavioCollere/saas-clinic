@@ -2,16 +2,30 @@ import { isRight, unwrapEither } from '@/shared/either/either';
 import { makeAppointment } from 'test/factories/makeAppointment';
 import { makePatient } from 'test/factories/makePatient';
 import { InMemoryAppointmentsRepository } from 'test/in-memory-repositories/in-memory-appointments-repository';
+import { InMemoryPatientRepository } from 'test/in-memory-repositories/in-memory-patient-repository';
+import { InMemoryProfessionalRepository } from 'test/in-memory-repositories/in-memory-professional-repository';
+import { InMemoryUsersRepository } from 'test/in-memory-repositories/in-memory-users-repository';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FetchAppointmentsByPatientIdUseCase } from '../fetch-appointments-by-patient-id';
 
 describe('FetchAppointmentsByPatientIdUseCase Unit Tests', () => {
   let sut: FetchAppointmentsByPatientIdUseCase;
   let inMemoryAppointmentsRepository: InMemoryAppointmentsRepository;
+  let inMemoryPatientRepository: InMemoryPatientRepository;
+  let inMemoryProfessionalRepository: InMemoryProfessionalRepository;
+  let inMemoryUsersRepository: InMemoryUsersRepository;
 
   beforeEach(() => {
     inMemoryAppointmentsRepository = new InMemoryAppointmentsRepository();
-    sut = new FetchAppointmentsByPatientIdUseCase(inMemoryAppointmentsRepository);
+    inMemoryPatientRepository = new InMemoryPatientRepository();
+    inMemoryProfessionalRepository = new InMemoryProfessionalRepository();
+    inMemoryUsersRepository = new InMemoryUsersRepository();
+    sut = new FetchAppointmentsByPatientIdUseCase(
+      inMemoryAppointmentsRepository,
+      inMemoryPatientRepository,
+      inMemoryProfessionalRepository,
+      inMemoryUsersRepository,
+    );
   });
 
   it('should be able to fetch appointments by patient id', async () => {

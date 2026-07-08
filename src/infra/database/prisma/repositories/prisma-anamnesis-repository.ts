@@ -1,37 +1,46 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { AnamnesisRepository } from "@/domain/application/repositories/anamnesis-repository";
-import { Anamnesis } from "@/domain/enterprise/entities/anamnesis/anamnesis";
-import { PrismaService } from "../../prisma.service";
+import { Inject, Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+import { AnamnesisRepository } from '@/domain/application/repositories/anamnesis-repository'
+import { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis'
+import { PrismaService } from '../../prisma.service'
+import { AnamnesisMapper } from '../mappers/anamnesis-mapper'
 
-// NOTE: As tabelas Anamnesis ainda não existem no schema.prisma
-// Este repositório será funcional quando as tabelas forem criadas
 @Injectable()
 export class PrismaAnamnesisRepository extends AnamnesisRepository {
   constructor(
     @Inject(PrismaService)
-    private prisma: PrismaService
+    private prisma: PrismaService,
   ) {
-    super();
+    super()
   }
 
   async create(anamnesis: Anamnesis): Promise<Anamnesis> {
-    // TODO: Implementar quando tabela Anamnesis for criada no schema.prisma
-    throw new Error("Anamnesis table not yet created in Prisma schema");
+    const data = AnamnesisMapper.toPrisma(anamnesis)
+    const raw = await this.prisma.anamnesis.create({
+      data: data as unknown as Prisma.AnamnesisCreateInput,
+    })
+    return AnamnesisMapper.toDomain(raw)
   }
 
   async findById(id: string): Promise<Anamnesis | null> {
-    // TODO: Implementar quando tabela Anamnesis for criada
-    throw new Error("Anamnesis table not yet created in Prisma schema");
+    const raw = await this.prisma.anamnesis.findUnique({ where: { id } })
+    return raw ? AnamnesisMapper.toDomain(raw) : null
   }
 
   async findByPatientId(patientId: string): Promise<Anamnesis | null> {
-    // TODO: Implementar quando tabela Anamnesis for criada
-    throw new Error("Anamnesis table not yet created in Prisma schema");
+    const raw = await this.prisma.anamnesis.findUnique({
+      where: { patientId },
+    })
+    return raw ? AnamnesisMapper.toDomain(raw) : null
   }
 
   async update(anamnesis: Anamnesis): Promise<Anamnesis> {
-    // TODO: Implementar quando tabela Anamnesis for criada
-    throw new Error("Anamnesis table not yet created in Prisma schema");
+    const data = AnamnesisMapper.toPrisma(anamnesis)
+    const { id, ...updateData } = data
+    const raw = await this.prisma.anamnesis.update({
+      where: { id },
+      data: updateData as unknown as Prisma.AnamnesisUpdateInput,
+    })
+    return AnamnesisMapper.toDomain(raw)
   }
 }
-

@@ -4,6 +4,7 @@ import { GetProfessionalsByFranchiseIdUseCase } from "@/domain/application/use-c
 import {
 	Controller,
 	Get,
+	Inject,
 	NotFoundException,
 	Param,
 } from "@nestjs/common";
@@ -29,7 +30,10 @@ const getProfessionalsByFranchiseIdParamsValidationPipe = new ZodValidationPipe(
 @ApiTags("Professionals")
 @Controller("/franchises")
 export class GetProfessionalsByFranchiseIdController {
-	constructor(private readonly getProfessionalsByFranchiseIdUseCase: GetProfessionalsByFranchiseIdUseCase) {}
+	constructor(
+		@Inject(GetProfessionalsByFranchiseIdUseCase)
+		private readonly getProfessionalsByFranchiseIdUseCase: GetProfessionalsByFranchiseIdUseCase
+	) {}
 
 	@Get("/:franchiseId/professionals")
 	@ApiOperation({
@@ -63,8 +67,10 @@ export class GetProfessionalsByFranchiseIdController {
 			}
 		}
 
-		const { professionals } = unwrapEither(result);
+		const { professionals, users } = unwrapEither(result);
 
-		return professionals.map(ProfessionalPresenter.toHTTP);
+		return professionals.map((professional) => 
+			ProfessionalPresenter.toHTTP(professional, users.get(professional.userId.toString()))
+		);
 	}
 }

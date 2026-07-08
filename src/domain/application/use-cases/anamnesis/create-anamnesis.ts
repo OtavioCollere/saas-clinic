@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
@@ -7,8 +8,8 @@ import type { HealthConditions } from '@/domain/enterprise/entities/anamnesis/he
 import type { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history';
 import type { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment';
 import { Anamnesis as AnamnesisEntity } from '@/domain/enterprise/entities/anamnesis/anamnesis';
-import type { AnamnesisRepository } from '../../repositories/anamnesis-repository';
-import type { PatientRepository } from '../../repositories/patient-repository';
+import { AnamnesisRepository } from '../../repositories/anamnesis-repository';
+import { PatientRepository } from '../../repositories/patient-repository';
 
 interface CreateAnamnesisUseCaseRequest {
   patientId: string;
@@ -16,6 +17,7 @@ interface CreateAnamnesisUseCaseRequest {
   healthConditions: HealthConditions;
   medicalHistory: MedicalHistory;
   physicalAssessment: PhysicalAssessment;
+  patientSignature: string;
 }
 
 type CreateAnamnesisUseCaseResponse = Either<
@@ -25,9 +27,12 @@ type CreateAnamnesisUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class CreateAnamnesisUseCase {
   constructor(
+    @Inject(AnamnesisRepository)
     private anamnesisRepository: AnamnesisRepository,
+    @Inject(PatientRepository)
     private patientRepository: PatientRepository
   ) {}
 
@@ -37,6 +42,7 @@ export class CreateAnamnesisUseCase {
     healthConditions,
     medicalHistory,
     physicalAssessment,
+    patientSignature,
   }: CreateAnamnesisUseCaseRequest): Promise<CreateAnamnesisUseCaseResponse> {
     const patient = await this.patientRepository.findById(patientId);
 
@@ -50,6 +56,7 @@ export class CreateAnamnesisUseCase {
       healthConditions,
       medicalHistory,
       physicalAssessment,
+      patientSignature,
     });
 
     await this.anamnesisRepository.create(anamnesis);

@@ -1,8 +1,10 @@
+import { Inject } from "@nestjs/common";
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ProfessionalNotFoundError } from "@/shared/errors/professional-not-found-error";
 import { FranchiseNotFoundError } from "@/shared/errors/franchise-not-found-error";
 import { PatientNotFoundError } from "@/shared/errors/patient-not-found-error";
 import { AppointmentConflictError } from "@/shared/errors/appointment-conflict-error";
+import { AppointmentInPastError } from "@/shared/errors/appointment-in-past-error";
 import { CreateAppointmentUseCase } from "@/domain/application/use-cases/appointment/create-appointment";
 import {
 	BadRequestException,
@@ -48,7 +50,10 @@ const createAppointmentBodyValidationPipe = new ZodValidationPipe(createAppointm
 @ApiTags("Appointments")
 @Controller("/appointments")
 export class CreateAppointmentController {
-	constructor(private readonly createAppointmentUseCase: CreateAppointmentUseCase) {}
+	constructor(
+		@Inject(CreateAppointmentUseCase)
+		private readonly createAppointmentUseCase: CreateAppointmentUseCase
+	) {}
 
 	@Post()
 	@ApiOperation({
@@ -121,6 +126,7 @@ export class CreateAppointmentController {
 				case PatientNotFoundError:
 					throw new NotFoundException(error.message);
 				case AppointmentConflictError:
+				case AppointmentInPastError:
 					throw new BadRequestException(error.message);
 				default:
 					throw new BadRequestException(error.message);

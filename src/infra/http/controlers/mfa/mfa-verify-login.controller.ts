@@ -10,7 +10,9 @@ import {
 	Body,
 	Controller,
 	Post,
+	Res,
 } from "@nestjs/common";
+import type { FastifyReply } from 'fastify';
 import {
 	ApiBadRequestResponse,
 	ApiOkResponse,
@@ -48,7 +50,8 @@ export class MfaVerifyLoginController {
   async handle(
     @CurrentUser() user: User,
     @Fingerprint() fingerprint: Fingerprint,
-    @Body(mfaVerifyLoginBodyValidationPipe) body: MfaVerifyLoginBodySchema
+    @Body(mfaVerifyLoginBodyValidationPipe) body: MfaVerifyLoginBodySchema,
+    @Res() reply: FastifyReply,
   ) {
     const result = await this.mfaVerifyLoginUseCase.execute({
       userId: user.id.toString(),
@@ -72,9 +75,27 @@ export class MfaVerifyLoginController {
 
     const { access_token, refresh_token } = unwrapEither(result);
 
+    // Define cookies HTTP-only e seguros
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    reply.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60, // 15 minutos em segundos
+    });
+
+    reply.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
+    });
+
     return {
-      access_token,
-      refresh_token,
+      message: 'MFA verified successfully',
     };
   }
 }

@@ -1,15 +1,21 @@
 import { isLeft, unwrapEither } from "@/shared/either/either";
 import { ClinicNotFoundError } from "@/shared/errors/clinic-not-found-error";
-import { UserNotFoundError } from "@/shared/errors/user-not-found-error";
+import { CpfAlreadyExistsError } from "@/shared/errors/cpf-already-exists-error";
+import { EmailAlreadyExistsError } from "@/shared/errors/email-already-exists-error";
+import { InvalidCpfError } from "@/shared/errors/invalid-cpf-error";
+import { InvalidEmailError } from "@/shared/errors/invalid-email-error";
 import { RegisterPatientUseCase } from "@/domain/application/use-cases/patient/register-patient";
 import {
+	BadRequestException,
 	Body,
 	Controller,
+	Inject,
 	NotFoundException,
 	Param,
 	Post,
 } from "@nestjs/common";
 import {
+	ApiBadRequestResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
@@ -19,27 +25,36 @@ import {
 import z from "zod";
 import { ZodValidationPipe } from "../../pipes/zod-validation-pipe";
 import { PatientPresenter } from "../../presenters/patient-presenter";
-import { CurrentUser } from "@/infra/auth/decorators/current-user.decorator";
-import { User } from "@/domain/enterprise/entities/user";
 
 const registerPatientBodySchema = z.object({
-	clinicId: z.string(),
 	name: z.string(),
+	cpf: z.string(),
+	email: z.string().email(),
+	phone: z.string().optional(),
 	birthDay: z.coerce.date(),
 	address: z.string(),
 	zipCode: z.string(),
-	anamnesis: z.any(),
 });
+
+const registerPatientParamsSchema = z.object({
+	clinicId: z.string(),
+});
+
+type RegisterPatientParamsSchema = z.infer<typeof registerPatientParamsSchema>;
 
 
 type RegisterPatientBodySchema = z.infer<typeof registerPatientBodySchema>;
 
 const registerPatientBodyValidationPipe = new ZodValidationPipe(registerPatientBodySchema);
+const registerPatientParamsValidationPipe = new ZodValidationPipe(registerPatientParamsSchema);
 
 @ApiTags("Patients")
 @Controller("/clinics")
 export class RegisterPatientController {
-	constructor(private readonly registerPatientUseCase: RegisterPatientUseCase) {}
+	constructor(
+		@Inject(RegisterPatientUseCase)
+		private readonly registerPatientUseCase: RegisterPatientUseCase
+	) {}
 
 	@Post("/:clinicId/patients")
 	@ApiOperation({
@@ -55,39 +70,57 @@ export class RegisterPatientController {
 		description: "Patient created successfully",
 	})
 	@ApiNotFoundResponse({
-		description: "Clinic or user not found",
+		description: "Clinic not found",
+	})
+	@ApiBadRequestResponse({
+		description: "Invalid request data or email/CPF already exists",
 	})
 	async handle(
-		@CurrentUser() user: User,
+		@Param(registerPatientParamsValidationPipe) params: RegisterPatientParamsSchema,
 		@Body(registerPatientBodyValidationPipe) body: RegisterPatientBodySchema,
 	) {
-		const personId = user.id.toString();
-		const { clinicId, name, birthDay, address, zipCode, anamnesis } = body;
+		const { clinicId } = params;
+		const { name, cpf, email, phone, birthDay, address, zipCode } = body;
+
+		console.log('📝 [RegisterPatientController] Recebendo requisição:', {
+			clinicId, name, cpf, email, birthDay, address, zipCode,
+		});
 
 		const result = await this.registerPatientUseCase.execute({
 			clinicId,
-			personId,
 			name,
+			cpf,
+			email,
+			phone,
 			birthDay,
 			address,
 			zipCode,
-			anamnesis,
 		});
 
 		if (isLeft(result)) {
 			const error = unwrapEither(result);
 
+			console.error('❌ [RegisterPatientController] Erro ao criar paciente:', {
+				errorType: error.constructor.name,
+				errorMessage: error.message,
+			});
+
 			switch (error.constructor) {
 				case ClinicNotFoundError:
 					throw new NotFoundException(error.message);
-				case UserNotFoundError:
-					throw new NotFoundException(error.message);
+				case EmailAlreadyExistsError:
+				case CpfAlreadyExistsError:
+				case InvalidCpfError:
+				case InvalidEmailError:
+					throw new BadRequestException(error.message);
 				default:
-					throw new NotFoundException(error.message);
+					throw new BadRequestException(error.message);
 			}
 		}
 
 		const { patient } = unwrapEither(result);
+
+		console.log('✅ [RegisterPatientController] Paciente criado com sucesso:', patient.id.toString());
 
 		return PatientPresenter.toHTTP(patient);
 	}

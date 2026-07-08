@@ -7,6 +7,7 @@ import {
 	Body,
 	Controller,
 	ForbiddenException,
+	Inject,
 	NotFoundException,
 	Param,
 	Patch,
@@ -45,7 +46,10 @@ const editProfessionalParamsValidationPipe = new ZodValidationPipe(editProfessio
 @ApiTags("Professionals")
 @Controller("/professionals")
 export class EditProfessionalController {
-	constructor(private readonly editProfessionalUseCase: EditProfessionalUseCase) {}
+	constructor(
+		@Inject(EditProfessionalUseCase)
+		private readonly editProfessionalUseCase: EditProfessionalUseCase
+	) {}
 
 	@Patch("/:professionalId")
 	@ApiOperation({
@@ -100,6 +104,6 @@ export class EditProfessionalController {
 
 		const { professional } = unwrapEither(result);
 
-		return ProfessionalPresenter.toHTTP(professional);
+		return ProfessionalPresenter.toHTTP(professional, undefined);
 	}
 }

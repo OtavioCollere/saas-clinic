@@ -5,7 +5,10 @@ export abstract class PatientRepository {
   abstract create(patient: Patient): Promise<Patient>;
   abstract findById(id: string): Promise<Patient | null>;
   abstract findByUserId(userId: string): Promise<Patient | null>;
+  abstract findByUserIdAndClinicId(userId: string, clinicId: string): Promise<Patient | null>;
   abstract findByClinicId(clinicId: string): Promise<Patient[]>;
   abstract update(patient: Patient): Promise<Patient>;
   abstract fetch({ query, page, pageSize }: PaginationParams): Promise<Patient[]>;
+  abstract countByClinicId(clinicId: string): Promise<number>;
+  abstract countByClinicIdCreatedBefore(clinicId: string, date: Date): Promise<number>;
 }

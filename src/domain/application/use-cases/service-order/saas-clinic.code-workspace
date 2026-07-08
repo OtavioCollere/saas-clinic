@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../.."
+		},
+		{
+			"path": "../../../../../../clinic-full-stack"
+		}
+	],
+	"settings": {
+		"prisma.pinToPrisma6": true
+	}
+}

@@ -46,6 +46,22 @@ async fetch({
     return clinic;
   }
 
+  async findByName(name: string): Promise<Clinic | null> {
+    const clinic = this.items.find((item) => item.name === name);
+
+    if (!clinic) return null;
+
+    return clinic;
+  }
+
+  async findByCnpj(cnpj: string): Promise<Clinic | null> {
+    const clinic = this.items.find((item) => item.cnpj.getValue() === cnpj);
+
+    if (!clinic) return null;
+
+    return clinic;
+  }
+
   async findByOwnerId(ownerId: string): Promise<Clinic | null> {
     const clinic = this.items.find((item) => item.ownerId.toString() === ownerId);
 

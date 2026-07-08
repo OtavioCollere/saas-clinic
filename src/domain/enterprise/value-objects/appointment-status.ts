@@ -29,6 +29,21 @@ export class AppointmentStatus {
     return new AppointmentStatus('CANCELED')
   }
 
+  static fromValue(value: string): AppointmentStatus {
+    switch (value) {
+      case 'WAITING':
+        return AppointmentStatus.waiting();
+      case 'CONFIRMED':
+        return AppointmentStatus.confirmed();
+      case 'DONE':
+        return AppointmentStatus.done();
+      case 'CANCELED':
+        return AppointmentStatus.canceled();
+      default:
+        return AppointmentStatus.waiting();
+    }
+  }
+
   // queries
   isWaiting(): boolean {
     return this.value === 'WAITING'

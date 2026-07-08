@@ -1,3 +1,4 @@
+import { Inject } from "@nestjs/common";
 import { unwrapEither } from "@/shared/either/either";
 import { FetchProceduresByFranchiseIdUseCase } from "@/domain/application/use-cases/procedure/fetch-procedures-by-franchise-id";
 import {
@@ -26,7 +27,10 @@ const fetchProceduresByFranchiseIdParamsValidationPipe = new ZodValidationPipe(f
 @ApiTags("Procedures")
 @Controller("/franchises")
 export class FetchProceduresByFranchiseIdController {
-	constructor(private readonly fetchProceduresByFranchiseIdUseCase: FetchProceduresByFranchiseIdUseCase) {}
+	constructor(
+		@Inject(FetchProceduresByFranchiseIdUseCase)
+		private readonly fetchProceduresByFranchiseIdUseCase: FetchProceduresByFranchiseIdUseCase
+	) {}
 
 	@Get("/:franchiseId/procedures")
 	@ApiOperation({

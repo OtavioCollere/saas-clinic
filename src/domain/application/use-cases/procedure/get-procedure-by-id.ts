@@ -1,7 +1,8 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { ProcedureNotFoundError } from '@/shared/errors/procedure-not-found-error';
 import type { Procedure } from '@/domain/enterprise/entities/procedure';
-import type { ProcedureRepository } from '../../repositories/procedure-repository';
+import { ProcedureRepository } from '../../repositories/procedure-repository';
 
 interface GetProcedureByIdUseCaseRequest {
   procedureId: string;
@@ -12,8 +13,12 @@ type GetProcedureByIdUseCaseResponse = Either<
   { procedure: Procedure }
 >;
 
+@Injectable()
 export class GetProcedureByIdUseCase {
-  constructor(private procedureRepository: ProcedureRepository) {}
+  constructor(
+    @Inject(ProcedureRepository)
+    private procedureRepository: ProcedureRepository
+  ) {}
 
   async execute({
     procedureId,

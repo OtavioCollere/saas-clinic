@@ -3,8 +3,9 @@ import { AppointmentNotFoundError } from '@/shared/errors/appointment-not-found-
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error';
 import { AppointmentNotWaitingError } from '@/shared/errors/appointment-not-waiting-error';
 import type { Appointment } from '@/domain/enterprise/entities/appointment';
-import type { AppointmentsRepository } from '../../repositories/appointments-repository';
-import type { PatientRepository } from '../../repositories/patient-repository';
+import { AppointmentsRepository } from '../../repositories/appointments-repository';
+import { PatientRepository } from '../../repositories/patient-repository';
+import { Inject, Injectable } from '@nestjs/common';
 
 interface ConfirmAppointmentUseCaseRequest {
   appointmentId: string;
@@ -18,9 +19,12 @@ type ConfirmAppointmentUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class ConfirmAppointmentUseCase {
   constructor(
+    @Inject(AppointmentsRepository)
     private appointmentsRepository: AppointmentsRepository,
+    @Inject(PatientRepository)
     private patientRepository: PatientRepository
   ) {}
 
@@ -38,6 +42,9 @@ export class ConfirmAppointmentUseCase {
     }
 
     if (!appointment.status.isWaiting()) {
+      if (appointment.status.isConfirmed()) {
+        return makeRight({ appointment });
+      }
       return makeLeft(new AppointmentNotWaitingError());
     }
 

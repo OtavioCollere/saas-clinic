@@ -5,9 +5,10 @@ export class UserPresenter {
 		return {
 			id: user.id.toString(),
 			name: user.name,
-			cpf: user.cpf.toString(),
-			email: user.email.toString(),
+			cpf: user.cpf.getValue(),
+			email: user.email.getValue(),
 			role: user.role.getValue(),
+			isEmailVerified: user.isEmailVerified,
 			createdAt: user.createdAt.toISOString(),
 			updatedAt: user.updatedAt?.toISOString(),
 		};

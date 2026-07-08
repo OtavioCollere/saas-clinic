@@ -1,8 +1,9 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { type Either, makeLeft, makeRight } from '@/shared/either/either';
 import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
 import type { Franchise } from '@/domain/enterprise/entities/franchise';
-import type { ClinicRepository } from '../../repositories/clinic-repository';
-import type { FranchiseRepository } from '../../repositories/franchise-repository';
+import { ClinicRepository } from '../../repositories/clinic-repository';
+import { FranchiseRepository } from '../../repositories/franchise-repository';
 
 interface FetchFranchisesByClinicIdUseCaseRequest {
   clinicId: string;
@@ -15,10 +16,13 @@ type FetchFranchisesByClinicIdUseCaseResponse = Either<
   }
 >;
 
+@Injectable()
 export class FetchFranchisesByClinicIdUseCase {
   constructor(
+    @Inject(FranchiseRepository)
     private franchiseRepository: FranchiseRepository,
-    private clinicRepository: ClinicRepository
+    @Inject(ClinicRepository)
+    private clinicRepository: ClinicRepository,
   ) {}
 
   async execute({

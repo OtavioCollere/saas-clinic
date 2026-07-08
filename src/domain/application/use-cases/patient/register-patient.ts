@@ -1,36 +1,42 @@
-import { Injectable } from "@nestjs/common";
-import { Either, makeLeft, makeRight } from '@/shared/either/either';
+import { Inject, Injectable } from "@nestjs/common";
+import { type Either, makeLeft, makeRight, isRight, unwrapEither } from '@/shared/either/either';
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id';
 import { ClinicNotFoundError } from '@/shared/errors/clinic-not-found-error';
-import { UserNotFoundError } from '@/shared/errors/user-not-found-error';
-import { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/aesthetic-history';
-import { Anamnesis } from '@/domain/enterprise/entities/anamnesis/anamnesis';
-import { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions';
-import { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history';
-import { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment';
 import { Patient } from '@/domain/enterprise/entities/patient';
-import { AnamnesisRepository } from '../../repositories/anamnesis-repository';
 import { ClinicRepository } from '../../repositories/clinic-repository';
+import { ClinicMembershipRepository } from '../../repositories/clinic-membership-repository';
 import { PatientRepository } from '../../repositories/patient-repository';
 import { UsersRepository } from '../../repositories/users-repository';
+import { HashGenerator } from '../../cryptography/hash-generator';
+import { CpfAlreadyExistsError } from '@/shared/errors/cpf-already-exists-error';
+import { Cpf } from '@/domain/enterprise/value-objects/cpf';
+import { InvalidCpfError } from '@/shared/errors/invalid-cpf-error';
+import { Email } from '@/domain/enterprise/value-objects/email';
+import { InvalidEmailError } from '@/shared/errors/invalid-email-error';
+import { EmailAlreadyExistsError } from '@/shared/errors/email-already-exists-error';
+import { TransactionManager } from '../../transactions/transaction-manager';
+import { ClinicMembership } from '@/domain/enterprise/entities/clinic-membership';
+import { ClinicRole } from '@/domain/enterprise/value-objects/clinic-role';
+import { User } from '@/domain/enterprise/entities/user';
+import { UserRole } from '@/domain/enterprise/value-objects/user-role';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PatientCreatedEvent } from '@/domain/enterprise/events/patient-created.event';
+import { AnamnesisTokenRequestedEvent } from '@/domain/enterprise/events/anamnesis-token-requested.event';
+import crypto from 'crypto';
 
 interface RegisterPatientUseCaseRequest {
   clinicId: string;
-  personId: string;
   name: string;
+  cpf: string;
+  email: string;
+  phone?: string;
   birthDay: Date;
   address: string;
   zipCode: string;
-  anamnesis: {
-    aestheticHistory: AestheticHistory;
-    healthConditions: HealthConditions;
-    medicalHistory: MedicalHistory;
-    physicalAssessment: PhysicalAssessment;
-  };
 }
 
 type RegisterPatientUseCaseResponse = Either<
-  ClinicNotFoundError | UserNotFoundError,
+  EmailAlreadyExistsError | CpfAlreadyExistsError | InvalidCpfError | InvalidEmailError | ClinicNotFoundError,
   {
     patient: Patient;
   }
@@ -39,54 +45,133 @@ type RegisterPatientUseCaseResponse = Either<
 @Injectable()
 export class RegisterPatientUseCase {
   constructor(
+    @Inject(HashGenerator)
+    private hashGenerator: HashGenerator,
+    @Inject(PatientRepository)
     private patientRepository: PatientRepository,
-    private anamnesisRepository: AnamnesisRepository,
+    @Inject(ClinicRepository)
     private clinicRepository: ClinicRepository,
-    private usersRepository: UsersRepository
+    @Inject(ClinicMembershipRepository)
+    private clinicMembershipRepository: ClinicMembershipRepository,
+    @Inject(UsersRepository)
+    private usersRepository: UsersRepository,
+    @Inject(TransactionManager)
+    private transactionManager: TransactionManager,
+    @Inject(EventEmitter2)
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async execute({
     clinicId,
-    personId,
     name,
+    cpf,
+    email,
+    phone,
     birthDay,
     address,
     zipCode,
-    anamnesis: anamnesisData,
   }: RegisterPatientUseCaseRequest): Promise<RegisterPatientUseCaseResponse> {
-    const clinic = await this.clinicRepository.findById(clinicId);
+    // Validações de email e CPF
+    const emailExists = await this.usersRepository.findByEmail(email);
+    if (emailExists) {
+      return makeLeft(new EmailAlreadyExistsError());
+    }
 
+    const cpfExists = await this.usersRepository.findByCpf(cpf);
+    if (cpfExists) {
+      return makeLeft(new CpfAlreadyExistsError());
+    }
+
+    const isValidCpf = Cpf.isValid(cpf);
+    if (!isValidCpf) {
+      return makeLeft(new InvalidCpfError());
+    }
+
+    const isValidEmail = Email.isValid(email);
+    if (!isValidEmail) {
+      return makeLeft(new InvalidEmailError());
+    }
+
+    // Validação de clínica (antes da transação)
+    const clinic = await this.clinicRepository.findById(clinicId);
     if (!clinic) {
       return makeLeft(new ClinicNotFoundError());
     }
 
-    const user = await this.usersRepository.findById(personId);
+    // Gera senha aleatória (expira em 72 h)
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    const randomPassword = Array.from(crypto.randomBytes(8))
+      .map(b => chars[b % chars.length])
+      .join('');
+    const passwordExpiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
 
-    if (!user) {
-      return makeLeft(new UserNotFoundError());
+    // Preparação de dados
+    const passwordHash = await this.hashGenerator.hash(randomPassword);
+    const cpfVO = Cpf.create(cpf);
+    const emailVO = Email.create(email);
+
+    // Execução dentro da transação
+    const result = await this.transactionManager.run(
+      async (tx) => {
+        const user = User.create({
+          name,
+          cpf: cpfVO,
+          email: emailVO,
+          phone,
+          password: passwordHash,
+          role: UserRole.member(),
+        });
+
+        await this.usersRepository.create(user, tx);
+
+        const patient = Patient.create({
+          clinicId: new UniqueEntityId(clinicId),
+          userId: user.id,
+          name,
+          birthDay,
+          address,
+          zipCode,
+        });
+
+        await this.patientRepository.create(patient);
+
+        const membership = ClinicMembership.create({
+          userId: user.id,
+          clinicId: clinic.id,
+          role: ClinicRole.patient(),
+        });
+        await this.clinicMembershipRepository.create(membership, tx);
+
+        return makeRight({ patient, user, email: emailVO.getValue(), password: randomPassword });
+      }
+    );
+
+    if (isRight(result)) {
+      const { patient, user, email, password } = unwrapEither(result);
+      this.eventEmitter.emit(
+        'patient.created',
+        new PatientCreatedEvent(
+          patient.id.toString(),
+          user.id.toString(),
+          clinicId,
+          email,
+          password,
+          passwordExpiresAt,
+        ),
+      );
+      this.eventEmitter.emit(
+        'anamnesis.token.requested',
+        new AnamnesisTokenRequestedEvent(
+          patient.id.toString(),
+          clinicId,
+          email,
+          phone,
+          name,
+        ),
+      );
+      return makeRight({ patient });
     }
 
-    const patient = Patient.create({
-      clinicId: new UniqueEntityId(clinicId),
-      userId: new UniqueEntityId(personId),
-      name,
-      birthDay,
-      address,
-      zipCode,
-      anamnesis: Anamnesis.create({
-        patientId: new UniqueEntityId(),
-        aestheticHistory: anamnesisData.aestheticHistory,
-        healthConditions: anamnesisData.healthConditions,
-        medicalHistory: anamnesisData.medicalHistory,
-        physicalAssessment: anamnesisData.physicalAssessment,
-      }),
-    });
-
-    patient.anamnesis.patientId = patient.id;
-
-    await this.anamnesisRepository.create(patient.anamnesis);
-    await this.patientRepository.create(patient);
-
-    return makeRight({ patient });
+    return result;
   }
 }

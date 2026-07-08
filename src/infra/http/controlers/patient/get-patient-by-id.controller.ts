@@ -4,6 +4,7 @@ import { GetPatientByIdUseCase } from "@/domain/application/use-cases/patient/ge
 import {
 	Controller,
 	Get,
+	Inject,
 	NotFoundException,
 	Param,
 } from "@nestjs/common";
@@ -29,7 +30,10 @@ const getPatientByIdParamsValidationPipe = new ZodValidationPipe(getPatientByIdP
 @ApiTags("Patients")
 @Controller("/patients")
 export class GetPatientByIdController {
-	constructor(private readonly getPatientByIdUseCase: GetPatientByIdUseCase) {}
+	constructor(
+		@Inject(GetPatientByIdUseCase)
+		private readonly getPatientByIdUseCase: GetPatientByIdUseCase,
+	) {}
 
 	@Get("/:patientId")
 	@ApiOperation({

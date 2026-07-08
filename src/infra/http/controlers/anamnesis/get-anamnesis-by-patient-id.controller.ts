@@ -4,6 +4,7 @@ import { GetAnamnesisByPatientIdUseCase } from "@/domain/application/use-cases/a
 import {
 	Controller,
 	Get,
+	Inject,
 	NotFoundException,
 	Param,
 } from "@nestjs/common";
@@ -29,7 +30,10 @@ const getAnamnesisByPatientIdParamsValidationPipe = new ZodValidationPipe(getAna
 @ApiTags("Anamnesis")
 @Controller("/patients")
 export class GetAnamnesisByPatientIdController {
-	constructor(private readonly getAnamnesisByPatientIdUseCase: GetAnamnesisByPatientIdUseCase) {}
+	constructor(
+		@Inject(GetAnamnesisByPatientIdUseCase)
+		private readonly getAnamnesisByPatientIdUseCase: GetAnamnesisByPatientIdUseCase,
+	) {}
 
 	@Get("/:patientId/anamnesis")
 	@ApiOperation({
