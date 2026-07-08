@@ -42,9 +42,7 @@ export class ProcedureMapper {
       ? ProcedureStatus.active() 
       : ProcedureStatus.inactive();
 
-    const price = typeof raw.price === 'string' 
-      ? parseFloat(raw.price) 
-      : raw.price;
+    const price = Number(raw.price);
 
     return Procedure.create(
       {

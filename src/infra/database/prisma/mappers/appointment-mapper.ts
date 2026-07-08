@@ -78,9 +78,7 @@ export class AppointmentMapper {
     const status = AppointmentStatus.fromValue(raw.status);
 
     const appointmentItems = raw.appointmentItems.map((item) => {
-      const price = typeof item.price === 'string' 
-        ? parseFloat(item.price) 
-        : item.price;
+      const price = Number(item.price);
 
       return AppointmentItem.create(
         {

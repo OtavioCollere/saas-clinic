@@ -43,7 +43,7 @@ export class WhatsAppConversation extends Entity<WhatsAppConversationProps> {
   set professionalId(professionalId: UniqueEntityId | undefined) { this.props.professionalId = professionalId }
   set selectedDate(selectedDate: Date | undefined) { this.props.selectedDate = selectedDate }
   set expiresAt(expiresAt: Date) { this.props.expiresAt = expiresAt }
-  set updatedAt(updatedAt: Date) { this.props.updatedAt = updatedAt }
+  set updatedAt(updatedAt: Date | undefined) { this.props.updatedAt = updatedAt }
 
   refreshExpiry() {
     this.props.expiresAt = new Date(Date.now() + 30 * 60 * 1000)

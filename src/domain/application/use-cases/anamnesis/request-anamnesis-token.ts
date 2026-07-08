@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { type Either, makeRight } from '@/shared/either/either'
 import { UniqueEntityId } from '@/shared/entities/unique-entity-id'
 import { AnamnesisToken } from '@/domain/enterprise/entities/anamnesis-token'
-import { AnamnesisTokenRepository } from '../repositories/anamnesis-token-repository'
+import { AnamnesisTokenRepository } from '../../repositories/anamnesis-token-repository'
 
 interface RequestAnamnesisTokenUseCaseRequest {
   patientId: string

@@ -7,8 +7,8 @@ import type { AestheticHistory } from '@/domain/enterprise/entities/anamnesis/ae
 import type { HealthConditions } from '@/domain/enterprise/entities/anamnesis/health-conditions'
 import type { MedicalHistory } from '@/domain/enterprise/entities/anamnesis/medical-history'
 import type { PhysicalAssessment } from '@/domain/enterprise/entities/anamnesis/physical-assessment'
-import { AnamnesisRepository } from '../repositories/anamnesis-repository'
-import { AnamnesisTokenRepository } from '../repositories/anamnesis-token-repository'
+import { AnamnesisRepository } from '../../repositories/anamnesis-repository'
+import { AnamnesisTokenRepository } from '../../repositories/anamnesis-token-repository'
 
 interface SubmitAnamnesisViaTokenUseCaseRequest {
   token: string

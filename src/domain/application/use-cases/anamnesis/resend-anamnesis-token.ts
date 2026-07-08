@@ -3,8 +3,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { type Either, makeLeft, makeRight } from '@/shared/either/either'
 import { PatientNotFoundError } from '@/shared/errors/patient-not-found-error'
 import { AnamnesisTokenRequestedEvent } from '@/domain/enterprise/events/anamnesis-token-requested.event'
-import { PatientRepository } from '../repositories/patient-repository'
-import { UsersRepository } from '../repositories/users-repository'
+import { PatientRepository } from '../../repositories/patient-repository'
+import { UsersRepository } from '../../repositories/users-repository'
 
 interface ResendAnamnesisTokenUseCaseRequest {
   patientId: string

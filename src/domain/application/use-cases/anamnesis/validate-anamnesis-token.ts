@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { type Either, makeLeft, makeRight } from '@/shared/either/either'
 import { InvalidAnamnesisTokenError } from '@/shared/errors/invalid-anamnesis-token-error'
-import { AnamnesisTokenRepository } from '../repositories/anamnesis-token-repository'
-import { PatientRepository } from '../repositories/patient-repository'
+import { AnamnesisTokenRepository } from '../../repositories/anamnesis-token-repository'
+import { PatientRepository } from '../../repositories/patient-repository'
 
 interface ValidateAnamnesisTokenUseCaseRequest {
   token: string
