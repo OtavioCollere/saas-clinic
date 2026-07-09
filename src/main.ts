@@ -19,17 +19,39 @@ async function bootstrap() {
 	const configService = app.get(ConfigService);
 	const port = configService.get("PORT") || 3000;
 
-	// Lista de origens permitidas
-	const allowedOrigins = [
+	const configuredOrigins = (process.env.CORS_ORIGINS ?? process.env.APP_URL ?? "")
+		.split(",")
+		.map((origin) => origin.trim())
+		.filter(Boolean);
+
+	const allowedOrigins = new Set([
 		"http://localhost:3005",
 		"http://localhost:3000",
 		"http://127.0.0.1:3005",
 		"http://127.0.0.1:3000",
-	];
+		"https://cliniker.com.br",
+		"https://www.cliniker.com.br",
+		...configuredOrigins,
+	]);
 	
 
 	app.enableCors({
-		origin: allowedOrigins,
+		origin: (origin, callback) => {
+			if (!origin) {
+				callback(null, true);
+				return;
+			}
+
+			let isAllowedCloudRunOrigin = false;
+
+			try {
+				isAllowedCloudRunOrigin = new URL(origin).hostname.endsWith(".run.app");
+			} catch {
+				isAllowedCloudRunOrigin = false;
+			}
+
+			callback(null, allowedOrigins.has(origin) || isAllowedCloudRunOrigin);
+		},
 		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 		allowedHeaders: [
 			"Content-Type",

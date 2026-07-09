@@ -99,7 +99,7 @@ export class AuthenticateUserController {
         reply.setCookie("access_token", response.access_token, {
           httpOnly: true,
           secure: isProduction,
-          sameSite: isProduction ? "strict" : "lax",
+          sameSite: isProduction ? "none" : "lax",
           path: "/",
           maxAge: 60 * 15,
         })
@@ -107,7 +107,7 @@ export class AuthenticateUserController {
         reply.setCookie("refresh_token", response.refresh_token, {
           httpOnly: true,
           secure: isProduction,
-          sameSite: isProduction ? "strict" : "lax",
+          sameSite: isProduction ? "none" : "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 30, // 30 days
         })

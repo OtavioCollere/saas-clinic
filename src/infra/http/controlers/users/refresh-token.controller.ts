@@ -58,7 +58,7 @@ export class RefreshTokenController {
     reply.setCookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
       maxAge: 60 * 15,
     });

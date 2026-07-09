@@ -72,14 +72,14 @@ export class LogoutController {
 			path: '/',
 			httpOnly: true,
 			secure: isProduction,
-			sameSite: isProduction ? "strict" : "lax",
+			sameSite: isProduction ? "none" : "lax",
 		});
 
 		(reply as any).clearCookie('refresh_token', {
 			path: '/',
 			httpOnly: true,
 			secure: isProduction,
-			sameSite: isProduction ? "strict" : "lax",
+			sameSite: isProduction ? "none" : "lax",
 		});
 
 		return {

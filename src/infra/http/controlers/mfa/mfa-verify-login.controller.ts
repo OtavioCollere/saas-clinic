@@ -81,7 +81,7 @@ export class MfaVerifyLoginController {
     reply.cookie('access_token', access_token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       maxAge: 15 * 60, // 15 minutos em segundos
     });
@@ -89,7 +89,7 @@ export class MfaVerifyLoginController {
     reply.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 dias em segundos
     });
@@ -99,4 +99,3 @@ export class MfaVerifyLoginController {
     };
   }
 }
-
