@@ -4,10 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-  workflow_run:
-    workflows: ["CI Backend"]
-    types: [completed]
-    branches: [main]
 
 concurrency:
   group: cd-backend-${{ github.ref }}
@@ -26,14 +22,11 @@ env:
 
 jobs:
   deploy:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
@@ -49,7 +42,7 @@ jobs:
 
       - name: Build & Push Docker image
         run: |
-          TAG="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          TAG="${{ github.sha }}"
 
           docker build \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:$TAG \
@@ -69,7 +62,7 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           CLOUDSQL_INSTANCE: ${{ secrets.CLOUDSQL_INSTANCE }}
         run: |
-          TAG="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          TAG="${{ github.sha }}"
           CLOUDSQL_ARGS=()
 
           if [ -n "$CLOUDSQL_INSTANCE" ]; then
