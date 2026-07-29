@@ -27,6 +27,8 @@ model User {
   clinicMemberships    ClinicMembership[]
   professionals        Professional[]
   patients             Patient[]
+  inviteTokensCreated  InviteToken[]         @relation("InviteTokenCreator")
+  inviteTokensUsed     InviteToken[]         @relation("InviteTokenUser")
 
   @@map("users")
   @@index([email])
@@ -420,4 +422,23 @@ model AnamnesisToken {
   @@index([token])
   @@index([patientId, status])
   @@map("anamnesis_tokens")
+}
+
+model InviteToken {
+  id          String    @id @default(uuid())
+  token       String    @unique
+  createdById String
+  usedById    String?
+  status      String    @default("PENDING")
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  usedAt      DateTime?
+
+  createdBy User  @relation("InviteTokenCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  usedBy    User? @relation("InviteTokenUser", fields: [usedById], references: [id], onDelete: SetNull)
+
+  @@map("invite_tokens")
+  @@index([token])
+  @@index([createdById])
+  @@index([status])
 }

@@ -17,6 +17,8 @@ import { PasswordVerificationRepository } from '@/domain/application/repositorie
 import { WhatsAppConversationRepository } from '@/domain/application/repositories/whatsapp-conversation-repository';
 import { NotificationLogRepository } from '@/domain/application/repositories/notification-log-repository';
 import { AnamnesisTokenRepository } from '@/domain/application/repositories/anamnesis-token-repository';
+import { InviteTokenRepository } from '@/domain/application/repositories/invite-token-repository';
+import { PrismaInviteTokenRepository } from './prisma/repositories/prisma-invite-token-repository';
 import { PrismaUsersRepository } from './prisma/repositories/prisma-users-repository';
 import { PrismaMfaSettingsRepository } from './prisma/repositories/prisma-mfa-settings-repository';
 import { PrismaSessionsRepository } from './prisma/repositories/prisma-sessions-repository';
@@ -58,6 +60,7 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     {provide : WhatsAppConversationRepository, useClass : PrismaWhatsAppConversationRepository},
     {provide : NotificationLogRepository, useClass : PrismaNotificationLogRepository},
     {provide : AnamnesisTokenRepository, useClass : PrismaAnamnesisTokenRepository},
+    {provide : InviteTokenRepository, useClass : PrismaInviteTokenRepository},
   ],
   exports: [
     PrismaService,
@@ -79,6 +82,7 @@ import { PrismaTransactionManager } from './prisma-transaction-manager';
     WhatsAppConversationRepository,
     NotificationLogRepository,
     AnamnesisTokenRepository,
+    InviteTokenRepository,
   ],
 })
 export class DatabaseModule {}
