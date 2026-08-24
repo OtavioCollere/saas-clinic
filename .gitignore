@@ -14,3 +14,8 @@ data
 newrelic_agent.log
 newrelic.js
 newrelic.cjs
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/*.tfvars
