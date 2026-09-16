@@ -60,6 +60,7 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_TLS: ${{ secrets.REDIS_TLS }}
           CLOUDSQL_INSTANCE: ${{ secrets.CLOUDSQL_INSTANCE }}
         run: |
           TAG="${{ github.sha }}"
@@ -77,6 +78,7 @@ jobs:
           REDIS_HOST=$REDIS_HOST
           REDIS_PORT=$REDIS_PORT
           REDIS_PASSWORD=$REDIS_PASSWORD
+          REDIS_TLS=$REDIS_TLS
           NODE_ENV=production
           EOF
 

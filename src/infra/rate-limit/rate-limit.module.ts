@@ -17,6 +17,7 @@ import { RateLimitService } from './rate-limit.service';
           port,
           password: password || undefined,
           db: database,
+          tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
         });
       },
     },

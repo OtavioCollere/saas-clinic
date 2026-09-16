@@ -44,6 +44,7 @@ import { LoggerModule } from 'nestjs-pino';
         port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD || undefined,
         db: process.env.REDIS_DATABASE ? Number.parseInt(process.env.REDIS_DATABASE, 10) : undefined,
+        tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
       },
     }),
     AuthModule,
