@@ -18,7 +18,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const publicKey = process.env.JWT_PUBLIC_KEY as string;
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // O login entrega o token no cookie access_token; sem ler o cookie aqui,
+      // toda rota autenticada responde 401 mesmo logo apos um login valido.
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: { cookies?: Record<string, string> }) =>
+          request?.cookies?.access_token ?? null,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       secretOrKey: Buffer.from(publicKey, 'base64'),
       algorithms: ['RS256'],
     })
